@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/eventImage"
-        android:layout_width="289dp"
-        android:layout_height="145dp"
+        android:layout_width="381dp"
+        android:layout_height="159dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
