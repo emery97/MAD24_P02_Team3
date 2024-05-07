@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/abhaya_libre</item>
+        <item>@font/alike_angular</item>
+        <item>@font/amarante</item>
+        <item>@font/berkshire_swash</item>
+        <item>@font/englebert</item>
+        <item>@font/grenze_gotisch_thin</item>
+    </array>
+</resources>
