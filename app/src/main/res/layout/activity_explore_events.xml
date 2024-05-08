@@ -7,25 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".ExploreEvents">
 
-    <!-- Header Fragment -->
-    <fragment
-        android:id="@+id/headerFragment"
-        android:name="sg.edu.np.mad.madassignment.HeaderFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Header -->
 
-
-
-    <!-- Footer Fragment -->
-    <fragment
-        android:id="@+id/FooterFragment"
-        android:name="sg.edu.np.mad.madassignment.FooterFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <include
+        android:id="@+id/include"
+        layout="@layout/header"></include>
 
     <SearchView
         android:id="@+id/searchView"
@@ -33,17 +19,7 @@
         android:layout_height="44dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerFragment" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/exploreView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/FooterFragment"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/filters" />
+        app:layout_constraintTop_toBottomOf="@+id/include" />
 
     <LinearLayout
         android:id="@+id/filters"
@@ -81,5 +57,22 @@
             android:layout_weight="1"
             android:text="filter3" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/exploreView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/footer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/filters" />
+
+    <include
+        android:id="@+id/footer"
+        layout="@layout/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
