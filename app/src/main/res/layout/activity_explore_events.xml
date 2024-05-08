@@ -8,11 +8,11 @@
     tools:context=".ExploreEvents">
 
     <!-- Header -->
-
     <include
         android:id="@+id/include"
         layout="@layout/header"></include>
 
+    <!-- Search -->
     <SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
@@ -21,6 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include" />
 
+    <!-- Filters -->
     <LinearLayout
         android:id="@+id/filters"
         android:layout_width="match_parent"
@@ -43,7 +44,7 @@
 
 
         <Button
-            android:id="@+id/filter3"
+            android:id="@+id/filter2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
