@@ -2,7 +2,6 @@ package sg.edu.np.mad.madassignment;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -25,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        TextView signup = findViewById(R.id.signup);
+        TextView signup = findViewById(R.id.signin);
         TextView register = findViewById(R.id.register);
 
         signup.setOnClickListener(new View.OnClickListener() {

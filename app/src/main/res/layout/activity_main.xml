@@ -50,7 +50,7 @@
             android:textSize="34dp" />
 
         <TextView
-            android:id="@+id/signup"
+            android:id="@+id/signin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="65dp"
