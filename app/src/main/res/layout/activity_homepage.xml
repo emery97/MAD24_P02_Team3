@@ -6,32 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Header Fragment -->
-    <fragment
-        android:id="@+id/headerFragment"
-        android:name="sg.edu.np.mad.madassignment.HeaderFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include
+        android:id="@+id/include"
+        layout="@layout/header"></include>
 
-    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/eventRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/headerFragment"
-        app:layout_constraintBottom_toTopOf="@id/FooterFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/include" />
 
-    <!-- Footer Fragment -->
-    <fragment
-        android:id="@+id/FooterFragment"
-        android:name="sg.edu.np.mad.madassignment.FooterFragment"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <include
+        android:id="@+id/include2"
+        layout="@layout/footer"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
