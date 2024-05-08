@@ -17,11 +17,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ImageView eventImage;
         public TextView eventTitle;
+        public TextView eventDate;
 
         public EventViewHolder(View itemView) {
             super(itemView);
             eventImage = itemView.findViewById(R.id.eventImage);
             eventTitle = itemView.findViewById(R.id.eventTitle);
+            eventDate = itemView.findViewById(R.id.eventDate);
         }
     }
 
@@ -40,6 +42,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(EventViewHolder holder, int position) {
         Event event = eventList.get(position);
         holder.eventTitle.setText(event.getTitle());
+        holder.eventDate.setText(event.getDate());
         holder.eventImage.setImageResource(event.getImageResId());  // Assuming images are drawable resources
     }
 
