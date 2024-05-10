@@ -1,7 +1,6 @@
-package sg.edu.np.mad.madassignment;
+package sg.edu.np.mad.ticketFinder;
 
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;

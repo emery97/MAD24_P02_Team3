@@ -1,4 +1,4 @@
-package sg.edu.np.mad.madassignment;
+package sg.edu.np.mad.ticketFinder;
 
 import org.junit.Test;
 

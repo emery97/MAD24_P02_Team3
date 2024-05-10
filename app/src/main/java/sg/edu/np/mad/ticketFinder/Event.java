@@ -1,4 +1,4 @@
-package sg.edu.np.mad.madassignment;
+package sg.edu.np.mad.ticketFinder;
 
 public class Event {
     private final int imageResId;
