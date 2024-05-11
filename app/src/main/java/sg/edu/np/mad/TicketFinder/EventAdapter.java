@@ -1,4 +1,4 @@
-package sg.edu.np.mad.ticketFinder;
+package sg.edu.np.mad.TicketFinder;
 
 import android.view.LayoutInflater;
 import android.view.View;
