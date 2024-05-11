@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "sg.edu.np.mad.madassignment"
+    namespace = "sg.edu.np.mad.ticketFinder"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "sg.edu.np.mad.madassignment"
+        applicationId = "sg.edu.np.mad.ticketFinder"
         minSdk = 21
         targetSdk = 34
         versionCode = 1
