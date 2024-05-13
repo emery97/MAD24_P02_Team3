@@ -1,15 +1,15 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import android.widget.EditText;
-import android.widget.Button;
-import android.widget.Toast;
 
 public class payment extends AppCompatActivity {
     private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode;

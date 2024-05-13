@@ -13,6 +13,11 @@
         android:theme="@style/Theme.Madassignment"
         tools:targetApi="31">
         <activity
+            android:name=".profilePage"
+            android:exported="true">
+
+        </activity>
+        <activity
             android:name=".payment"
             android:exported="true">
             <intent-filter>
