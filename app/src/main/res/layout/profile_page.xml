@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -52,8 +52,8 @@
                         app:layout_constraintEnd_toEndOf="@id/profilePicture"
                         app:layout_constraintTop_toTopOf="@id/profilePicture"
                         android:layout_marginEnd="-110dp"
-                    android:layout_marginTop="140dp"
-                    app:srcCompat="@drawable/edittingicon" />
+                        android:layout_marginTop="140dp"
+                        app:srcCompat="@drawable/edittingicon" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -65,8 +65,7 @@
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_editor_absoluteX="16dp"
-                    app:layout_editor_absoluteY="54dp"
-                    tools:layout_editor_absoluteY="0dp">
+                    app:layout_editor_absoluteY="54dp">
 
 
                     <TextView
@@ -119,7 +118,7 @@
                         android:minHeight="48dp"
                         android:text="MAD Scientist"
                         android:textColor="@android:color/darker_gray"
-                        android:textSize="20sp"
+                        android:textSize="25sp"
                         android:textStyle="bold"
                         app:layout_constraintTop_toBottomOf="@+id/password" />
 
@@ -157,12 +156,25 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintTop_toBottomOf="@+id/Password" />
-
+                    <Button
+                        android:id="@+id/saveButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Save"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:textSize="15dp"
+                        android:background="#4b0082"
+                        android:layout_marginTop="25dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="20dp"
+                        android:visibility="invisible">
+                    </Button>
 
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-        
+
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
