@@ -5,6 +5,22 @@
       <entry key="EventDetails">
         <State />
       </entry>
+      <entry key="MainActivity (1)">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-13T18:04:10.005116900Z" />
+        </State>
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -20,6 +36,9 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-05-13T11:20:10.787514Z" />
         </State>
+      </entry>
+      <entry key="profilePage">
+        <State />
       </entry>
     </value>
   </component>

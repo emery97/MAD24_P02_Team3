@@ -32,7 +32,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="210dp"
+        android:layout_marginTop="250dp"
         android:backgroundTint="#000000"
         android:text="Enter"
         android:textSize="20sp" />
@@ -56,4 +56,24 @@
         android:layout_marginRight="97dp"
         android:text="Username"
         android:textSize="16dp" />
+
+    <CheckBox
+        android:id="@+id/RememberMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="180sp"
+        android:layout_marginRight="75sp"
+        android:text="Remember Me"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/forgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="195dp"
+        android:text="Forgot password?"
+        android:textColor="#0056FF" />
 </FrameLayout>
