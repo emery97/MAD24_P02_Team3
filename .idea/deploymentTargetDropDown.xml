@@ -2,7 +2,48 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="EventDetails">
+        <State />
+      </entry>
+      <entry key="MainActivity (1)">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-11T15:05:10.888114800Z" />
+        </State>
+      </entry>
       <entry key="app">
+        <State />
+      </entry>
+      <entry key="homepage">
+        <State />
+      </entry>
+      <entry key="homepage (1)">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_30.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-11T15:05:43.879379900Z" />
+        </State>
+      </entry>
+      <entry key="payment (1)">
         <State />
       </entry>
     </value>
