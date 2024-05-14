@@ -34,9 +34,10 @@ public class ExploreEvents extends AppCompatActivity {
 
         for (int i = 0; i < 10; i++) {
             String name = "Name" + new Random().nextInt(100);
+            String artist = "Artist" + new Random().nextInt(100);
             String date = "Date" + new Random().nextInt(100);
             int img = R.drawable.img;
-            tempEvents.add(new Event(img,name,date));
+            tempEvents.add(new Event(img,name,artist,date));
         }
 
         RecyclerView recyclerView = findViewById(R.id.exploreView);
