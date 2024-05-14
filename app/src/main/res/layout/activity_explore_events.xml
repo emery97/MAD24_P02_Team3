@@ -13,17 +13,18 @@
         layout="@layout/header"></include>
 
     <!-- Search -->
+
+    <!-- Filters -->
     <SearchView
         android:id="@+id/searchEvents"
-        android:layout_width="match_parent"
+        android:layout_width="285dp"
         android:layout_height="44dp"
         android:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/searchToggle"
         app:layout_constraintTop_toBottomOf="@+id/include"
         app:queryHint="Search events ..." />
 
-    <!-- Filters -->
     <LinearLayout
         android:id="@+id/filters"
         android:layout_width="match_parent"
@@ -77,5 +78,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <Button
+        android:id="@+id/searchToggle"
+        android:layout_width="134dp"
+        android:layout_height="44dp"
+        android:text="Search Title"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/filters"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

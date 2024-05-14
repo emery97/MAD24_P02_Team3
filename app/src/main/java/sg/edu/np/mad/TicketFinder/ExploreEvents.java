@@ -1,6 +1,8 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ExploreEvents extends AppCompatActivity {
+    private boolean searchByArtist = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +31,11 @@ public class ExploreEvents extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // blank recycler view
         ArrayList<Event> noEvents = new ArrayList<>();
 
+        //temp event list
         ArrayList<Event> tempEvents = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -40,6 +46,7 @@ public class ExploreEvents extends AppCompatActivity {
             tempEvents.add(new Event(img,name,artist,date));
         }
 
+        //set recycler view, show blank
         RecyclerView recyclerView = findViewById(R.id.exploreView);
         EventAdapter mAdapter = new EventAdapter(noEvents);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
@@ -47,6 +54,25 @@ public class ExploreEvents extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+
+        // search
+        // toggle search
+        Button searchToggle = findViewById(R.id.searchToggle);
+        searchToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!searchByArtist){
+                    searchByArtist = true;
+                    searchToggle.setText("Search Artist");
+                    Toast.makeText(ExploreEvents.this, "Now searching by artist...", Toast.LENGTH_SHORT).show();
+                } else{
+                    searchByArtist = false;
+                    searchToggle.setText("Search Title");
+                    Toast.makeText(ExploreEvents.this, "Now searching by title...", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
         SearchView searchEvents = findViewById(R.id.searchEvents);
         searchEvents.clearFocus();
@@ -66,8 +92,14 @@ public class ExploreEvents extends AppCompatActivity {
                 ArrayList<Event> searchList = new ArrayList<>();
 
                 for (Event event : tempEvents){
-                    if (event.getTitle().toLowerCase().contains(newText.toLowerCase()) || event.getArtist().toLowerCase().contains(newText.toLowerCase())){
-                        searchList.add(event);
+                    if (searchByArtist) {
+                        if (event.getArtist().toLowerCase().contains(newText.toLowerCase())){
+                            searchList.add(event);
+                        }
+                    } else {
+                        if (event.getTitle().toLowerCase().contains(newText.toLowerCase())){
+                            searchList.add(event);
+                        }
                     }
                 }
 
