@@ -66,7 +66,7 @@ public class ExploreEvents extends AppCompatActivity {
                 ArrayList<Event> searchList = new ArrayList<>();
 
                 for (Event event : tempEvents){
-                    if (event.getTitle().toLowerCase().contains(newText.toLowerCase())){
+                    if (event.getTitle().toLowerCase().contains(newText.toLowerCase()) || event.getArtist().toLowerCase().contains(newText.toLowerCase())){
                         searchList.add(event);
                     }
                 }
