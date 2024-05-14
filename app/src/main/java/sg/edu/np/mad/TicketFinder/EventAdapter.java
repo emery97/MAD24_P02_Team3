@@ -8,11 +8,21 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
-    private final List<Event> eventList;
+    private ArrayList<Event> eventList;
+
+    public void setSearchList(ArrayList<Event> searchList) {
+        this.eventList = searchList;
+        notifyDataSetChanged();
+    }
+    public void clear() {
+        eventList.clear();
+        notifyDataSetChanged();
+    }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ImageView eventImage;
@@ -27,7 +37,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
-    public EventAdapter(List<Event> eventList) {
+    public EventAdapter(ArrayList<Event> eventList) {
         this.eventList = eventList;
     }
 

@@ -14,12 +14,14 @@
 
     <!-- Search -->
     <SearchView
-        android:id="@+id/searchView"
+        android:id="@+id/searchEvents"
         android:layout_width="match_parent"
         android:layout_height="44dp"
+        android:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include" />
+        app:layout_constraintTop_toBottomOf="@+id/include"
+        app:queryHint="Search events ..." />
 
     <!-- Filters -->
     <LinearLayout
@@ -32,7 +34,7 @@
         app:layout_constraintBottom_toTopOf="@id/exploreView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchView">
+        app:layout_constraintTop_toBottomOf="@+id/searchEvents">
 
         <Button
             android:id="@+id/filter1"

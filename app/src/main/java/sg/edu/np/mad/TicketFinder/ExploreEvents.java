@@ -1,9 +1,11 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -26,6 +28,7 @@ public class ExploreEvents extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        ArrayList<Event> noEvents = new ArrayList<>();
 
         ArrayList<Event> tempEvents = new ArrayList<>();
 
@@ -37,12 +40,43 @@ public class ExploreEvents extends AppCompatActivity {
         }
 
         RecyclerView recyclerView = findViewById(R.id.exploreView);
-        EventAdapter mAdapter = new EventAdapter(tempEvents);
+        EventAdapter mAdapter = new EventAdapter(noEvents);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
 
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
 
+        SearchView searchEvents = findViewById(R.id.searchEvents);
+        searchEvents.clearFocus();
+        searchEvents.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty()) {
+                    mAdapter.clear();
+                    return true;
+                }
+
+                ArrayList<Event> searchList = new ArrayList<>();
+
+                for (Event event : tempEvents){
+                    if (event.getTitle().toLowerCase().contains(newText.toLowerCase())){
+                        searchList.add(event);
+                    }
+                }
+
+                if (searchList.isEmpty()){
+                    Toast.makeText(ExploreEvents.this, "No events found", Toast.LENGTH_SHORT).show();
+                }
+                mAdapter.setSearchList(searchList);
+
+                return true;
+            }
+        });
     }
 }
