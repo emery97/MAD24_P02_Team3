@@ -71,6 +71,10 @@ public class Register extends Fragment {
                             public void onSuccess(DocumentReference documentReference) {
                                 Log.d(TAG, "User added successfully: " + documentReference.getId());
                                 Toast.makeText(getActivity(), "Registered Successfully", Toast.LENGTH_SHORT).show();
+                                Name.setText("");
+                                Email.setText("");
+                                PhoneNumber.setText("");
+                                Password.setText("");
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
