@@ -48,7 +48,7 @@ public class ExploreEvents extends AppCompatActivity {
 
         //set recycler view, show blank
         RecyclerView recyclerView = findViewById(R.id.exploreView);
-        EventAdapter mAdapter = new EventAdapter(noEvents);
+        EventAdapter mAdapter = new EventAdapter(ExploreEvents.this, noEvents);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
 
         recyclerView.setLayoutManager(mLayoutManager);

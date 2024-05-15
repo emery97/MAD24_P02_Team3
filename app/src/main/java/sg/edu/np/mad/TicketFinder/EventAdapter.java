@@ -1,19 +1,26 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private ArrayList<Event> eventList;
+    private Context context;
 
     public void setSearchList(ArrayList<Event> searchList) {
         this.eventList = searchList;
@@ -25,6 +32,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
+        public ConstraintLayout eventCard;
         public ImageView eventImage;
         public TextView eventTitle;
         public TextView eventArtist;
@@ -32,6 +40,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         public EventViewHolder(View itemView) {
             super(itemView);
+            eventCard = itemView.findViewById(R.id.eventCard);
             eventImage = itemView.findViewById(R.id.eventImage);
             eventTitle = itemView.findViewById(R.id.eventTitle);
             eventArtist = itemView.findViewById(R.id.eventArtist);
@@ -39,8 +48,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
-    public EventAdapter(ArrayList<Event> eventList) {
-        this.eventList = eventList;
+    public EventAdapter(Context context, ArrayList<Event> eventList) {
+         this.context = context;
+         this.eventList = eventList;
     }
 
     @Override
@@ -57,6 +67,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.eventArtist.setText(event.getArtist());
         holder.eventDate.setText(event.getDate());
         holder.eventImage.setImageResource(event.getImageResId());  // Assuming images are drawable resources
+
+        holder.eventCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, EventDetails.class);
+                intent.putExtra("event", event);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

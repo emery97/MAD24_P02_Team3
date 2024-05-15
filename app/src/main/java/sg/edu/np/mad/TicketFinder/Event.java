@@ -1,6 +1,8 @@
 package sg.edu.np.mad.TicketFinder;
 
-public class Event {
+import java.io.Serializable;
+
+public class Event implements Serializable {
     private final int imageResId;
     private final String title;
     private float price;

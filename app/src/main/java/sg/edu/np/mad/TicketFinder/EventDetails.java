@@ -1,7 +1,9 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,6 +26,10 @@ public class EventDetails extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        Intent intent = getIntent();
+        Event eventObj = (Event) getIntent().getSerializableExtra("event");
+        Log.i("event", eventObj.getTitle()); // testing
 
         Button showMapButton = findViewById(R.id.showMapButton);
         showMapButton.setOnClickListener(new View.OnClickListener() {
