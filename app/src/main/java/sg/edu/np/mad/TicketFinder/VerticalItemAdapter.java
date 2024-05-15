@@ -6,31 +6,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class VerticalItemAdapter extends RecyclerView.Adapter<VerticalItemAdapter.VerticalItemViewHolder> {
 
-    private ArrayList<Event> eventList;
+    private ArrayList<Event> recoList;
 
-    public void setSearchList(ArrayList<Event> searchList) {
-        this.eventList = searchList;
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        eventList.clear();
-        notifyDataSetChanged();
-    }
-
-    public static class EventViewHolder extends RecyclerView.ViewHolder {
+    public static class VerticalItemViewHolder extends RecyclerView.ViewHolder {
         public ImageView eventImage;
         public TextView eventTitle;
         public TextView eventArtist;
         public TextView eventDate;
 
-        public EventViewHolder(View itemView) {
+        public VerticalItemViewHolder(View itemView) {
             super(itemView);
             eventImage = itemView.findViewById(R.id.eventImage);
             eventTitle = itemView.findViewById(R.id.eventTitle);
@@ -39,20 +30,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
-    public EventAdapter(ArrayList<Event> eventList) {
-        this.eventList = eventList;
+    public VerticalItemAdapter(ArrayList<Event> recoList) {
+        this.recoList = recoList;
     }
 
+    @NonNull
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public VerticalItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_event, parent, false);
-        return new EventViewHolder(itemView);
+        return new VerticalItemViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(EventViewHolder holder, int position) {
-        Event event = eventList.get(position);
+    public void onBindViewHolder(@NonNull VerticalItemViewHolder holder, int position) {
+        Event event = recoList.get(position);
         holder.eventTitle.setText(event.getTitle());
         holder.eventArtist.setText(event.getArtist());
         holder.eventDate.setText(event.getDate());
@@ -61,6 +53,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     @Override
     public int getItemCount() {
-        return eventList.size();
+        return recoList.size();
     }
 }
