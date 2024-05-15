@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "532652389189",
+    "project_id": "ticket-finder-df243",
+    "storage_bucket": "ticket-finder-df243.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532652389189:android:6d1618a0819022d327842c",
+        "android_client_info": {
+          "package_name": "sg.edu.np.mad.TicketFinder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZbDWvdRL8WQCurneL0wrBPdZXzUnKQa0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
