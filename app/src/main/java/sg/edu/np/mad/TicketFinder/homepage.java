@@ -17,7 +17,7 @@ public class homepage extends AppCompatActivity {
     private RecyclerView eventRecyclerView;
     private EventAdapter eventAdapter;
     private RecyclerView verticalRecyclerView;
-    private VerticalItemAdapter verticalItemAdapter;
+    private EventAdapter verticalItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +33,13 @@ public class homepage extends AppCompatActivity {
         // Horizontal RecyclerView
         eventRecyclerView = findViewById(R.id.eventRecyclerView);
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        eventAdapter = new EventAdapter(getEventList());
+        eventAdapter = new EventAdapter(homepage.this, getEventList());
         eventRecyclerView.setAdapter(eventAdapter);
 
         // Vertical RecyclerView
         verticalRecyclerView = findViewById(R.id.verticalRecyclerView);
         verticalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        verticalItemAdapter = new VerticalItemAdapter(getRecoList());
+        verticalItemAdapter = new EventAdapter(homepage.this, getRecoList());
         verticalRecyclerView.setAdapter(verticalItemAdapter);
     }
 
