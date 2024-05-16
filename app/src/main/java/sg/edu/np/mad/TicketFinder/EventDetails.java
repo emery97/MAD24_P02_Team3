@@ -50,5 +50,6 @@ public class EventDetails extends AppCompatActivity {
                 mapDialog.show();
             }
         });
+        Footer.setUpFooter(this);
     }
 }
