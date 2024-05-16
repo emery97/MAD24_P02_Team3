@@ -42,6 +42,9 @@ public class profilePage extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton); // initialize saveButton
         passwordSet = regPassword.getText().toString();
 
+        // Set up footer buttons
+        Footer.setUpFooter(this);
+
         // onclicklistener for showing password
         showPassword.setOnClickListener(new View.OnClickListener() {
             @Override

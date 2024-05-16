@@ -1,6 +1,9 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +44,9 @@ public class homepage extends AppCompatActivity {
         verticalRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         verticalItemAdapter = new EventAdapter(homepage.this, getRecoList());
         verticalRecyclerView.setAdapter(verticalItemAdapter);
+
+        // for navbar
+        Footer.setUpFooter(this);
     }
 
     private ArrayList<Event> getRecoList() {

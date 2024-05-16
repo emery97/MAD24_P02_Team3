@@ -111,5 +111,8 @@ public class ExploreEvents extends AppCompatActivity {
                 return true;
             }
         });
+
+        // for navbar
+        Footer.setUpFooter(this);
     }
 }
