@@ -66,7 +66,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.eventTitle.setText(event.getTitle());
         holder.eventArtist.setText(event.getArtist());
         holder.eventDate.setText(event.getDate());
-        holder.eventImage.setImageResource(event.getImageResId());  // Assuming images are drawable resources
+        holder.eventImage.setImageResource(event.getImageResId()); 
 
         holder.eventCard.setOnClickListener(new View.OnClickListener() {
             @Override
