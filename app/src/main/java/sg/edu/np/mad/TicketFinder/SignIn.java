@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,7 +15,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class SignIn extends Fragment {
     private EditText usernameField;
@@ -22,6 +30,7 @@ public class SignIn extends Fragment {
     private Button submitButton;
     private CheckBox Remember;
     private TextView forgotpassword;
+    private FirebaseFirestore db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,12 +41,13 @@ public class SignIn extends Fragment {
         submitButton = view.findViewById(R.id.Submit);
         Remember = view.findViewById(R.id.RememberMe);
         forgotpassword = view.findViewById(R.id.forgotPassword);
+        db = FirebaseFirestore.getInstance();
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (validateInput()) {
-                    Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
+                    checkCredentials();
                 } else {
                     Toast.makeText(getActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
@@ -60,6 +70,33 @@ public class SignIn extends Fragment {
         String password = passwordField.getText().toString();
 
         return !username.isEmpty() && !password.isEmpty();  // Both fields must be filled
+    }
+
+    private void  checkCredentials() {
+        String username = usernameField.getText().toString().trim();
+        String password = passwordField.getText().toString().trim();
+
+        db.collection("Account")
+                .whereEqualTo("Name", username)
+                .whereEqualTo("Password", password)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Valid credentials, navigate to Homepage
+                                Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getActivity(), homepage.class);
+                                startActivity(intent);
+                                getActivity().finish(); // Close the SignIn fragment
+                            }
+                        } else {
+                            // Invalid credentials
+                            Toast.makeText(getActivity(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void showForgotPasswordDialog(Context context) {

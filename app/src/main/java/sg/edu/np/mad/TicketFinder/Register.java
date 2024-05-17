@@ -17,8 +17,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 

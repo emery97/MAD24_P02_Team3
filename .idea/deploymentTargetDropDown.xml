@@ -2,6 +2,22 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="MainActivity (1)">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-15T04:47:56.504469500Z" />
+        </State>
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -15,7 +31,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-16T22:21:39.735174900Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-05-15T00:23:00.448250800Z" />
         </State>
       </entry>
     </value>
