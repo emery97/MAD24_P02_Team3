@@ -20,6 +20,9 @@ Entertainment
    
 ### Stage 2 
 1. Allow users to review booking history
+2. Reminder Function for user (POSTING to database)
+      i. Choose Date
+      ii. Things to bring for concert
 
 ### UI
 1. home page
