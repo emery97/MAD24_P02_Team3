@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +22,13 @@ import java.util.Random;
 
 public class ExploreEvents extends AppCompatActivity {
     private boolean searchByArtist = false;
+    private EventAdapter mAdapter;
+    private RecyclerView recyclerView;
+
+    // blank recycler view
+    ArrayList<Event> noEvents = new ArrayList<>();
+    //temp event list
+    ArrayList<Event> tempEvents = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +41,7 @@ public class ExploreEvents extends AppCompatActivity {
             return insets;
         });
 
-        // blank recycler view
-        ArrayList<Event> noEvents = new ArrayList<>();
-
-        //temp event list
-        ArrayList<Event> tempEvents = new ArrayList<>();
-
+        // init temp events
         for (int i = 0; i < 10; i++) {
             String name = "Name" + new Random().nextInt(100);
             String artist = "Artist" + new Random().nextInt(100);
@@ -47,13 +51,11 @@ public class ExploreEvents extends AppCompatActivity {
         }
 
         //set recycler view, show blank
-        RecyclerView recyclerView = findViewById(R.id.exploreView);
-        EventAdapter mAdapter = new EventAdapter(ExploreEvents.this, noEvents);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-
-        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView = findViewById(R.id.exploreView);
+        mAdapter = new EventAdapter(ExploreEvents.this, noEvents);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+        setLayoutManager(getResources().getConfiguration().orientation); // change based on phone orientation
 
         // search
         // toggle search
@@ -73,7 +75,7 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
-
+        // searchbar function
         SearchView searchEvents = findViewById(R.id.searchEvents);
         searchEvents.clearFocus();
         searchEvents.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -114,5 +116,19 @@ public class ExploreEvents extends AppCompatActivity {
 
         // for navbar
         Footer.setUpFooter(this);
+    }
+
+    private void setLayoutManager(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns for landscape mode
+        } else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this)); // 1 column for portrait mode
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setLayoutManager(newConfig.orientation);
     }
 }
