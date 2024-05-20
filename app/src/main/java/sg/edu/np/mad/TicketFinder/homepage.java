@@ -21,6 +21,7 @@ public class homepage extends AppCompatActivity {
     private EventAdapter eventAdapter;
     private RecyclerView verticalRecyclerView;
     private EventAdapter verticalItemAdapter;
+    private dbHandler handler = new dbHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,17 +52,35 @@ public class homepage extends AppCompatActivity {
 
     private ArrayList<Event> getRecoList() {
         ArrayList<Event> recoList = new ArrayList<>();
-        recoList.add(new Event(R.drawable.img, "Event 1", 45.50, "Description 1", "Artist 1", "Genre 1", "Venue 1", "Date 1", "Time 1"));
-        recoList.add(new Event(R.drawable.img, "Event 2", 55.50, "Description 2", "Artist 2", "Genre 2", "Venue 2", "Date 2", "Time 2"));
-        recoList.add(new Event(R.drawable.img, "Event 3", 35.50, "Description 3", "Artist 3", "Genre 3", "Venue 3", "Date 3", "Time 3"));
+        handler.getData(new FirestoreCallback() {
+            @Override
+            public void onCallback(ArrayList<Event> eventList) {
+
+                // add the first 5 events from list
+                if (eventList.size() > 5) {
+                    for (int i = 0; i < 5; i++) {
+                        recoList.add(eventList.get(i));
+                    }
+                } else {
+                    recoList.addAll(eventList);
+                }
+
+                verticalItemAdapter.notifyDataSetChanged();
+            }
+        });
         return recoList;
     }
 
     private ArrayList<Event> getEventList() {
         ArrayList<Event> eventList = new ArrayList<>();
-        eventList.add(new Event(R.drawable.featured_img, "Event 1", 45.50, "Description 1", "Artist 1", "Genre 1", "Venue 1", "Date 1", "Time 1"));
-        eventList.add(new Event(R.drawable.featured_img, "Event 2", 55.50, "Description 2", "Artist 2", "Genre 2", "Venue 2", "Date 2", "Time 2"));
-        eventList.add(new Event(R.drawable.featured_img, "Event 3", 35.50, "Description 3", "Artist 3", "Genre 3", "Venue 3", "Date 3", "Time 3"));
+        handler.getData(new FirestoreCallback() {
+            @Override
+            public void onCallback(ArrayList<Event> retrievedEventList) {
+                eventList.addAll(retrievedEventList);
+
+                eventAdapter.notifyDataSetChanged();
+            }
+        });
         return eventList;
     }
 }

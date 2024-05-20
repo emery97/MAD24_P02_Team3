@@ -29,7 +29,7 @@ public class EventDetails extends AppCompatActivity {
 
         Intent intent = getIntent();
         Event eventObj = (Event) getIntent().getSerializableExtra("event");
-        Log.i("event", eventObj.getTitle()); // testing
+        Log.i("event", eventObj.toString()); // testing
 
         Button showMapButton = findViewById(R.id.showMapButton);
         showMapButton.setOnClickListener(new View.OnClickListener() {

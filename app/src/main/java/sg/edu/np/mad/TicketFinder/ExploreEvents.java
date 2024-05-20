@@ -24,11 +24,10 @@ public class ExploreEvents extends AppCompatActivity {
     private boolean searchByArtist = false;
     private EventAdapter mAdapter;
     private RecyclerView recyclerView;
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     // blank recycler view
     ArrayList<Event> noEvents = new ArrayList<>();
-    //temp event list
-    ArrayList<Event> tempEvents = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +40,14 @@ public class ExploreEvents extends AppCompatActivity {
             return insets;
         });
 
-        // init temp events
-        for (int i = 0; i < 10; i++) {
-            Event tempEvent = new Event(R.drawable.img, "Event" + i, new Random().nextDouble(), "Description"+i, "Artist"+i, "Genre"+i, "Venue"+i, "Date"+i, "Time"+i);
-            tempEvents.add(tempEvent);
-        }
+        dbHandler handler = new dbHandler();
+        handler.getData(new FirestoreCallback() {
+            @Override
+            public void onCallback(ArrayList<Event> retrievedEventList) {
+                eventList.addAll(retrievedEventList);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
 
         //set recycler view, show blank
         recyclerView = findViewById(R.id.exploreView);
@@ -90,7 +92,7 @@ public class ExploreEvents extends AppCompatActivity {
 
                 ArrayList<Event> searchList = new ArrayList<>();
 
-                for (Event event : tempEvents){
+                for (Event event : eventList){
                     if (searchByArtist) {
                         if (event.getArtist().toLowerCase().contains(newText.toLowerCase())){
                             searchList.add(event);
