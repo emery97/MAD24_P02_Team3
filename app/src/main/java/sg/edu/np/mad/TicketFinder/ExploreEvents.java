@@ -43,11 +43,8 @@ public class ExploreEvents extends AppCompatActivity {
 
         // init temp events
         for (int i = 0; i < 10; i++) {
-            String name = "Name" + new Random().nextInt(100);
-            String artist = "Artist" + new Random().nextInt(100);
-            String date = "Date" + new Random().nextInt(100);
-            int img = R.drawable.img;
-            tempEvents.add(new Event(img,name,artist,date));
+            Event tempEvent = new Event(R.drawable.img, "Event" + i, new Random().nextDouble(), "Description"+i, "Artist"+i, "Genre"+i, "Venue"+i, "Date"+i, "Time"+i);
+            tempEvents.add(tempEvent);
         }
 
         //set recycler view, show blank
