@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -246,6 +247,7 @@ public class profilePage extends AppCompatActivity {
     // Logout method to clear shared preferences and navigate to login screen
     private void logout() {
         sharedPreferences.edit().clear().apply();
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(profilePage.this, MainActivity.class);
         startActivity(intent);
         finish(); // Close the profilePage activity

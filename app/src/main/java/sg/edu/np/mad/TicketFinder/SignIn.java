@@ -100,6 +100,8 @@ public class SignIn extends Fragment {
                                 editor.putBoolean("RememberMe", Remember.isChecked());
                                 editor.apply();
 
+
+
                                 // Navigate to Homepage
                                 navigateToHomepage();
                             }
@@ -112,6 +114,8 @@ public class SignIn extends Fragment {
     }
 
     private void navigateToHomepage() {
+        // Show login success toast
+        Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), homepage.class);
         startActivity(intent);
         getActivity().finish();
