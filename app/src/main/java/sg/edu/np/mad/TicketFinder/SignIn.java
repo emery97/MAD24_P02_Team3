@@ -33,6 +33,7 @@ public class SignIn extends Fragment {
     private TextView forgotpassword;
     private FirebaseFirestore db;
     private SharedPreferences sharedPreferences;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_in, container, false);  // Correct layout for this fragment
@@ -68,7 +69,6 @@ public class SignIn extends Fragment {
         });
 
         return view;
-
     }
 
     private boolean validateInput() {
@@ -78,7 +78,7 @@ public class SignIn extends Fragment {
         return !username.isEmpty() && !password.isEmpty();  // Both fields must be filled
     }
 
-    private void  checkCredentials() {
+    private void checkCredentials() {
         String username = usernameField.getText().toString().trim();
         String password = passwordField.getText().toString().trim();
 
@@ -93,14 +93,13 @@ public class SignIn extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // Valid credentials, save user data
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("UserId", document.getId());
                                 editor.putString("Name", document.getString("Name"));
                                 editor.putString("Email", document.getString("Email"));
                                 editor.putString("PhoneNum", document.getString("PhoneNum"));
                                 editor.putString("Password", document.getString("Password"));
                                 editor.putBoolean("RememberMe", Remember.isChecked());
                                 editor.apply();
-
-
 
                                 // Navigate to Homepage
                                 navigateToHomepage();

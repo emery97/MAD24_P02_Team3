@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class profilePage extends AppCompatActivity {
     // attributes
     private TextView username, password, email, regUsername, regPassword, regEmail;
@@ -26,6 +29,9 @@ public class profilePage extends AppCompatActivity {
     private Button saveButton, logoutButton;
     private String passwordSet;
     private SharedPreferences sharedPreferences;
+    private FirebaseFirestore db;
+    private String userId;
+    private static final String TAG = "ProfilePage";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,8 +51,8 @@ public class profilePage extends AppCompatActivity {
         showPassword = findViewById(R.id.showPassword);
         saveButton = findViewById(R.id.saveButton); // initialize saveButton
         logoutButton = findViewById(R.id.logoutButton); // initialize logoutButton
-        passwordSet = regPassword.getText().toString();
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        db = FirebaseFirestore.getInstance();
 
         loadUserData();
 
@@ -80,6 +86,9 @@ public class profilePage extends AppCompatActivity {
                 // Revert EditText fields back to TextView fields
                 UnallowEditing();
                 saveButton.setVisibility(View.INVISIBLE);
+
+                // Update user data in Firestore
+                updateUserInformation();
             }
         });
 
@@ -91,6 +100,7 @@ public class profilePage extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -103,11 +113,13 @@ public class profilePage extends AppCompatActivity {
         String name = sharedPreferences.getString("Name", "N/A");
         String email = sharedPreferences.getString("Email", "N/A");
         String password = sharedPreferences.getString("Password", "N/A");
+        userId = sharedPreferences.getString("UserId", "N/A");
 
         regUsername.setText(name);
         regEmail.setText(email);
         regPassword.setText(password);
         passwordSet = password;  // Ensure passwordSet is updated with the actual password
+        Log.d(TAG, "Loaded user data: " + name + ", " + email + ", " + userId);
     }
 
     // Toggle password visibility based on checkbox
@@ -221,7 +233,7 @@ public class profilePage extends AppCompatActivity {
         TextView textPassword = new TextView(this);
         textPassword.setLayoutParams(regPassword.getLayoutParams());
         textPassword.setTextSize(20); // Set the text size on the TextView object
-        textPassword.setText( hidingText(passwordText)); // password be bullets
+        textPassword.setText(hidingText(passwordText)); // password be bullets
         parentPassword.addView(textPassword, passwordIndex);
 
         // Increasing margintop
@@ -232,13 +244,12 @@ public class profilePage extends AppCompatActivity {
 
         // Remove reference to EditText field
         regPassword = textPassword;
-
     }
 
     // hide text after making password back to textview
-    private String hidingText(String originalText){
-        StringBuilder hiddenText = new StringBuilder() ;
-        for (int i =0 ; i< originalText.length(); i++){
+    private String hidingText(String originalText) {
+        StringBuilder hiddenText = new StringBuilder();
+        for (int i = 0; i < originalText.length(); i++) {
             hiddenText.append("\u2022");
         }
         return hiddenText.toString();
@@ -250,6 +261,35 @@ public class profilePage extends AppCompatActivity {
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(profilePage.this, MainActivity.class);
         startActivity(intent);
-        finish(); // Close the profilePage activity
+        finish();
+    }
+
+    // Update user information in Firestore
+    private void updateUserInformation() {
+        String updatedName = regUsername.getText().toString();
+        String updatedEmail = regEmail.getText().toString();
+        String updatedPassword = regPassword.getText().toString();
+
+        if (!userId.equals("N/A")) {
+            db.collection("Account").document(userId)
+                    .update("Name", updatedName, "Email", updatedEmail, "Password", updatedPassword)
+                    .addOnSuccessListener(aVoid -> {
+                        // Update SharedPreferences
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("Name", updatedName);
+                        editor.putString("Email", updatedEmail);
+                        editor.putString("Password", updatedPassword);
+                        editor.apply();
+
+                        Toast.makeText(profilePage.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to update profile", e);
+                        Toast.makeText(profilePage.this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Log.e(TAG, "User ID not found in SharedPreferences");
+            Toast.makeText(this, "Failed to update profile: User ID not found", Toast.LENGTH_SHORT).show();
+        }
     }
 }
