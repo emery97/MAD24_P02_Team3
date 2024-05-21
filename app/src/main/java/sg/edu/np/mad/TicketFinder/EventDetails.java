@@ -46,20 +46,16 @@ public class EventDetails extends AppCompatActivity {
         TextView price = findViewById(R.id.eventTicketPrice);
         TextView salesTiming = findViewById(R.id.eventGeneralSales);
 
-        // test
-        String inputDate = eventObj.getDate(); // example input
+        // date formatter (eg. 30 October 2023)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
 
-        // Define the date formatter
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        // format eventdate
+        String eventDateString = eventObj.getDate().format(formatter);
 
-        // Parse the input date string to LocalDate
-        LocalDate date = LocalDate.parse(inputDate, formatter);
-
-        // Subtract one month from the date
-        LocalDate newDate = date.minusMonths(1);
-
-        // Format the new date back to a string
-        String outputDate = newDate.format(formatter);
+        // get sales period (subtract 1 month from eventDate)
+        LocalDate salesDate = eventObj.getDate().minusMonths(1);
+        // format sales period date to string
+        String salesDateString = salesDate.format(formatter);
 
 
         // setting text
@@ -67,11 +63,11 @@ public class EventDetails extends AppCompatActivity {
         caption.setText(eventObj.getCaption());
         artist.setText(eventObj.getArtist());
         genre.setText(eventObj.getGenre());
-        timing.setText(eventObj.getDate() + ", " + eventObj.getTime());
+        timing.setText(eventDateString + ", " + eventObj.getTime());
         venue.setText(eventObj.getVenue());
         description.setText(eventObj.getDescription());
         price.setText("$" + String.format("%.2f",eventObj.getPrice())); // set price to string with 2dp
-        salesTiming.setText(outputDate);
+        salesTiming.setText(salesDateString + ", " + eventObj.getTime()); // sales timing is 1 month before, same time
 
 
         // show map button

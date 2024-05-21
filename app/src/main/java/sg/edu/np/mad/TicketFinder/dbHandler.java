@@ -14,6 +14,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class dbHandler extends Application {
     @Override
@@ -60,7 +62,10 @@ public class dbHandler extends Application {
                                     event.setVenue(document.getString("Venue"));
                                 }
                                 if (document.contains("Date")) {
-                                    event.setDate(document.getString("Date").substring(0, 10));
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                    String inputDate = document.getString("Date").substring(0, 10);
+                                    LocalDate date = LocalDate.parse(inputDate, formatter);
+                                    event.setDate(date);
 
                                 }
                                 if (document.contains("Time")) {

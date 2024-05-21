@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -63,9 +65,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
         Event event = eventList.get(position);
+
+        // format date
+        LocalDate eventObjDate = event.getDate();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
+        String formattedDate = eventObjDate.format(formatter);
+
+        // set text
         holder.eventTitle.setText(event.getTitle());
         holder.eventArtist.setText(event.getArtist());
-        holder.eventDate.setText(event.getDate());
+        holder.eventDate.setText(formattedDate);
         holder.eventImage.setImageResource(R.drawable.img);
 
         holder.eventCard.setOnClickListener(new View.OnClickListener() {

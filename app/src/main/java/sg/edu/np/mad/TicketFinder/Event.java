@@ -1,6 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public class Event implements Serializable {
     private String title;
@@ -10,7 +11,7 @@ public class Event implements Serializable {
     private String artist;
     private String genre;
     private String venue;
-    private String date;
+    private LocalDate date;
     private String time;
 
     // Default constructor
@@ -18,7 +19,7 @@ public class Event implements Serializable {
 
     // Parameterized constructor
     public Event(String title, String caption, double price, String description,
-                 String artist, String genre, String venue, String date, String time) {
+                 String artist, String genre, String venue, LocalDate date, String time) {
         this.title = title;
         this.caption = caption;
         this.price = price;
@@ -52,8 +53,8 @@ public class Event implements Serializable {
     public String getVenue() { return venue; }
     public void setVenue(String venue) { this.venue = venue; }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 
     public String getTime() { return time; }
     public void setTime(String time) { this.time = time; }
