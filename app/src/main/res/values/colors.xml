@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="searchBackground">#EFEFEF</color>
+    <color name="filterBackground">#EFEFEF</color>
+    <color name="buttonBackground">#6200EE</color>
+    <color name="recyclerViewBackground">#FFFFFF</color>
 </resources>

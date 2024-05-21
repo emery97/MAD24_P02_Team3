@@ -7,32 +7,41 @@
     android:layout_height="match_parent"
     tools:context=".ExploreEvents">
 
+    <!-- header -->
+    <include
+        android:id="@+id/include"
+        layout="@layout/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/include"
         app:layout_constraintBottom_toTopOf="@id/footer"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- header-->
-            <include
-                android:id="@+id/include"
-                layout="@layout/header" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <!-- search -->
             <LinearLayout
                 android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/searchBackground">
 
                 <Button
                     android:id="@+id/searchToggle"
@@ -40,11 +49,13 @@
                     android:layout_height="44dp"
                     android:layout_weight="0"
                     android:text="Search Title"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:background="@color/buttonBackground"
+                    android:textColor="@color/white" />
 
                 <SearchView
                     android:id="@+id/searchEvents"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="44dp"
                     android:layout_weight="1"
                     android:iconifiedByDefault="false"
@@ -55,33 +66,43 @@
             <LinearLayout
                 android:id="@+id/filters"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/filterBackground"
+                android:gravity="center"
+                android:weightSum="3">
 
                 <Button
-                    android:id="@+id/filter1"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/filterPriceRange"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="filter1" />
+                    android:text="Price Range"
+                    android:background="@color/buttonBackground"
+                    android:textColor="@color/white"
+                    android:layout_margin="4dp" />
 
                 <Button
-                    android:id="@+id/filter2"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/filterDateTime"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
                     android:layout_weight="1"
-                    android:text="filter2" />
+                    android:text="Date Time"
+                    android:background="@color/buttonBackground"
+                    android:textColor="@color/white"
+                    android:layout_margin="4dp" />
 
                 <Button
-                    android:id="@+id/filter3"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/filterEventType"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="filter3" />
+                    android:text="Event Type"
+                    android:background="@color/buttonBackground"
+                    android:textColor="@color/white"
+                    android:layout_margin="4dp" />
             </LinearLayout>
 
             <!-- recyclerview -->
@@ -89,7 +110,8 @@
                 android:id="@+id/exploreView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp" />
+                android:layout_margin="8dp"
+                android:background="@color/recyclerViewBackground" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
