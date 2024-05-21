@@ -190,7 +190,7 @@ public class ExploreEvents extends AppCompatActivity {
     private void filterByDateTime(String date) {
         ArrayList<Event> filteredList = new ArrayList<>();
         for (Event event : eventList) {
-            if (event.getDate().equals(date)) {
+            if (event.getDate().toString().equals(date)) {
                 filteredList.add(event);
             }
         }
