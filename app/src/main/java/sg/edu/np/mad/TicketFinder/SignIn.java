@@ -3,6 +3,7 @@ package sg.edu.np.mad.TicketFinder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -31,7 +32,7 @@ public class SignIn extends Fragment {
     private CheckBox Remember;
     private TextView forgotpassword;
     private FirebaseFirestore db;
-
+    private SharedPreferences sharedPreferences;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_in, container, false);  // Correct layout for this fragment
@@ -42,7 +43,12 @@ public class SignIn extends Fragment {
         Remember = view.findViewById(R.id.RememberMe);
         forgotpassword = view.findViewById(R.id.forgotPassword);
         db = FirebaseFirestore.getInstance();
+        sharedPreferences = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
+        // Check if "Remember Me" was previously selected
+        if (sharedPreferences.getBoolean("RememberMe", false)) {
+            navigateToHomepage();
+        }
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,11 +91,17 @@ public class SignIn extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Valid credentials, navigate to Homepage
-                                Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getActivity(), homepage.class);
-                                startActivity(intent);
-                                getActivity().finish(); // Close the SignIn fragment
+                                // Valid credentials, save user data
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("Name", document.getString("Name"));
+                                editor.putString("Email", document.getString("Email"));
+                                editor.putString("PhoneNum", document.getString("PhoneNum"));
+                                editor.putString("Password", document.getString("Password"));
+                                editor.putBoolean("RememberMe", Remember.isChecked());
+                                editor.apply();
+
+                                // Navigate to Homepage
+                                navigateToHomepage();
                             }
                         } else {
                             // Invalid credentials
@@ -97,6 +109,12 @@ public class SignIn extends Fragment {
                         }
                     }
                 });
+    }
+
+    private void navigateToHomepage() {
+        Intent intent = new Intent(getActivity(), homepage.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     private void showForgotPasswordDialog(Context context) {

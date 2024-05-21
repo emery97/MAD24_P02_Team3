@@ -171,6 +171,18 @@
                         android:visibility="invisible">
                     </Button>
 
+                    <Button
+                        android:id="@+id/logoutButton"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="148dp"
+                        android:background="#FF0000"
+                        android:text="Logout"
+                        android:textColor="@color/white"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+
+
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

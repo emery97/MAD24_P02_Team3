@@ -1,5 +1,8 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -19,9 +22,9 @@ public class profilePage extends AppCompatActivity {
     private TextView username, password, email, regUsername, regPassword, regEmail;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
-    private Button saveButton;
+    private Button saveButton, logoutButton;
     private String passwordSet;
-
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,7 +43,11 @@ public class profilePage extends AppCompatActivity {
         profilePicture = findViewById(R.id.profilePicture);
         showPassword = findViewById(R.id.showPassword);
         saveButton = findViewById(R.id.saveButton); // initialize saveButton
+        logoutButton = findViewById(R.id.logoutButton); // initialize logoutButton
         passwordSet = regPassword.getText().toString();
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
+        loadUserData();
 
         // Set up footer buttons
         Footer.setUpFooter(this);
@@ -74,11 +81,36 @@ public class profilePage extends AppCompatActivity {
                 saveButton.setVisibility(View.INVISIBLE);
             }
         });
+
+        // onclicklistener for logging out
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!sharedPreferences.getBoolean("RememberMe", false)) {
+            sharedPreferences.edit().clear().apply();
+        }
+    }
+
+    private void loadUserData() {
+        String name = sharedPreferences.getString("Name", "N/A");
+        String email = sharedPreferences.getString("Email", "N/A");
+        String password = sharedPreferences.getString("Password", "N/A");
+
+        regUsername.setText(name);
+        regEmail.setText(email);
+        regPassword.setText(password);
+        passwordSet = password;  // Ensure passwordSet is updated with the actual password
     }
 
     // Toggle password visibility based on checkbox
     private void togglePasswordVisibility() {
-        regPassword.setText(passwordSet);
         if (showPassword.isChecked()) {
             // Show password
             regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
@@ -86,7 +118,9 @@ public class profilePage extends AppCompatActivity {
             // Hide password
             regPassword.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
-        regPassword.getSelectionEnd(); // Ensure cursor is at the end of the text
+        if (regPassword instanceof EditText) {
+            ((EditText) regPassword).setSelection(regPassword.getText().length()); // Ensure cursor is at the end of the text
+        }
     }
 
     // method to edit - creates EditText fields and copies existing properties from TextView
@@ -207,5 +241,13 @@ public class profilePage extends AppCompatActivity {
             hiddenText.append("\u2022");
         }
         return hiddenText.toString();
+    }
+
+    // Logout method to clear shared preferences and navigate to login screen
+    private void logout() {
+        sharedPreferences.edit().clear().apply();
+        Intent intent = new Intent(profilePage.this, MainActivity.class);
+        startActivity(intent);
+        finish(); // Close the profilePage activity
     }
 }
