@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/payment"
+    android:id="@+id/testpaymentbtn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".payment">
@@ -29,6 +29,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/header" />
+
+
+    <Button
+        android:id="@+id/paymenttest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="39dp"
+        android:background="@color/black"
+        android:text="PAYMENT"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
+
+    <Spinner
+        android:id="@+id/paymentMethodSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        android:entries="@array/payment_methods" />
 
     <EditText
         android:id="@+id/editExpiry"
@@ -123,7 +145,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="60dp"
         android:text="Card Details"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -187,7 +209,7 @@
         android:id="@+id/buyNow"
         android:layout_width="190dp"
         android:layout_height="46dp"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#4b0082"
         android:text="BUY NOW"
         app:layout_constraintEnd_toEndOf="parent"
