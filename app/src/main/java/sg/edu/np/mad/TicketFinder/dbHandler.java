@@ -40,6 +40,12 @@ public class dbHandler extends Application {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Event event = new Event();
 
+                                if (document.contains("EventImage")) {
+                                    ArrayList<String> eventImages = (ArrayList<String>) document.get("EventImage");
+                                    if (eventImages != null && !eventImages.isEmpty()) {
+                                        event.setImgUrl(eventImages.get(0));
+                                    }
+                                }
                                 if (document.contains("Name")) {
                                     event.setTitle(document.getString("Name"));
                                 }

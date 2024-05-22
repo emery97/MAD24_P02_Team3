@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Event implements Serializable {
+    private String imgUrl;
     private String title;
     private String caption;
     private double price;
@@ -18,8 +19,9 @@ public class Event implements Serializable {
     public Event() {}
 
     // Parameterized constructor
-    public Event(String title, String caption, double price, String description,
+    public Event(String imgUrl, String title, String caption, double price, String description,
                  String artist, String genre, String venue, LocalDate date, String time) {
+        this.imgUrl = imgUrl;
         this.title = title;
         this.caption = caption;
         this.price = price;
@@ -32,6 +34,8 @@ public class Event implements Serializable {
     }
 
     // Getters and setters
+    public String getImgUrl() { return imgUrl; }
+    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
@@ -62,6 +66,7 @@ public class Event implements Serializable {
     @Override
     public String toString() {
         return "Event{" +
+                "imgUrl='" + imgUrl + '\'' +
                 "title='" + title + '\'' +
                 ", caption='" + caption + '\'' +
                 ", price=" + price +

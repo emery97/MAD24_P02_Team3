@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.bumptech.glide.Glide;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -36,6 +39,7 @@ public class EventDetails extends AppCompatActivity {
         Log.i("event", eventObj.toString()); // testing
 
         // initialise all views
+        ImageView eventImg = findViewById(R.id.eventImg);
         TextView title = findViewById(R.id.eventTitle);
         TextView caption = findViewById(R.id.eventCaption);
         TextView artist = findViewById(R.id.eventArtist);
@@ -57,6 +61,10 @@ public class EventDetails extends AppCompatActivity {
         // format sales period date to string
         String salesDateString = salesDate.format(formatter);
 
+        // set image
+        Glide.with(this)
+                .load(eventObj.getImgUrl())
+                        .into(eventImg);
 
         // setting text
         title.setText(eventObj.getTitle());

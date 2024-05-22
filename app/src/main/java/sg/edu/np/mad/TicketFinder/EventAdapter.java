@@ -13,6 +13,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.time.LocalDate;
@@ -75,7 +77,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.eventTitle.setText(event.getTitle());
         holder.eventArtist.setText(event.getArtist());
         holder.eventDate.setText(formattedDate);
-        holder.eventImage.setImageResource(R.drawable.img);
+        Glide.with(context)
+                        .load(event.getImgUrl())
+                                .into(holder.eventImage);
 
         holder.eventCard.setOnClickListener(new View.OnClickListener() {
             @Override
