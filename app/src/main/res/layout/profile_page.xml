@@ -180,6 +180,7 @@
                         android:text="Logout"
                         android:textColor="@color/white"
                         android:textSize="15dp"
+                        android:layout_gravity="center_horizontal"
                         android:textStyle="bold" />
 
 

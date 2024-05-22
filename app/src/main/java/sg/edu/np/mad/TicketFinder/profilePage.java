@@ -27,7 +27,7 @@ public class profilePage extends AppCompatActivity {
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
     private Button saveButton, logoutButton;
-    private String passwordSet;
+    private String actualPassword;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
     private String userId;
@@ -81,7 +81,7 @@ public class profilePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Save updated password
-                passwordSet = regPassword.getText().toString();
+                actualPassword = ((EditText) regPassword).getText().toString(); // Ensure it's from EditText
 
                 // Revert EditText fields back to TextView fields
                 UnallowEditing();
@@ -89,6 +89,9 @@ public class profilePage extends AppCompatActivity {
 
                 // Update user data in Firestore
                 updateUserInformation();
+
+                // Refresh password visibility state
+                updatePasswordVisibilityState();
             }
         });
 
@@ -118,7 +121,7 @@ public class profilePage extends AppCompatActivity {
         regUsername.setText(name);
         regEmail.setText(email);
         regPassword.setText(password);
-        passwordSet = password;  // Ensure passwordSet is updated with the actual password
+        actualPassword = password;  // Ensure actualPassword is updated with the actual password
         Log.d(TAG, "Loaded user data: " + name + ", " + email + ", " + userId);
     }
 
@@ -129,10 +132,21 @@ public class profilePage extends AppCompatActivity {
             regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         } else {
             // Hide password
-            regPassword.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
         if (regPassword instanceof EditText) {
             ((EditText) regPassword).setSelection(regPassword.getText().length()); // Ensure cursor is at the end of the text
+        } else {
+            updatePasswordVisibilityState();
+        }
+    }
+
+    // Update password visibility state after saving
+    private void updatePasswordVisibilityState() {
+        if (showPassword.isChecked()) {
+            regPassword.setText(actualPassword);
+        } else {
+            regPassword.setText(hidingText(actualPassword));
         }
     }
 
@@ -159,13 +173,12 @@ public class profilePage extends AppCompatActivity {
         // Replace TextView with EditText for password
         ViewGroup parentPassword = (ViewGroup) regPassword.getParent();
         int passwordIndex = parentPassword.indexOfChild(regPassword);
-        String passwordText = regPassword.getText().toString();
         parentPassword.removeView(regPassword);
 
         // Adding new EditText to replace regPassword
         EditText editPassword = new EditText(this);
         editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        editPassword.setText(passwordText);
+        editPassword.setText(actualPassword);  // Set the actual password
         editPassword.setLayoutParams(regPassword.getLayoutParams());
 
         parentPassword.addView(editPassword, passwordIndex);
@@ -233,7 +246,11 @@ public class profilePage extends AppCompatActivity {
         TextView textPassword = new TextView(this);
         textPassword.setLayoutParams(regPassword.getLayoutParams());
         textPassword.setTextSize(20); // Set the text size on the TextView object
-        textPassword.setText(hidingText(passwordText)); // password be bullets
+        if (showPassword.isChecked()) {
+            textPassword.setText(actualPassword); // Show the actual password if checkbox is checked
+        } else {
+            textPassword.setText(hidingText(actualPassword)); // Otherwise, show bullets
+        }
         parentPassword.addView(textPassword, passwordIndex);
 
         // Increasing margintop
@@ -268,17 +285,16 @@ public class profilePage extends AppCompatActivity {
     private void updateUserInformation() {
         String updatedName = regUsername.getText().toString();
         String updatedEmail = regEmail.getText().toString();
-        String updatedPassword = regPassword.getText().toString();
 
         if (!userId.equals("N/A")) {
             db.collection("Account").document(userId)
-                    .update("Name", updatedName, "Email", updatedEmail, "Password", updatedPassword)
+                    .update("Name", updatedName, "Email", updatedEmail, "Password", actualPassword)
                     .addOnSuccessListener(aVoid -> {
                         // Update SharedPreferences
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("Name", updatedName);
                         editor.putString("Email", updatedEmail);
-                        editor.putString("Password", updatedPassword);
+                        editor.putString("Password", actualPassword);
                         editor.apply();
 
                         Toast.makeText(profilePage.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
