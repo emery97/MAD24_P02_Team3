@@ -39,6 +39,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.paypal.sdk:paypal-android-sdk:2.16.0")
     implementation("com.stripe:stripe-java:25.0.0")
     implementation("com.stripe:stripe-android:20.44.0")
     implementation("com.android.volley:volley:1.2.1")
