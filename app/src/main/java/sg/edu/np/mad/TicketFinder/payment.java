@@ -60,8 +60,7 @@ public class payment extends AppCompatActivity {
             if (validateInput()) {
                 processPayment();
             } else {
-                // Display error message if validation fails
-                Toast.makeText(payment.this, "Invalid input", Toast.LENGTH_SHORT).show();
+                //Error Message
             }
         });
     }
@@ -69,15 +68,33 @@ public class payment extends AppCompatActivity {
     // Method to validate input fields
     private boolean validateInput() {
         String cardNumber = editCardNumber.getText().toString();
+        if (cardNumber.length() != 16) {
+            Toast.makeText(payment.this, "Invalid Card Number", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         String expiry = editExpiry.getText().toString();
+        if (expiry.length() != 5){
+            Toast.makeText(payment.this, "Input valid date", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         String cvv = editCVV.getText().toString();
+        if (cvv.length() != 3){
+            Toast.makeText(payment.this, "Invalid Cvv Input", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         String name = editName.getText().toString();
         String address = editAddress.getText().toString();
         String postalCode = editPostalCode.getText().toString();
 
-        // Check if all fields are filled
-        return !cardNumber.isEmpty() && !expiry.isEmpty() && !cvv.isEmpty()
-                && !name.isEmpty() && !address.isEmpty() && !postalCode.isEmpty();
+
+        if (name.isEmpty() || address.isEmpty() || postalCode.isEmpty()) {
+            Toast.makeText(payment.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 
     // Method to process payment

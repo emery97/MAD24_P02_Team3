@@ -50,7 +50,7 @@ public class SignIn extends Fragment {
 
         // Check if "Remember Me" was previously selected
         if (sharedPreferences.getBoolean("RememberMe", false)) {
-            promptRemainLoggedIn();
+            navigateToHomepage();
         }
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +115,6 @@ public class SignIn extends Fragment {
     }
 
     private void navigateToHomepage() {
-        // Show login success toast
         Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), homepage.class);
         startActivity(intent);
@@ -154,29 +153,5 @@ public class SignIn extends Fragment {
         });
 
         forgotPasswordDialog.show();
-    }
-
-    private void promptRemainLoggedIn() {
-        new AlertDialog.Builder(getContext())
-                .setTitle("Remain Logged In")
-                .setMessage("Do you want to remain logged in?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        navigateToHomepage();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        clearPreferences();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-
-    private void clearPreferences() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
     }
 }

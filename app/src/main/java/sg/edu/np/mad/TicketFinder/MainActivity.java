@@ -1,5 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -24,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        if (sharedPreferences.contains("UserId")) {
+            navigateToHomepage();
+            return;
+        }
+
         TextView signup = findViewById(R.id.signin);
         TextView register = findViewById(R.id.register);
 
@@ -44,5 +52,10 @@ public class MainActivity extends AppCompatActivity {
                 transaction.commit();  // Commit
             }
         });
+    }
+
+    private void navigateToHomepage() {
+        Intent intent = new Intent(MainActivity.this, homepage.class);
+        startActivity(intent);
     }
 }

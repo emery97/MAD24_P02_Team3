@@ -46,7 +46,8 @@
         android:layout_height="44dp"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="date"
+        android:maxLength="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/expiry" />
 
@@ -68,7 +69,8 @@
         android:layout_height="44dp"
         android:layout_marginStart="54dp"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="number"
+        android:maxLength="3"
         app:layout_constraintStart_toEndOf="@+id/editExpiry"
         app:layout_constraintTop_toBottomOf="@+id/cvv" />
 
@@ -112,7 +114,8 @@
         android:layout_height="44dp"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="number"
+        android:maxLength="16"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardNumber" />
 
@@ -189,7 +192,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postalCode" />
 
