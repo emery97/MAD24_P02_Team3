@@ -41,7 +41,8 @@
             android:exported="true"></activity>
         <activity
             android:name=".ExploreEvents"
-            android:exported="true"></activity>
+            android:exported="true"
+            android:configChanges="orientation|screenSize"></activity>
 
         <meta-data
             android:name="preloaded_fonts"
