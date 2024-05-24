@@ -16,6 +16,7 @@ Entertainment
 4. Allow users to filter content (JOEYI)
 5. Allows users to update their account information (IVAN)
 6. Allow users to choose their seats and select their desired date (under booking details) (DO TOGETHER)
+7. Allow users to leave feedbacks after making payment (YE CHYANG)
 
    
 ### Stage 2 
