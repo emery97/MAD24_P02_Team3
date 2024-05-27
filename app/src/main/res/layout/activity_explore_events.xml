@@ -39,15 +39,16 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/searchToggle"
                     android:layout_width="wrap_content"
                     android:layout_height="44dp"
                     android:layout_weight="0"
-                    android:background="#4E1F09"
-                    android:text="Search Title"
+                    android:background="@drawable/filter_button"
+                    android:text="SEARCH TITLE"
                     android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:textSize="12sp"
+                    android:padding="4dp" />
 
                 <SearchView
                     android:id="@+id/searchEvents"
@@ -74,35 +75,40 @@
                 android:padding="8dp"
                 android:weightSum="3">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/filterPriceRange"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
                     android:layout_weight="1"
-                    android:background="@color/buttonBackground"
-                    android:text="Price Range"
-                    android:textColor="@color/white" />
+                    android:background="@drawable/filter_button"
+                    android:text="PRICE RANGE"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:padding="4dp" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/filterDateTime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
                     android:layout_weight="1"
-                    android:background="@color/buttonBackground"
-                    android:text="Date Time"
-                    android:textColor="@color/white" />
+                    android:background="@drawable/filter_button"
+                    android:text="DATE TIME"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:padding="4dp" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/filterEventType"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
                     android:layout_weight="1"
-                    android:background="@color/buttonBackground"
-                    android:text="Event Type"
-                    android:textColor="@color/white" />
+                    android:background="@drawable/filter_button"
+                    android:text="EVENT TYPE"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:padding="4dp" />
             </LinearLayout>
 
             <!-- recyclerview -->

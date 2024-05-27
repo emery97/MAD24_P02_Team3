@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,10 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 public class homepage extends AppCompatActivity {
 
@@ -48,6 +52,26 @@ public class homepage extends AppCompatActivity {
 
         // for navbar
         Footer.setUpFooter(this);
+
+        // Load the featured image
+        ImageView featuredImage = findViewById(R.id.featuredImage);
+        loadFeaturedImage(featuredImage);
+    }
+
+    private void loadFeaturedImage(ImageView imageView) {
+        handler.getData(new FirestoreCallback() {
+            @Override
+            public void onCallback(ArrayList<Event> eventList) {
+                if (!eventList.isEmpty()) {
+                    Random random = new Random();
+                    int randomIndex = random.nextInt(eventList.size());
+                    String imageUrl = eventList.get(randomIndex).getImgUrl(); // Replace with actual method to get the URL
+                    Glide.with(homepage.this)
+                            .load(imageUrl)
+                            .into(imageView);
+                }
+            }
+        });
     }
 
     private ArrayList<Event> getRecoList() {

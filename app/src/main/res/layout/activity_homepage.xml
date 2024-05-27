@@ -27,8 +27,7 @@
                 android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include"
-                app:srcCompat="@drawable/featured_img" />
+                app:layout_constraintTop_toBottomOf="@+id/include" />
 
             <TextView
                 android:id="@+id/recoText"
@@ -40,7 +39,7 @@
                 android:fontFamily="sans-serif-condensed-medium"
                 android:text="RECOMMENDED FOR YOU"
                 android:textColor="#4E1F09"
-                android:textSize="30sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/eventRecyclerView"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +68,7 @@
                 android:fontFamily="sans-serif-condensed"
                 android:text="UPCOMING EVENTS"
                 android:textColor="#4E1F09"
-                android:textSize="30sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
