@@ -17,6 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.bumptech.glide.Glide;
+
 public class EventDetails extends AppCompatActivity {
 
     @Override
@@ -45,6 +47,7 @@ public class EventDetails extends AppCompatActivity {
         TextView description = findViewById(R.id.eventDescription);
         TextView price = findViewById(R.id.eventTicketPrice);
         TextView salesTiming = findViewById(R.id.eventGeneralSales);
+        ImageView eventImg = findViewById(R.id.eventImg);
 
         // date formatter (eg. 30 October 2023)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
@@ -57,6 +60,10 @@ public class EventDetails extends AppCompatActivity {
         // format sales period date to string
         String salesDateString = salesDate.format(formatter);
 
+        // set image
+        Glide.with(this)
+                .load(eventObj.getImgUrl())
+                .into(eventImg);
 
         // setting text
         title.setText(eventObj.getTitle());
