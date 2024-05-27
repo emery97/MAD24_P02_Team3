@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,29 @@ public class Register extends Fragment {
     private EditText Password;
     private Button Registerbutton;
     private FirebaseFirestore db;
+
+    public interface OnRegistrationSuccessListener {
+        void onRegistrationSuccess();
+    }
+
+    private OnRegistrationSuccessListener registrationSuccessListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnRegistrationSuccessListener) {
+            registrationSuccessListener = (OnRegistrationSuccessListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnRegistrationSuccessListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        registrationSuccessListener = null;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,11 +128,15 @@ public class Register extends Fragment {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "User added successfully: " + documentReference.getId());
-                        Toast.makeText(getActivity(), "Registered Successfully, Please go to Login Page.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Registered Successfully!", Toast.LENGTH_SHORT).show();
                         Name.setText("");
                         Email.setText("");
                         PhoneNumber.setText("");
                         Password.setText("");
+
+                        if (registrationSuccessListener != null) {
+                            registrationSuccessListener.onRegistrationSuccess();
+                        }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
