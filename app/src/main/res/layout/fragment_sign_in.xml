@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F4F0E5"
     tools:context=".SignIn">
 
     <EditText
@@ -33,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="250dp"
-        android:backgroundTint="#000000"
+        android:backgroundTint="#E15250"
         android:text="Enter"
         android:textSize="20sp" />
 
@@ -45,7 +46,9 @@
         android:layout_marginTop="130dp"
         android:layout_marginRight="97dp"
         android:text="Password"
-        android:textSize="16dp" />
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/Usertxt"
@@ -55,7 +58,9 @@
         android:layout_marginTop="50dp"
         android:layout_marginRight="97dp"
         android:text="Username"
-        android:textSize="16dp" />
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <CheckBox
         android:id="@+id/RememberMe"
@@ -65,6 +70,7 @@
         android:layout_marginTop="180sp"
         android:layout_marginRight="75sp"
         android:text="Remember Me"
+        android:textColor="#4C240A"
         android:textSize="14sp" />
 
     <TextView
@@ -75,5 +81,5 @@
         android:layout_marginLeft="80dp"
         android:layout_marginTop="195dp"
         android:text="Forgot password?"
-        android:textColor="#0056FF" />
+        android:textColor="#E15250" />
 </FrameLayout>
