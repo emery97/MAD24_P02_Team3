@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="280dp"
-        android:backgroundTint="#E15250"
+        android:backgroundTint="#462109"
         android:text="Register"
         android:textSize="20sp" />
 

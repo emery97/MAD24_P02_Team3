@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="250dp"
-        android:backgroundTint="#E15250"
+        android:backgroundTint="#4C240A"
         android:text="Enter"
         android:textSize="20sp" />
 
@@ -69,6 +69,8 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="180sp"
         android:layout_marginRight="75sp"
+        android:backgroundTint="#4C240A"
+        android:buttonTint="#4C240A"
         android:text="Remember Me"
         android:textColor="#4C240A"
         android:textSize="14sp" />
