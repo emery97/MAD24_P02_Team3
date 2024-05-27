@@ -20,10 +20,11 @@ Entertainment
 
    
 ### Stage 2 
-1. Allow users to review booking history
-2. Reminder Function for user (POSTING to database)
-      i. Choose Date
-      ii. Things to bring for concert
+1. Google Maps of the venue (CHLOE)
+2. When changing profile picture, allow user to take picture using the camera (IVAN)
+3. Voice recording and recognition (Speech-to-Text) for search (JOEYI)
+4. Add event to calendar app  (WEIYING)
+5. Implement weather forecast API for dates of events (YE CHYANG)
 
 ### UI
 1. home page
