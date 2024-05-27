@@ -26,7 +26,6 @@ public class dbHandler extends Application {
 
         FirebaseFirestore.setLoggingEnabled(true);
     }
-
     public void getData(FirestoreCallback firestoreCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference eventsCollection = db.collection("Events");
@@ -87,5 +86,59 @@ public class dbHandler extends Application {
                         }
                     }
                 });
+    }
+    public void getSeatCategoryData(FirestoreCallback<SeatCategory> firestoreCallback){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference seatCategoryCollection = db.collection("SeatCategory");
+
+        seatCategoryCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d("dbHandler", "getSeatCategoryData: Fetching seat category data from Firestore");
+                        ArrayList<SeatCategory> seatCategoryList = new ArrayList<>();
+                        if (task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()){
+                                SeatCategory seatCategory = new SeatCategory();
+                                if (document.contains("Category")) {
+                                    seatCategory.setCategory(document.getString("Category"));
+                                }
+                                // USED CHATGPT FOR THIS
+                                if (document.contains("Price")) {
+                                    Object priceObject = document.get("Price");
+                                    if (priceObject instanceof Long) {
+                                        // Convert integer to double
+                                        Long priceLong = (Long) priceObject;
+                                        double priceDouble = priceLong.doubleValue();
+                                        seatCategory.setSeatCategoryPrice(priceDouble);
+                                        Log.d("PRICE", String.valueOf(priceDouble));
+                                    } else if (priceObject instanceof Double) {
+                                        // Price is already a double
+                                        double price = (Double) priceObject;
+                                        seatCategory.setSeatCategoryPrice(price);
+                                        Log.d("PRICE", String.valueOf(price));
+                                    } else {
+                                        // Handle unexpected data type
+                                        Log.e("PRICE", "Unexpected data type for 'Price' field: " + priceObject.getClass().getSimpleName());
+                                    }
+                                }
+
+                                if (document.contains("Seats")) {
+                                    ArrayList<String> seatList = (ArrayList<String>) document.get("Seats");
+                                    if (seatList != null && !seatList.isEmpty()) {
+                                        seatCategory.setSeats(seatList.get(0));
+                                    }
+                                }
+                                seatCategoryList.add(seatCategory);
+                            }
+                            firestoreCallback.onCallback(seatCategoryList);
+                            Log.d("seatCategorySize", "getData: Callback invoked with seatCategory size: " + seatCategoryList.size());
+                        }else{
+                            Log.w("seatCategoryError", "Error getting documents.", task.getException());
+                        }
+
+                    }
+                });
+
+
     }
 }

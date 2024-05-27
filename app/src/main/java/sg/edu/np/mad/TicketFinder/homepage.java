@@ -1,9 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,12 +51,12 @@ public class homepage extends AppCompatActivity {
         ArrayList<Event> recoList = new ArrayList<>();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> eventList) {
+            public void onCallback(ArrayList eventList) {
 
                 // add the first 5 events from list
                 if (eventList.size() > 5) {
                     for (int i = 0; i < 5; i++) {
-                        recoList.add(eventList.get(i));
+                        recoList.add((Event) eventList.get(i));
                     }
                 } else {
                     recoList.addAll(eventList);
@@ -75,7 +72,7 @@ public class homepage extends AppCompatActivity {
         ArrayList<Event> eventList = new ArrayList<>();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> retrievedEventList) {
+            public void onCallback(ArrayList retrievedEventList) {
                 eventList.addAll(retrievedEventList);
 
                 eventAdapter.notifyDataSetChanged();

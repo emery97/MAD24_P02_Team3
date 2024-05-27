@@ -59,5 +59,11 @@
             android:hint="@string/seat_category_select"
             android:contentDescription="@string/select_seat_category" />
     </com.google.android.material.textfield.TextInputLayout>
+    <include
+        android:id="@+id/footer"
+        layout="@layout/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

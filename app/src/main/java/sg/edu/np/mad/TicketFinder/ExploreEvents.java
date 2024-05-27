@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Set;
 
 public class ExploreEvents extends AppCompatActivity {
@@ -51,7 +50,7 @@ public class ExploreEvents extends AppCompatActivity {
         dbHandler handler = new dbHandler();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> retrievedEventList) {
+            public void onCallback(ArrayList retrievedEventList) {
                 eventList.addAll(retrievedEventList);
                 mAdapter.notifyDataSetChanged();
             }
