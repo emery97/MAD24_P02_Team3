@@ -262,15 +262,25 @@ public class ExploreEvents extends AppCompatActivity {
 
     private void filterByPriceRange(String priceRange) {
         ArrayList<Event> filteredList = new ArrayList<>();
-        String[] ranges = priceRange.split(" - ");
-        int minPrice = Integer.parseInt(ranges[0].replace("$", "").trim());
-        int maxPrice = ranges.length > 1 ? Integer.parseInt(ranges[1].replace("$", "").trim()) : Integer.MAX_VALUE;
 
-        for (Event event : eventList) {
-            if (event.getPrice() >= minPrice && event.getPrice() <= maxPrice) {
-                filteredList.add(event);
+        if (priceRange.equals("$201+")) {
+            for (Event event : eventList) {
+                if (event.getPrice() > 200) {
+                    filteredList.add(event);
+                }
+            }
+        } else {
+            String[] ranges = priceRange.split(" - ");
+            int minPrice = Integer.parseInt(ranges[0].replace("$", "").trim());
+            int maxPrice = ranges.length > 1 ? Integer.parseInt(ranges[1].replace("$", "").trim()) : Integer.MAX_VALUE;
+
+            for (Event event : eventList) {
+                if (event.getPrice() >= minPrice && event.getPrice() <= maxPrice) {
+                    filteredList.add(event);
+                }
             }
         }
+
         mAdapter.setSearchList(filteredList);
         if (filteredList.isEmpty()) {
             Toast.makeText(this, "No events found in this price range", Toast.LENGTH_SHORT).show();
