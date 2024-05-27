@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,10 +94,23 @@ public class SignIn extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Fetch the userId and handle its type
+                                Object userIdObject = document.get("userId");
+                                String userIdString;
+                                if (userIdObject instanceof Number) {
+                                    userIdString = String.valueOf(userIdObject);
+                                } else if (userIdObject instanceof String) {
+                                    userIdString = (String) userIdObject;
+                                } else {
+                                    Log.e("SignIn", "Unexpected type for userId: " + userIdObject.getClass().getName());
+                                    Toast.makeText(getActivity(), "Invalid userId type", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
                                 // Valid credentials, save user data
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("Document", document.getId());
-                                editor.putString("UserId", document.getString("userId"));
+                                editor.putString("UserId", userIdString);
                                 editor.putString("Name", document.getString("Name"));
                                 editor.putString("Email", document.getString("Email"));
                                 editor.putString("PhoneNum", document.getString("PhoneNum"));
@@ -114,6 +128,7 @@ public class SignIn extends Fragment {
                     }
                 });
     }
+
 
     private void navigateToHomepage() {
         Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
