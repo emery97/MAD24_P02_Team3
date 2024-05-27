@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="#F4F0E5">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,11 +20,12 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="748dp">
+
                 <View
                     android:id="@+id/header"
                     android:layout_width="wrap_content"
                     android:layout_height="83dp"
-                    android:background="#4b0082"
+                    android:background="#4C240A"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -49,10 +52,10 @@
                         android:id="@+id/editingIcon"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
+                        android:layout_marginTop="140dp"
+                        android:layout_marginEnd="-110dp"
                         app:layout_constraintEnd_toEndOf="@id/profilePicture"
                         app:layout_constraintTop_toTopOf="@id/profilePicture"
-                        android:layout_marginEnd="-110dp"
-                        android:layout_marginTop="140dp"
                         app:srcCompat="@drawable/edittingicon" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -62,10 +65,11 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_editor_absoluteX="16dp"
-                    app:layout_editor_absoluteY="54dp">
+                    app:layout_editor_absoluteY="54dp"
+                    tools:layout_editor_absoluteY="0dp">
 
 
                     <TextView
@@ -75,7 +79,9 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="200dp"
                         android:text="Name"
+                        android:textColor="#4C240A"
                         android:textSize="25sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 
@@ -103,7 +109,9 @@
                         android:layout_marginTop="20dp"
                         android:gravity="left"
                         android:text="Password"
+                        android:textColor="#4C240A"
                         android:textSize="25sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/regUsername" />
 
@@ -128,7 +136,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:text="Show password"
+                        android:textColor="#4C240A"
                         android:textSize="15dp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/RegPassword"
                         app:layout_constraintTop_toBottomOf="@+id/RegPassword" />
 
@@ -139,7 +149,9 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="30dp"
                         android:text="Email"
+                        android:textColor="#4C240A"
                         android:textSize="25sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
@@ -156,31 +168,32 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         app:layout_constraintTop_toBottomOf="@+id/Password" />
+
                     <Button
                         android:id="@+id/saveButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="25dp"
+                        android:layout_marginEnd="20dp"
+                        android:background="#4b0082"
                         android:text="Save"
                         android:textColor="@color/white"
-                        android:textStyle="bold"
                         android:textSize="15dp"
-                        android:background="#4b0082"
-                        android:layout_marginTop="25dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="20dp"
-                        android:visibility="invisible">
-                    </Button>
+                        android:textStyle="bold"
+                        android:visibility="invisible"></Button>
 
                     <Button
                         android:id="@+id/logoutButton"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginStart="148dp"
-                        android:background="#FF0000"
+                        android:background="#4C240A"
+                        android:backgroundTint="#4C240A"
                         android:text="Logout"
                         android:textColor="@color/white"
                         android:textSize="15dp"
-                        android:layout_gravity="center_horizontal"
                         android:textStyle="bold" />
 
 
@@ -190,6 +203,7 @@
         </LinearLayout>
 
     </ScrollView>
+
     <include
         android:id="@+id/footer"
         layout="@layout/footer"

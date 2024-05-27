@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="#DCC2B7"
     tools:context=".MainActivity">
 
     <TextView
@@ -15,9 +15,10 @@
         android:layout_marginStart="108dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="108dp"
-        android:text="Website Name"
-        android:textColor="@color/white"
-        android:textSize="30dp"
+        android:text="TICKET FINDER"
+        android:textColor="#F3EFE4"
+        android:textSize="38sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +29,8 @@
         android:layout_marginStart="41dp"
         android:layout_marginTop="77dp"
         android:layout_marginEnd="41dp"
-        android:background="@drawable/gradient_background"
+        android:background="#F4F0E5"
+        android:backgroundTint="#F4F0E5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView">
@@ -38,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="2dp"
             android:layout_marginTop="80dp"
-            android:background="@color/black" />
+            android:background="#987A61" />
 
         <TextView
             android:id="@+id/Login"
@@ -47,7 +49,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="25dp"
             android:text="Account"
-            android:textSize="34dp" />
+            android:textColor="#4C240A"
+            android:textSize="34dp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/signin"
@@ -57,6 +61,7 @@
             android:layout_marginTop="100dp"
             android:clickable="true"
             android:text="Login"
+            android:textColor="#4C240A"
             android:textSize="24dp" />
 
         <TextView
@@ -67,6 +72,7 @@
             android:layout_marginTop="100dp"
             android:clickable="true"
             android:text="Register"
+            android:textColor="#4C240A"
             android:textSize="24dp" />
 
         <FrameLayout

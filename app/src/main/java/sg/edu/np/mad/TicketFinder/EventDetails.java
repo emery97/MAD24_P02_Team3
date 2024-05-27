@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.bumptech.glide.Glide;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -30,44 +31,54 @@ public class EventDetails extends AppCompatActivity {
             return insets;
         });
 
-        // get event object
-        Intent intent = getIntent();
-        Event eventObj = (Event) getIntent().getSerializableExtra("event");
-        Log.i("event", eventObj.toString()); // testing
+        try {
+            // get event object
+            Intent intent = getIntent();
+            Event eventObj = (Event) getIntent().getSerializableExtra("event");
+            Log.i("event", eventObj.toString()); // testing
 
-        // initialise all views
-        TextView title = findViewById(R.id.eventTitle);
-        TextView caption = findViewById(R.id.eventCaption);
-        TextView artist = findViewById(R.id.eventArtist);
-        TextView genre = findViewById(R.id.eventGenre);
-        TextView timing = findViewById(R.id.eventTiming);
-        TextView venue = findViewById(R.id.eventVenue);
-        TextView description = findViewById(R.id.eventDescription);
-        TextView price = findViewById(R.id.eventTicketPrice);
-        TextView salesTiming = findViewById(R.id.eventGeneralSales);
+            // initialise all views
+            TextView title = findViewById(R.id.eventTitle);
+            TextView caption = findViewById(R.id.eventCaption);
+            TextView artist = findViewById(R.id.eventArtist);
+            TextView genre = findViewById(R.id.eventGenre);
+            TextView timing = findViewById(R.id.eventTiming);
+            TextView venue = findViewById(R.id.eventVenue);
+            TextView description = findViewById(R.id.eventDescription);
+            TextView price = findViewById(R.id.eventTicketPrice);
+            TextView salesTiming = findViewById(R.id.eventGeneralSales);
+            ImageView eventImg = findViewById(R.id.eventImg);
 
-        // date formatter (eg. 30 October 2023)
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
+            // date formatter (eg. 30 October 2023)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
 
-        // format eventdate
-        String eventDateString = eventObj.getDate().format(formatter);
+            // format eventdate
+            String eventDateString = eventObj.getDate().format(formatter);
 
-        // get sales period (subtract 1 month from eventDate)
-        LocalDate salesDate = eventObj.getDate().minusMonths(1);
-        // format sales period date to string
-        String salesDateString = salesDate.format(formatter);
+            // get sales period (subtract 1 month from eventDate)
+            LocalDate salesDate = eventObj.getDate().minusMonths(1);
+            // format sales period date to string
+            String salesDateString = salesDate.format(formatter);
 
+            // set image
+            Glide.with(this)
+                    .load(eventObj.getImgUrl())
+                    .into(eventImg);
 
-        // setting text
-        title.setText(eventObj.getTitle());
-        caption.setText(eventObj.getCaption());
-        artist.setText(eventObj.getArtist());
-        genre.setText(eventObj.getGenre());
-        timing.setText(eventDateString + ", " + eventObj.getTime());
-        venue.setText(eventObj.getVenue());
-        description.setText(eventObj.getDescription());
-        price.setText("$" + String.format("%.2f",eventObj.getPrice())); // set price to string with 2dp
-        salesTiming.setText(salesDateString + ", " + eventObj.getTime()); // sales timing is 1 month before, same time
+            // setting text
+            title.setText(eventObj.getTitle());
+            caption.setText(eventObj.getCaption());
+            artist.setText(eventObj.getArtist());
+            genre.setText(eventObj.getGenre());
+            timing.setText(eventDateString + ", " + eventObj.getTime());
+            venue.setText(eventObj.getVenue());
+            description.setText(eventObj.getDescription());
+            price.setText("$" + String.format("%.2f",eventObj.getPrice())); // set price to string with 2dp
+            salesTiming.setText(salesDateString + ", " + eventObj.getTime()); // sales timing is 1 month before, same time
+
+        } catch (Exception e) {
+            Log.e("EDIntent", "no intent passed in");
+        }
 
 
         // show map button

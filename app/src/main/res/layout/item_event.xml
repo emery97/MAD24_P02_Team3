@@ -23,6 +23,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="Event Title"
+        android:textColor="#4C240A"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,6 +38,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="Event Date"
+        android:textColor="#4C240A"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/eventImage" />
@@ -49,6 +51,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="Event Artist"
+        android:textColor="#4C240A"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/eventImage" />
