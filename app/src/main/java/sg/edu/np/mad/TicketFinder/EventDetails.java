@@ -14,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.bumptech.glide.Glide;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
-import com.bumptech.glide.Glide;
 
 public class EventDetails extends AppCompatActivity {
 

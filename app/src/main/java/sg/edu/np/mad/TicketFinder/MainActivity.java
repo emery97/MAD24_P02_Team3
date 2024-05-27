@@ -13,7 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Register.OnRegistrationSuccessListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         if (sharedPreferences.contains("UserId")) {
             navigateToHomepage();
-            return;
+        } else {
+            loadSignInFragment();
         }
 
         TextView signup = findViewById(R.id.signin);
@@ -38,18 +39,14 @@ public class MainActivity extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fraglayout, new SignIn());  // Load SignIn
-                transaction.commit();  // Commit
+                loadSignInFragment();
             }
         });
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fraglayout, new Register());  // Load Register
-                transaction.commit();  // Commit
+                loadRegisterFragment();
             }
         });
     }
@@ -57,5 +54,23 @@ public class MainActivity extends AppCompatActivity {
     private void navigateToHomepage() {
         Intent intent = new Intent(MainActivity.this, homepage.class);
         startActivity(intent);
+        finish();  // Finish MainActivity so the user can't navigate back to it
+    }
+
+    private void loadSignInFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fraglayout, new SignIn());
+        transaction.commit();
+    }
+
+    private void loadRegisterFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fraglayout, new Register());
+        transaction.commit();
+    }
+
+    @Override
+    public void onRegistrationSuccess() {
+        loadSignInFragment();
     }
 }

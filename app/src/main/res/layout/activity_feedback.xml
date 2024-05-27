@@ -1,8 +1,8 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F4F0E5"
     android:orientation="vertical">
 
     <Spinner
@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="30sp"
         android:layout_margin="16dp"
-        android:entries="@array/feedback_methods"/>
+        android:entries="@array/feedback_methods" />
 
     <EditText
         android:id="@+id/Feedback_msg"
@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:backgroundTint="#E15250"
         android:text="Attach Image" />
 
     <ImageView
@@ -37,14 +38,15 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/submitbutton_feedback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:backgroundTint="#E15250"
         android:text="Submit Feedback" />
 
     <Button
@@ -52,6 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:backgroundTint="#E15250"
         android:text="Exit" />
 
 </LinearLayout>
