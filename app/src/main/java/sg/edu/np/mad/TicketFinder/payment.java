@@ -1,6 +1,9 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -97,8 +101,38 @@ public class payment extends AppCompatActivity {
         return true;
     }
 
-    // Method to process payment
     private void processPayment() {
         Toast.makeText(payment.this, "Payment successful", Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before alert message
+    }
+
+    private void showConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Your Contribution Matter!");
+        builder.setMessage("Provide your feedback on what to improve on our app!")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        navigateToFeedback();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        navigateToHomepage();
+                    }
+                });
+        builder.create().show();
+    }
+
+    private void navigateToHomepage() {
+        Toast.makeText(payment.this, "Going back to homepage", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(payment.this, homepage.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToFeedback(){
+        Intent intent = new Intent(payment.this, homepage.class);
+        startActivity(intent);
+        finish();
     }
 }
