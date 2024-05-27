@@ -90,6 +90,17 @@ public class EventDetails extends AppCompatActivity {
                 mapDialog.show();
             }
         });
+
+        // link to buy tickets page
+        Button buyTicketsButton = findViewById(R.id.buyTicketsButton);
+        buyTicketsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (EventDetails.this, BuyTicket.class);
+                startActivity(intent);
+            }
+        });
+
         Footer.setUpFooter(this);
     }
 }

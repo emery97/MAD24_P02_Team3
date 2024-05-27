@@ -16,19 +16,17 @@
         android:text="Buy Tickets"
         android:textSize="25dp"
         android:textStyle="bold"
-        app:layout_constraintBaseline_toBottomOf="@layout/header"
+        app:layout_constraintTop_toBottomOf="@id/include"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10sp"
-        app:layout_constraintTop_toBottomOf="@+id/include" />
+        android:layout_marginTop="10dp" />
 
     <ImageView
         android:id="@+id/imageMap"
         android:layout_width="wrap_content"
         android:layout_height="400dp"
-        app:layout_constraintBaseline_toBottomOf="@id/include"
+        app:layout_constraintTop_toBottomOf="@id/eventDetail"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/seat_map_with_color_legend"
         tools:layout_editor_absoluteY="155dp" />
@@ -41,11 +39,25 @@
         android:layout_marginTop="10dp"
         android:text="Category"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageMap" />
-    <!-- category drop down  -->
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        app:layout_constraintTop_toBottomOf="@id/imageMap" />
+
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:hint="@string/select_seat_category"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        app:layout_constraintTop_toBottomOf="@id/category"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <AutoCompleteTextView
+            android:id="@+id/auto_complete_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:hint="@string/seat_category_select"
+            android:contentDescription="@string/select_seat_category" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

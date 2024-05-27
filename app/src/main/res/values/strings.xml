@@ -14,4 +14,7 @@
         <item>Feature Request</item>
         <item>Performance</item>
     </string-array>
+    <!--seat category-->
+    <string name="select_seat_category">Select Seat Category</string>
+    <string name = "seat_category_select">Select Item</string>
 </resources>

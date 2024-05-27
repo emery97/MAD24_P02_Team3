@@ -46,6 +46,9 @@
         <activity
             android:name=".Feedback"
             android:exported="true" />
+        <activity
+            android:name=".BuyTicket"
+            android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
