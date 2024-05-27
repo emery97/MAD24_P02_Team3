@@ -51,7 +51,7 @@ public class ExploreEvents extends AppCompatActivity {
         dbHandler handler = new dbHandler();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> retrievedEventList) {
+            public void onCallback(ArrayList retrievedEventList) {
                 eventList.addAll(retrievedEventList);
                 mAdapter.notifyDataSetChanged();
             }

@@ -1,9 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
@@ -59,13 +56,13 @@ public class homepage extends AppCompatActivity {
     }
 
     private void loadFeaturedImage(ImageView imageView) {
-        handler.getData(new FirestoreCallback() {
+        handler.getData(new FirestoreCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> eventList) {
                 if (!eventList.isEmpty()) {
                     Random random = new Random();
                     int randomIndex = random.nextInt(eventList.size());
-                    String imageUrl = eventList.get(randomIndex).getImgUrl(); // Replace with actual method to get the URL
+                    String imageUrl = eventList.get(randomIndex).getImgUrl();
                     Glide.with(homepage.this)
                             .load(imageUrl)
                             .into(imageView);
@@ -78,28 +75,26 @@ public class homepage extends AppCompatActivity {
         ArrayList<Event> recoList = new ArrayList<>();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> eventList) {
+            public void onCallback(ArrayList eventList) {
 
                 // add the first 5 events from list
                 if (eventList.size() > 5) {
                     for (int i = 0; i < 5; i++) {
-                        recoList.add(eventList.get(i));
+                        recoList.add((Event) eventList.get(i));
                     }
                 } else {
                     recoList.addAll(eventList);
                 }
-
                 verticalItemAdapter.notifyDataSetChanged();
             }
         });
         return recoList;
     }
-
     private ArrayList<Event> getEventList() {
         ArrayList<Event> eventList = new ArrayList<>();
         handler.getData(new FirestoreCallback() {
             @Override
-            public void onCallback(ArrayList<Event> retrievedEventList) {
+            public void onCallback(ArrayList retrievedEventList) {
                 eventList.addAll(retrievedEventList);
 
                 eventAdapter.notifyDataSetChanged();
