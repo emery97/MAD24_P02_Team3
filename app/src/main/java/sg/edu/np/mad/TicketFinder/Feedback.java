@@ -97,7 +97,14 @@ public class Feedback extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitFeedback(documentId,userId,name,email);
+                submitFeedback(documentId,name, email, userId);
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToHomepage();
             }
         });
     }
@@ -148,6 +155,7 @@ public class Feedback extends AppCompatActivity {
                         message.setText("");
                         imageView.setImageURI(null);
                         imageUri = null;
+                        navigateToHomepage();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -156,4 +164,12 @@ public class Feedback extends AppCompatActivity {
                     }
                 });
     }
+
+    private void navigateToHomepage() {
+        Toast.makeText(Feedback.this, "Going back to homepage", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(Feedback.this, homepage.class);
+        startActivity(intent);
+        Feedback.this.finish();
+    }
+
 }
