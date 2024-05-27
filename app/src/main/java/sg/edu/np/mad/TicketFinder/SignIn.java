@@ -95,7 +95,8 @@ public class SignIn extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // Valid credentials, save user data
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("UserId", document.getId());
+                                editor.putString("Document", document.getId());
+                                editor.putString("UserId", document.getString("userId"));
                                 editor.putString("Name", document.getString("Name"));
                                 editor.putString("Email", document.getString("Email"));
                                 editor.putString("PhoneNum", document.getString("PhoneNum"));
