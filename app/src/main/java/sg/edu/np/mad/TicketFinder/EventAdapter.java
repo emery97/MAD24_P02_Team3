@@ -24,6 +24,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     private ArrayList<Event> eventList;
     private Context context;
+    private boolean isGrid; // Flag to indicate grid layout
+
+    // Single constructor to handle both list and grid layouts
+    public EventAdapter(Context context, ArrayList<Event> eventList, boolean isGrid) {
+        this.context = context;
+        this.eventList = eventList;
+        this.isGrid = isGrid;
+    }
+
 
     public void setSearchList(ArrayList<Event> searchList) {
         this.eventList = searchList;
@@ -52,17 +61,31 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
+    // Default constructor to maintain compatibility with existing code
     public EventAdapter(Context context, ArrayList<Event> eventList) {
-         this.context = context;
-         this.eventList = eventList;
+        this(context, eventList, false); // default to list layout
     }
+    /*
+    public EventAdapter(Context context, ArrayList<Event> eventList) {
+        this.context = context;
+        this.eventList = eventList;
+    }*/
 
     @Override
     public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_event, parent, false);
+        View itemView;
+        if (isGrid) {
+            // Inflate grid layout item
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_event_grid, parent, false);
+        } else {
+            // Inflate default layout item
+            itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_event, parent, false);
+        }
         return new EventViewHolder(itemView);
     }
+
 
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
@@ -78,8 +101,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.eventArtist.setText(event.getArtist());
         holder.eventDate.setText(formattedDate);
         Glide.with(context)
-                        .load(event.getImgUrl())
-                                .into(holder.eventImage);
+                .load(event.getImgUrl())
+                .into(holder.eventImage);
 
         holder.eventCard.setOnClickListener(new View.OnClickListener() {
             @Override

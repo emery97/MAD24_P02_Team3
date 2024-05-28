@@ -1,6 +1,6 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,7 +18,12 @@
 
             <include
                 android:id="@+id/include"
-                layout="@layout/header" />
+                layout="@layout/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageView
                 android:id="@+id/featuredImage"
@@ -29,41 +34,10 @@
                 android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include" />
+                app:layout_constraintTop_toBottomOf="@id/include" />
 
             <TextView
-                android:id="@+id/recoText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:text="RECOMMENDED FOR YOU"
-                android:textColor="#4E1F09"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/eventRecyclerView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/featuredImage" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/eventRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="182dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recoText" />
-
-            <TextView
-                android:id="@+id/verticalRecyclerViewHeader"
+                android:id="@+id/horizontalRecyclerViewHeader"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -77,19 +51,45 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/eventRecyclerView" />
+                app:layout_constraintTop_toBottomOf="@id/featuredImage" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/verticalRecyclerView"
-                android:layout_width="wrap_content"
+                android:id="@+id/horizontalRecyclerView"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:paddingTop="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/verticalRecyclerViewHeader" />
+                app:layout_constraintTop_toBottomOf="@id/horizontalRecyclerViewHeader" />
+
+            <TextView
+                android:id="@+id/recoText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="#976954"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="RECOMMENDED FOR YOU"
+                android:textColor="#F3EFE4"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/horizontalRecyclerView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/gridRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recoText"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
