@@ -56,12 +56,19 @@ public class ExploreEvents extends AppCompatActivity {
             return insets;
         });
 
+        if (savedInstanceState != null) {
+            selectedDate = savedInstanceState.getString("selectedDate");
+            selectedEventType = savedInstanceState.getString("selectedEventType");
+            selectedPriceRange = savedInstanceState.getString("selectedPriceRange");
+        }
+
         dbHandler handler = new dbHandler();
         handler.getData(new FirestoreCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> retrievedEventList) {
                 eventList.addAll(retrievedEventList);
                 mAdapter.notifyDataSetChanged();
+                applyFilters(); // Apply filters if they were restored
             }
         });
 
@@ -70,6 +77,14 @@ public class ExploreEvents extends AppCompatActivity {
         setupSearchBar();
         setupFilterButton();
         Footer.setUpFooter(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("selectedDate", selectedDate);
+        outState.putString("selectedEventType", selectedEventType);
+        outState.putString("selectedPriceRange", selectedPriceRange);
     }
 
     private void setupRecyclerView() {
@@ -180,6 +195,20 @@ public class ExploreEvents extends AppCompatActivity {
             public void onCallback(ArrayList<Event> events) {
                 setupPriceRangeSpinner(priceRangeSpinner, events);
                 setupEventTypeSpinner(eventTypeSpinner, events);
+
+
+                // Restore filter selections
+                if (selectedPriceRange != null) {
+                    int position = ((ArrayAdapter<String>) priceRangeSpinner.getAdapter()).getPosition(selectedPriceRange);
+                    priceRangeSpinner.setSelection(position);
+                }
+                if (selectedEventType != null) {
+                    int position = ((ArrayAdapter<String>) eventTypeSpinner.getAdapter()).getPosition(selectedEventType);
+                    eventTypeSpinner.setSelection(position);
+                }
+                if (selectedDate != null) {
+                    selectedDateTextView.setText(selectedDate);
+                }
             }
         });
 
