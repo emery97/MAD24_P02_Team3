@@ -26,7 +26,7 @@
                 android:id="@+id/include"
                 layout="@layout/header" />
 
-            <!-- search -->
+            <!-- search and filter -->
             <LinearLayout
                 android:id="@+id/search"
                 android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="44dp"
                     android:layout_weight="0"
-                    android:background="@drawable/filter_button"
+                    android:background="#976954"
                     android:text="SEARCH TITLE"
                     android:textColor="@color/white"
                     android:textSize="12sp"
@@ -59,62 +59,22 @@
                     android:backgroundTint="#F3EFE4"
                     android:iconifiedByDefault="false"
                     app:queryHint="Search events ..." />
-            </LinearLayout>
 
-            <!-- filters -->
-            <LinearLayout
-                android:id="@+id/filters"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="#E6D7C7"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:weightSum="3">
+                <ImageButton
+                    android:id="@+id/filterButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:padding="8dp"
+                    android:src="@drawable/filter_icon"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/filterPriceRange"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/filter_button"
-                    android:text="PRICE RANGE"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/filterDateTime"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/filter_button"
-                    android:text="DATE TIME"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/filterEventType"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/filter_button"
-                    android:text="EVENT TYPE"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:padding="4dp" />
             </LinearLayout>
 
             <!-- recyclerview -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/exploreView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="8dp"

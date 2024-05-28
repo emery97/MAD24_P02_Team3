@@ -5,14 +5,18 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
+import android.widget.SearchView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,8 +28,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Set;
 
 public class ExploreEvents extends AppCompatActivity {
@@ -33,6 +37,10 @@ public class ExploreEvents extends AppCompatActivity {
     private EventAdapter mAdapter;
     private RecyclerView recyclerView;
     private ArrayList<Event> eventList = new ArrayList<>();
+
+    private String selectedDate = null;
+    private String selectedEventType = null;
+    private String selectedPriceRange = null;
 
     // blank recycler view
     ArrayList<Event> noEvents = new ArrayList<>();
@@ -49,40 +57,62 @@ public class ExploreEvents extends AppCompatActivity {
         });
 
         dbHandler handler = new dbHandler();
-        handler.getData(new FirestoreCallback() {
+        handler.getData(new FirestoreCallback<Event>() {
             @Override
-            public void onCallback(ArrayList retrievedEventList) {
+            public void onCallback(ArrayList<Event> retrievedEventList) {
                 eventList.addAll(retrievedEventList);
                 mAdapter.notifyDataSetChanged();
             }
         });
 
-        //set recycler view, show blank
+        setupRecyclerView();
+        setupSearchToggle();
+        setupSearchBar();
+        setupFilterButton();
+        Footer.setUpFooter(this);
+    }
+
+    private void setupRecyclerView() {
         recyclerView = findViewById(R.id.exploreView);
         mAdapter = new EventAdapter(ExploreEvents.this, noEvents);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        setLayoutManager(getResources().getConfiguration().orientation); // change based on phone orientation
+        setRecyclerViewLayoutManager(getResources().getConfiguration().orientation);
+    }
 
-        // search
-        // toggle search
+    private void setRecyclerViewLayoutManager(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns for landscape mode
+        } else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this)); // 1 column for portrait mode
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setRecyclerViewLayoutManager(newConfig.orientation);
+    }
+
+    private void setupSearchToggle() {
         Button searchToggle = findViewById(R.id.searchToggle);
         searchToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!searchByArtist){
+                if (!searchByArtist) {
                     searchByArtist = true;
                     searchToggle.setText("Search Artist");
                     Toast.makeText(ExploreEvents.this, "Now searching by artist...", Toast.LENGTH_SHORT).show();
-                } else{
+                } else {
                     searchByArtist = false;
                     searchToggle.setText("Search Title");
                     Toast.makeText(ExploreEvents.this, "Now searching by title...", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
 
-        // searchbar function
+    private void setupSearchBar() {
         SearchView searchEvents = findViewById(R.id.searchEvents);
         searchEvents.clearFocus();
         searchEvents.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -100,19 +130,19 @@ public class ExploreEvents extends AppCompatActivity {
 
                 ArrayList<Event> searchList = new ArrayList<>();
 
-                for (Event event : eventList){
+                for (Event event : eventList) {
                     if (searchByArtist) {
-                        if (event.getArtist().toLowerCase().contains(newText.toLowerCase())){
+                        if (event.getArtist().toLowerCase().contains(newText.toLowerCase())) {
                             searchList.add(event);
                         }
                     } else {
-                        if (event.getTitle().toLowerCase().contains(newText.toLowerCase())){
+                        if (event.getTitle().toLowerCase().contains(newText.toLowerCase())) {
                             searchList.add(event);
                         }
                     }
                 }
 
-                if (searchList.isEmpty()){
+                if (searchList.isEmpty()) {
                     Toast.makeText(ExploreEvents.this, "No events found", Toast.LENGTH_SHORT).show();
                 }
                 mAdapter.setSearchList(searchList);
@@ -120,58 +150,72 @@ public class ExploreEvents extends AppCompatActivity {
                 return true;
             }
         });
-
-        // ---------------------------------------------- filtering
-
-        Button filterPriceRange = findViewById(R.id.filterPriceRange);
-        Button filterDateTime = findViewById(R.id.filterDateTime);
-        Button filterEventType = findViewById(R.id.filterEventType);
-
-        // ---------------------------------------------------------
-        filterPriceRange.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPriceRange();
-            }
-        });
-
-        filterDateTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
-
-        filterEventType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEventTypeDialog();
-            }
-        });
-
-        // for navbar
-        Footer.setUpFooter(this);
     }
 
-    private void setLayoutManager(int orientation) {
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns for landscape mode
-        } else {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this)); // 1 column for portrait mode
+    private void setupFilterButton() {
+        ImageButton filterButton = findViewById(R.id.filterButton);
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFilterDialog();
+            }
+        });
+    }
+
+
+    // -------------------------------------------------------------------------- filtering
+    private void showFilterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_filter_options, null);
+
+        Spinner priceRangeSpinner = view.findViewById(R.id.priceRangeSpinner);
+        Spinner eventTypeSpinner = view.findViewById(R.id.eventTypeSpinner);
+        Button selectDateButton = view.findViewById(R.id.selectDateButton);
+        TextView selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
+
+        // Use the existing getData method to populate the filters dynamically
+        dbHandler handler = new dbHandler();
+        handler.getData(new FirestoreCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> events) {
+                setupPriceRangeSpinner(priceRangeSpinner, events);
+                setupEventTypeSpinner(eventTypeSpinner, events);
+            }
+        });
+
+
+        // ---------------------------------------------- filter for date
+        selectDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(selectedDateTextView);
+            }
+        });
+
+        builder.setView(view)
+                .setTitle("Apply Filters")
+                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectedPriceRange = priceRangeSpinner.getSelectedItem().toString();
+                        selectedEventType = eventTypeSpinner.getSelectedItem().toString();
+                        applyFilters();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+    private ArrayList<Event> filterByDate(ArrayList<Event> events, String date) {
+        ArrayList<Event> filteredList = new ArrayList<>();
+        for (Event event : events) {
+            if (event.getDate().toString().equals(date)) {
+                filteredList.add(event);
+            }
         }
+        return filteredList;
     }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        setLayoutManager(newConfig.orientation);
-    }
-
-
-
-    // ---------------------------------------------- Date and Time
-
-    private void showDatePickerDialog() {
+    private void showDatePickerDialog(TextView selectedDateTextView) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -181,110 +225,95 @@ public class ExploreEvents extends AppCompatActivity {
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        String selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, month + 1, dayOfMonth);
-                        filterByDateTime(selectedDate);
+                        selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, month + 1, dayOfMonth);
+                        selectedDateTextView.setText(selectedDate);
                     }
                 }, year, month, day);
         datePickerDialog.show();
     }
-    private void filterByDateTime(String date) {
+    // ------------------------------------------------------ end of filter for date
+
+    // ---------------------------------------------------- filter for event type
+    private void setupEventTypeSpinner(Spinner spinner, ArrayList<Event> events) {
+        Set<String> eventTypes = new HashSet<>();
+        eventTypes.add("Any"); // Add "Any" option first
+        for (Event event : events) {
+            eventTypes.add(event.getGenre());
+        }
+        List<String> eventTypeList = new ArrayList<>(eventTypes);
+        setupSpinner(spinner, eventTypeList);
+
+        // Set default selection to "Any"
+        int defaultPosition = eventTypeList.indexOf("Any");
+        spinner.setSelection(defaultPosition);
+    }
+    private ArrayList<Event> filterByEventType(ArrayList<Event> events, String eventType) {
         ArrayList<Event> filteredList = new ArrayList<>();
-        for (Event event : eventList) {
-            if (event.getDate().toString().equals(date)) {
-                filteredList.add(event);
-            }
-        }
-        mAdapter.setSearchList(filteredList);
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No events found on this date", Toast.LENGTH_SHORT).show();
-        }
-    }
-    // ---------------------------------------------- End Of Date and Time
-
-
-
-    // ------------------------------------------------ Event Type
-    private void showEventTypeDialog() {
-        final String[] eventTypes = getUniqueEventTypes();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Event Type");
-        builder.setItems(eventTypes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String selectedEventType = eventTypes[which];
-                filterByEventType(selectedEventType);
-            }
-        });
-
-        builder.create().show();
-    }
-
-    private String[] getUniqueEventTypes() {
-        Set<String> eventTypeSet = new HashSet<>();
-        for (Event event : eventList) {
-            eventTypeSet.add(event.getGenre());
-        }
-        return eventTypeSet.toArray(new String[0]);
-    }
-
-    private void filterByEventType(String eventType) {
-        ArrayList<Event> filteredList = new ArrayList<>();
-        for (Event event : eventList) {
+        for (Event event : events) {
             if (event.getGenre().equalsIgnoreCase(eventType)) {
                 filteredList.add(event);
             }
         }
-        mAdapter.setSearchList(filteredList);
-        if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No events found of this type", Toast.LENGTH_SHORT).show();
-        }
+        return filteredList;
     }
-    // ------------------------------------------------------- End of Event Type
+    // ----------------------------------------------------  end of filter for event type
 
-
-
-    // ----------------------------------------------- price range
-    private void showPriceRange() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Price Range");
-
-        final String[] priceRange = {"$0 - $20", "$21 - $50", "$51 - $100", "$101 - $200", "$201+"};
-        builder.setItems(priceRange, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String selectedPriceRange = priceRange[which];
-                filterByPriceRange(selectedPriceRange);
+    // ------------------------------------------------------------ filter for price
+    private void setupPriceRangeSpinner(Spinner spinner, ArrayList<Event> events) {
+        Set<String> priceRanges = new HashSet<>();
+        priceRanges.add("Any"); // Add "Any" option
+        for (Event event : events) {
+            double price = event.getPrice();
+            if (price <= 20) {
+                priceRanges.add("$0 - $20");
+            } else if (price <= 50) {
+                priceRanges.add("$21 - $50");
+            } else if (price <= 100) {
+                priceRanges.add("$51 - $100");
+            } else if (price <= 200) {
+                priceRanges.add("$101 - $200");
+            } else {
+                priceRanges.add("$201+");
             }
-        });
-        builder.create().show();
+        }
+        setupSpinner(spinner, new ArrayList<>(priceRanges));
     }
-
-    private void filterByPriceRange(String priceRange) {
+    private ArrayList<Event> filterByPriceRange(ArrayList<Event> events, String priceRange) {
         ArrayList<Event> filteredList = new ArrayList<>();
+        String[] ranges = priceRange.split(" - ");
+        int minPrice = Integer.parseInt(ranges[0].replace("$", "").trim());
+        int maxPrice = ranges.length > 1 ? Integer.parseInt(ranges[1].replace("$", "").trim()) : Integer.MAX_VALUE;
 
-        if (priceRange.equals("$201+")) {
-            for (Event event : eventList) {
-                if (event.getPrice() > 200) {
-                    filteredList.add(event);
-                }
+        for (Event event : events) {
+            if (event.getPrice() >= minPrice && event.getPrice() <= maxPrice) {
+                filteredList.add(event);
             }
-        } else {
-            String[] ranges = priceRange.split(" - ");
-            int minPrice = Integer.parseInt(ranges[0].replace("$", "").trim());
-            int maxPrice = ranges.length > 1 ? Integer.parseInt(ranges[1].replace("$", "").trim()) : Integer.MAX_VALUE;
+        }
+        return filteredList;
+    }
+    // ------------------------------------------------------------ end of filter for price
 
-            for (Event event : eventList) {
-                if (event.getPrice() >= minPrice && event.getPrice() <= maxPrice) {
-                    filteredList.add(event);
-                }
-            }
+    private void setupSpinner(Spinner spinner, List<String> items) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+    private void applyFilters() {
+        ArrayList<Event> filteredList = new ArrayList<>(eventList);
+
+        if (selectedDate != null) {
+            filteredList = filterByDate(filteredList, selectedDate);
+        }
+        if (selectedEventType != null && !"Any".equals(selectedEventType)) {
+            filteredList = filterByEventType(filteredList, selectedEventType);
+        }
+        if (selectedPriceRange != null && !"Any".equals(selectedPriceRange)) {
+            filteredList = filterByPriceRange(filteredList, selectedPriceRange);
         }
 
         mAdapter.setSearchList(filteredList);
         if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No events found in this price range", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No events found with the selected filters", Toast.LENGTH_SHORT).show();
         }
     }
-    // -------------------------------------------------- End Of Price Range
 }
