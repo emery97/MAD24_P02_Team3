@@ -15,6 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 public class homepage extends AppCompatActivity {
@@ -83,12 +87,32 @@ public class homepage extends AppCompatActivity {
             @Override
             public void onCallback(ArrayList<Event> eventList) {
                 if (eventList != null && !eventList.isEmpty()) {
+                    // Sort events by date
+                    Collections.sort(eventList, new Comparator<Event>() {
+                        @Override
+                        public int compare(Event event1, Event event2) {
+                            return event1.getDate().compareTo(event2.getDate());
+                        }
+                    });
+
+                    // Filter out top 3 upcoming events
+                    List<Event> topEvents = eventList.subList(0, Math.min(eventList.size(), 3));
+
+                    // Convert List to ArrayList cos need to ensure compatibility
+                    // with the setSearchList() method of the EventAdapter
+                    ArrayList<Event> topEventsArrayList = new ArrayList<>(topEvents);
+
                     runOnUiThread(() -> {
-                        horizontalItemAdapter.setSearchList(eventList);
-                        gridItemAdapter.setSearchList(eventList);
+                        horizontalItemAdapter.setSearchList(topEventsArrayList);
+
+                        // Exclude the first 3 items from eventList
+                        List<Event> remainingEvents = eventList.subList(Math.min(3, eventList.size()), eventList.size());
+                        gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents)); // add the remaining events to the grid
+
                     });
                 }
             }
         });
     }
+
 }
