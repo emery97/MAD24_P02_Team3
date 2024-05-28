@@ -100,6 +100,20 @@
                         android:textStyle="bold"
                         app:layout_constraintTop_toBottomOf="@+id/username" />
 
+                    <EditText
+                        android:id="@+id/editUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="30dp"
+                        android:inputType="text"
+                        android:minHeight="48dp"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@+id/username" />
 
                     <TextView
                         android:id="@+id/password"
@@ -126,8 +140,23 @@
                         android:minHeight="48dp"
                         android:text="MAD Scientist"
                         android:textColor="@android:color/darker_gray"
-                        android:textSize="25sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@+id/password" />
+
+                    <EditText
+                        android:id="@+id/editPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="30dp"
+                        android:inputType="textPassword"
+                        android:minHeight="48dp"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
                         app:layout_constraintTop_toBottomOf="@+id/password" />
 
                     <CheckBox
@@ -139,8 +168,8 @@
                         android:textColor="#4C240A"
                         android:textSize="15dp"
                         android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="@+id/RegPassword"
-                        app:layout_constraintTop_toBottomOf="@+id/RegPassword" />
+                        app:layout_constraintStart_toStartOf="@+id/editPassword"
+                        app:layout_constraintTop_toBottomOf="@+id/editPassword" />
 
                     <TextView
                         android:id="@+id/email"
@@ -176,6 +205,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="25dp"
                         android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="20dp"
                         android:background="#4b0082"
                         android:text="Save"
                         android:textColor="@color/white"
@@ -195,7 +225,6 @@
                         android:textColor="@color/white"
                         android:textSize="15dp"
                         android:textStyle="bold" />
-
 
                 </LinearLayout>
 

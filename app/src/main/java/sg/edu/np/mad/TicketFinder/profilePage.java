@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,7 +8,6 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,49 +15,71 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profilePage extends AppCompatActivity {
-    // attributes
-    private TextView username, password, email, regUsername, regPassword, regEmail;
+    private TextView username, password, email;
+    private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
     private Button saveButton, logoutButton;
     private String actualPassword;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
-    private String userId;
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
+    private String userId; // This should be the userId from Firestore document, not Firebase UID
     private static final String TAG = "ProfilePage";
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.profile_page);
 
+        // Set up footer
+        Footer.setUpFooter(this);
+
         // initialize UI components
-        username = findViewById(R.id.username);
-        password = findViewById(R.id.password);
-        email = findViewById(R.id.email);
-        regUsername = findViewById(R.id.regUsername);
-        regPassword = findViewById(R.id.regPassword);
-        regEmail = findViewById(R.id.regEmail);
+        username = findViewById(R.id.regUsername);
+        password = findViewById(R.id.regPassword);
+        email = findViewById(R.id.regEmail);
+        editUsername = findViewById(R.id.editUsername);
+        editPassword = findViewById(R.id.editPassword);
         editingIcon = findViewById(R.id.editingIcon);
         profilePicture = findViewById(R.id.profilePicture);
         showPassword = findViewById(R.id.showPassword);
-        saveButton = findViewById(R.id.saveButton); // initialize saveButton
-        logoutButton = findViewById(R.id.logoutButton); // initialize logoutButton
+        saveButton = findViewById(R.id.saveButton);
+        logoutButton = findViewById(R.id.logoutButton);
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
 
-        loadUserData();
+        if (firebaseUser == null) {
+            // Redirect to login page if user is not authenticated
+            Log.e(TAG, "FirebaseUser is null, redirecting to login");
+            Intent intent = new Intent(profilePage.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
-        // Set up footer buttons
-        Footer.setUpFooter(this);
+        userId = sharedPreferences.getString("userId", "N/A");
+        if (userId.equals("N/A")) {
+            // Attempt to fetch the userId from Firestore using the email
+            fetchUserId();
+        } else {
+            loadUserData();
+        }
 
         // onclicklistener for showing password
         showPassword.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +94,7 @@ public class profilePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AllowEditing();
-                saveButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
             }
         });
 
@@ -80,18 +102,9 @@ public class profilePage extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Save updated password
-                actualPassword = ((EditText) regPassword).getText().toString(); // Ensure it's from EditText
-
-                // Revert EditText fields back to TextView fields
+                actualPassword = editPassword.getText().toString();
                 UnallowEditing();
-                saveButton.setVisibility(View.INVISIBLE);
-
-                // Update user data in Firestore
                 updateUserInformation();
-
-                // Refresh password visibility state
-                updatePasswordVisibilityState();
             }
         });
 
@@ -112,168 +125,102 @@ public class profilePage extends AppCompatActivity {
         }
     }
 
-    private void loadUserData() {
-        String name = sharedPreferences.getString("Name", "N/A");
-        String email = sharedPreferences.getString("Email", "N/A");
-        String password = sharedPreferences.getString("Password", "N/A");
-        userId = sharedPreferences.getString("UserId", "N/A");
+    private void fetchUserId() {
+        db.collection("Account").whereEqualTo("Email", firebaseUser.getEmail()).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                        userId = documentSnapshot.getId();
 
-        regUsername.setText(name);
-        regEmail.setText(email);
-        regPassword.setText(password);
-        actualPassword = password;  // Ensure actualPassword is updated with the actual password
-        Log.d(TAG, "Loaded user data: " + name + ", " + email + ", " + userId);
+                        // Save userId to SharedPreferences
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("userId", userId);
+                        editor.apply();
+
+                        loadUserData();
+                    } else {
+                        Log.e(TAG, "No matching document found in Firestore");
+                        Toast.makeText(this, "No user data found. Please log in again.", Toast.LENGTH_SHORT).show();
+                        mAuth.signOut();
+                        Intent intent = new Intent(profilePage.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching userId from Firestore", e);
+                    Toast.makeText(this, "Error fetching user data. Please try again later.", Toast.LENGTH_SHORT).show();
+                });
     }
 
-    // Toggle password visibility based on checkbox
+    private void loadUserData() {
+        if (firebaseUser != null) {
+            username.setText(sharedPreferences.getString("Name", "N/A"));
+            email.setText(firebaseUser.getEmail());
+            actualPassword = sharedPreferences.getString("Password", "N/A");
+            password.setText(actualPassword);
+
+            Log.d(TAG, "Loaded user data: " + firebaseUser.getDisplayName() + ", " + firebaseUser.getEmail() + ", userId: " + userId);
+
+            // Fetch the latest user data from Firestore
+            db.collection("Account").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    username.setText(documentSnapshot.getString("Name"));
+                    email.setText(documentSnapshot.getString("Email"));
+                    actualPassword = documentSnapshot.getString("Password");
+                    password.setText(actualPassword);
+
+                    // Save the latest data to SharedPreferences
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("Name", documentSnapshot.getString("Name"));
+                    editor.putString("Email", documentSnapshot.getString("Email"));
+                    editor.putString("Password", documentSnapshot.getString("Password"));
+                    editor.apply();
+
+                    Log.d(TAG, "User data refreshed from Firestore");
+                } else {
+                    Log.e(TAG, "No such document in Firestore");
+                }
+            }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch user data from Firestore", e));
+        } else {
+            Log.e(TAG, "FirebaseUser is null in loadUserData");
+        }
+    }
+
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
-            // Show password
-            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         } else {
-            // Hide password
-            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
-        if (regPassword instanceof EditText) {
-            ((EditText) regPassword).setSelection(regPassword.getText().length()); // Ensure cursor is at the end of the text
-        } else {
-            updatePasswordVisibilityState();
-        }
+        editPassword.setSelection(editPassword.getText().length());
     }
 
-    // Update password visibility state after saving
-    private void updatePasswordVisibilityState() {
-        if (showPassword.isChecked()) {
-            regPassword.setText(actualPassword);
-        } else {
-            regPassword.setText(hidingText(actualPassword));
-        }
-    }
-
-    // method to edit - creates EditText fields and copies existing properties from TextView
     private void AllowEditing() {
-        // Replace TextView with EditText for username
-        // Removing TextView regUsername
-        ViewGroup parentRegUsername = (ViewGroup) regUsername.getParent();
-        int usernameIndex = parentRegUsername.indexOfChild(regUsername);
-        String usernameText = regUsername.getText().toString();
-        parentRegUsername.removeView(regUsername);
+        username.setVisibility(View.GONE);
+        password.setVisibility(View.GONE);
 
-        // Adding new EditText to replace regUsername
-        EditText editUsername = new EditText(this);
-        editUsername.setLayoutParams(regUsername.getLayoutParams()); // Use regUsername's layout params
-        editUsername.setText(usernameText);
+        editUsername.setVisibility(View.VISIBLE);
+        editPassword.setVisibility(View.VISIBLE);
 
-        // Changing marginTop of editUsername
-        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) editUsername.getLayoutParams();
-        layoutParams.topMargin = 12;
+        editUsername.setText(username.getText());
+        editPassword.setText(password.getText());
 
-        parentRegUsername.addView(editUsername, usernameIndex);
-
-        // Replace TextView with EditText for password
-        ViewGroup parentPassword = (ViewGroup) regPassword.getParent();
-        int passwordIndex = parentPassword.indexOfChild(regPassword);
-        parentPassword.removeView(regPassword);
-
-        // Adding new EditText to replace regPassword
-        EditText editPassword = new EditText(this);
-        editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        editPassword.setText(actualPassword);  // Set the actual password
-        editPassword.setLayoutParams(regPassword.getLayoutParams());
-
-        parentPassword.addView(editPassword, passwordIndex);
-
-        // Replace TextView with EditText for email
-        ViewGroup parentEmail = (ViewGroup) regEmail.getParent();
-        int emailIndex = parentEmail.indexOfChild(regEmail);
-        parentEmail.removeView(regEmail);
-
-        EditText editEmail = new EditText(this);
-        editEmail.setLayoutParams(regEmail.getLayoutParams());
-        editEmail.setText(regEmail.getText());
-        parentEmail.addView(editEmail, emailIndex);
-
-        // Save references to the EditText fields
-        regUsername = editUsername;
-        regEmail = editEmail;
-        regPassword = editPassword;
+        saveButton.setVisibility(View.VISIBLE);
     }
 
-    // Method to revert EditText fields back to TextView fields
     private void UnallowEditing() {
-        ViewGroup parentRegUsername = (ViewGroup) regUsername.getParent();
-        int usernameIndex = parentRegUsername.indexOfChild(regUsername);
-        String usernameText = regUsername.getText().toString();
-        parentRegUsername.removeView(regUsername);
+        username.setVisibility(View.VISIBLE);
+        password.setVisibility(View.VISIBLE);
 
-        // Adding new TextView to replace EditText for username
-        TextView textUsername = new TextView(this);
-        textUsername.setLayoutParams(regUsername.getLayoutParams()); // Use regUsername's layout params
-        textUsername.setText(usernameText);
+        editUsername.setVisibility(View.GONE);
+        editPassword.setVisibility(View.GONE);
 
-        // Changing marginTop of textUsername
-        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) textUsername.getLayoutParams();
-        layoutParams.topMargin = 12;
-        textUsername.setTextSize(20);
-        parentRegUsername.addView(textUsername, usernameIndex);
-
-        // Remove reference to EditText field
-        regUsername = textUsername;
-
-        // Replace EditText with TextView for email
-        ViewGroup parentEmail = (ViewGroup) regEmail.getParent();
-        int emailIndex = parentEmail.indexOfChild(regEmail);
-        String emailText = regEmail.getText().toString();
-        parentEmail.removeView(regEmail);
-
-        // Adding new TextView to replace EditText for email
-        TextView textEmail = new TextView(this);
-        textEmail.setLayoutParams(regEmail.getLayoutParams());
-        textEmail.setText(emailText);
-        textEmail.setTextSize(20);
-        parentEmail.addView(textEmail, emailIndex);
-
-        // Remove reference to EditText field
-        regEmail = textEmail;
-
-        // Replace EditText with TextView for password
-        ViewGroup parentPassword = (ViewGroup) regPassword.getParent();
-        int passwordIndex = parentPassword.indexOfChild(regPassword);
-        String passwordText = regPassword.getText().toString();
-        parentPassword.removeView(regPassword);
-
-        // Adding new TextView to replace EditText for password
-        TextView textPassword = new TextView(this);
-        textPassword.setLayoutParams(regPassword.getLayoutParams());
-        textPassword.setTextSize(20); // Set the text size on the TextView object
-        if (showPassword.isChecked()) {
-            textPassword.setText(actualPassword); // Show the actual password if checkbox is checked
-        } else {
-            textPassword.setText(hidingText(actualPassword)); // Otherwise, show bullets
-        }
-        parentPassword.addView(textPassword, passwordIndex);
-
-        // Increasing margintop
-        ViewGroup.MarginLayoutParams passwordLayout = (ViewGroup.MarginLayoutParams) password.getLayoutParams();
-        passwordLayout.topMargin = 100;
-        ViewGroup.MarginLayoutParams regPasswordLayout = (ViewGroup.MarginLayoutParams) textPassword.getLayoutParams();
-        regPasswordLayout.topMargin = 50;
-
-        // Remove reference to EditText field
-        regPassword = textPassword;
+        saveButton.setVisibility(View.GONE);
     }
 
-    // hide text after making password back to textview
-    private String hidingText(String originalText) {
-        StringBuilder hiddenText = new StringBuilder();
-        for (int i = 0; i < originalText.length(); i++) {
-            hiddenText.append("\u2022");
-        }
-        return hiddenText.toString();
-    }
-
-    // Logout method to clear shared preferences and navigate to login screen
     private void logout() {
+        mAuth.signOut();
         sharedPreferences.edit().clear().apply();
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(profilePage.this, MainActivity.class);
@@ -281,31 +228,74 @@ public class profilePage extends AppCompatActivity {
         finish();
     }
 
-    // Update user information in Firestore
+    private void updateFirestore(String updatedName, String updatedEmail, String updatedPassword) {
+        db.collection("Account").document(userId)
+                .update("Name", updatedName, "Password", updatedPassword)
+                .addOnSuccessListener(aVoid -> {
+                    // Update SharedPreferences
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("Name", updatedName);
+                    editor.putString("Password", updatedPassword);
+                    editor.apply();
+
+                    Log.d(TAG, "Profile updated successfully in Firestore.");
+                    Toast.makeText(profilePage.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+
+                    // Reload user data to reflect changes
+                    loadUserData();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to update profile in Firestore", e);
+                    Toast.makeText(profilePage.this, "Failed to update profile in Firestore", Toast.LENGTH_SHORT).show();
+                });
+    }
+
     private void updateUserInformation() {
-        String updatedName = regUsername.getText().toString();
-        String updatedEmail = regEmail.getText().toString();
+        String updatedName = editUsername.getText().toString();
+        String updatedPassword = editPassword.getText().toString();
 
-        if (!userId.equals("N/A")) {
-            db.collection("Account").document(userId)
-                    .update("Name", updatedName, "Email", updatedEmail, "Password", actualPassword)
-                    .addOnSuccessListener(aVoid -> {
-                        // Update SharedPreferences
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("Name", updatedName);
-                        editor.putString("Email", updatedEmail);
-                        editor.putString("Password", actualPassword);
-                        editor.apply();
+        Log.d(TAG, "Updating user information with updatedName: " + updatedName + ", updatedPassword: " + updatedPassword);
 
-                        Toast.makeText(profilePage.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to update profile", e);
-                        Toast.makeText(profilePage.this, "Failed to update profile", Toast.LENGTH_SHORT).show();
-                    });
+        if (firebaseUser != null) {
+            // Reauthenticate the user with current credentials
+            String currentEmail = firebaseUser.getEmail();
+            String currentPassword = sharedPreferences.getString("Password", "N/A");
+
+            if (currentEmail != null && !currentPassword.equals("N/A")) {
+                Log.d(TAG, "Current email: " + currentEmail + ", Current password: " + currentPassword); // Log current email and password
+
+                AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, currentPassword);
+
+                firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "User re-authenticated.");
+                        Toast.makeText(this, "Re-Authentication success.", Toast.LENGTH_SHORT).show();
+
+                        // Update password in Firebase Auth
+                        firebaseUser.updatePassword(updatedPassword).addOnCompleteListener(passwordUpdateTask -> {
+                            if (passwordUpdateTask.isSuccessful()) {
+                                Log.d(TAG, "User password updated.");
+
+                                // Update profile in Firestore
+                                updateFirestore(updatedName, currentEmail, updatedPassword);
+                            } else {
+                                Log.e(TAG, "Error updating password in Firebase Auth", passwordUpdateTask.getException());
+                                Toast.makeText(profilePage.this, "Failed to update password in Firebase Auth", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    } else {
+                        Log.e(TAG, "User re-authentication failed", task.getException());
+                        Toast.makeText(profilePage.this, "User re-authentication failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Log.e(TAG, "Current email or password is missing");
+                Toast.makeText(profilePage.this, "Current email or password is missing", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Log.e(TAG, "User ID not found in SharedPreferences");
-            Toast.makeText(this, "Failed to update profile: User ID not found", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "FirebaseUser is null");
+            Toast.makeText(profilePage.this, "Failed to update profile: FirebaseUser not found", Toast.LENGTH_SHORT).show();
         }
     }
 }
