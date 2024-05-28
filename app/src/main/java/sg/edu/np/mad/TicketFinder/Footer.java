@@ -31,11 +31,10 @@ public class Footer {
         bookingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, homepage.class);
+                Intent intent = new Intent(activity, bookingHistory.class);
                 activity.startActivity(intent);
             }
         });
-
         accountIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
