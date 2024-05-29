@@ -107,6 +107,7 @@ public class BuyTicket extends AppCompatActivity {
                     seatAutoCompleteTextView.setText("");
                     Log.d("runTime value at run", String.valueOf(runTime));
                 }
+                //
             }
         });
     }
