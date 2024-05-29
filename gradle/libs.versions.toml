@@ -11,6 +11,7 @@ googleServices = "4.4.1"
 firebaseFirestore = "25.0.0"
 playServicesTasks = "18.1.0"
 glide = "5.0.0-rc01"
+firebaseAuth = "23.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -23,6 +24,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
 play-services-tasks = { group = "com.google.android.gms", name = "play-services-tasks", version.ref = "playServicesTasks" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
