@@ -188,7 +188,7 @@ public class BuyTicket extends AppCompatActivity {
                     }
 
                 }catch(Exception e){
-                    Toast.makeText(BuyTicket.this, "Please enter a valid quantity (numbers only)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BuyTicket.this, "Please enter a number more than 0 ", Toast.LENGTH_SHORT).show();
                 }
             }
 
