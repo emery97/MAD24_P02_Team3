@@ -1,11 +1,13 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,7 @@ public class BuyTicket extends AppCompatActivity {
 
     private String chosenSeatCategory;
     private int runTime ;
+    private Button booked;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         runTime = 0;
@@ -28,6 +31,7 @@ public class BuyTicket extends AppCompatActivity {
 
         autoCompleteTextView = findViewById(R.id.auto_complete_txt);
         seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
+        booked = findViewById(R.id.button_booked);
 
         // Initially disable the dropdowns
         autoCompleteTextView.setEnabled(false);
@@ -83,6 +87,17 @@ public class BuyTicket extends AppCompatActivity {
             }
         });
 
+        booked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
+                double seatPrice = findSeatPrice(selectedSeatNumber);
+                Intent intent = new Intent(BuyTicket.this, payment.class);
+                intent.putExtra("totalPrice", seatPrice);
+                startActivity(intent);
+            }
+        });
+
         Footer.setUpFooter(this);
     }
     private void filterSeatsByCategory(String category) {
@@ -110,5 +125,14 @@ public class BuyTicket extends AppCompatActivity {
                 //
             }
         });
+    }
+
+    private double findSeatPrice(String seatNumber) {
+        for (SeatCategory seatCategory : seatCategoryList) {
+            if (seatCategory.getSeats().contains(seatNumber)) {
+                return seatCategory.getSeatCategoryPrice();
+            }
+        }
+        return 0.0;
     }
 }

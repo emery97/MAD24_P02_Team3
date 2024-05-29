@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -38,6 +39,8 @@ import java.util.Map;
 public class payment extends AppCompatActivity {
     private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode;
     private Button buyNow;
+    private TextView totalPricetext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,8 +60,12 @@ public class payment extends AppCompatActivity {
         editAddress = findViewById(R.id.editAddress);
         editPostalCode = findViewById(R.id.editPostalCode);
         buyNow = findViewById(R.id.buyNow);
+        totalPricetext = findViewById(R.id.totalpricedisplay);
 
-        // Set OnClickListener for buyNow button
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+
+        totalPricetext.setText("Total Price: $" + totalPrice);
+
         buyNow.setOnClickListener(view -> {
             // Validate input fields
             if (validateInput()) {

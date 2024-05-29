@@ -97,6 +97,15 @@
                     android:contentDescription="@string/select_seat_number"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/button_booked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Book"
+                android:textSize="20sp" />
+
         </LinearLayout>
     </ScrollView>
 
