@@ -63,6 +63,8 @@ public class payment extends AppCompatActivity {
         totalPricetext = findViewById(R.id.totalpricedisplay);
 
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        String seatCategory = getIntent().getStringExtra("seatCategory");
+        String seatNumber = getIntent().getStringExtra("seatNumber");
 
         totalPricetext.setText("Total Price: $" + totalPrice);
 
