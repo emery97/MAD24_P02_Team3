@@ -1,11 +1,13 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ public class BuyTicket extends AppCompatActivity {
     private String chosenSeatCategory;
     private int runTime =0;
     private Button booked;
+    private EditText quantityEditText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         runTime = 0;
@@ -32,6 +35,7 @@ public class BuyTicket extends AppCompatActivity {
         autoCompleteTextView = findViewById(R.id.auto_complete_txt);
         seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
         booked = findViewById(R.id.button_booked);
+        quantityEditText = findViewById(R.id.editTextText);
 
         // Initially disable the dropdowns
         autoCompleteTextView.setEnabled(false);
@@ -88,6 +92,27 @@ public class BuyTicket extends AppCompatActivity {
                 String selectedItem = (String) parent.getItemAtPosition(position);
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Log.d("seatNumberToastMessage","DONE " + selectedItem);
+            }
+        });
+
+        booked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
+                double seatPrice = findSeatPrice(selectedSeatNumber);
+                String selectedSeatCategory = chosenSeatCategory;
+
+                String quantityText = quantityEditText.getText().toString().trim();
+                int quantity = Integer.parseInt(quantityText);
+
+                double totalPrice = seatPrice * quantity;
+
+                Intent intent = new Intent(BuyTicket.this, payment.class);
+                intent.putExtra("totalPrice", totalPrice);
+                intent.putExtra("seatCategory", selectedSeatCategory);
+                intent.putExtra("seatNumber", selectedSeatNumber);
+                intent.putExtra("quantity", quantity);
+                startActivity(intent);
             }
         });
 
