@@ -166,7 +166,7 @@ public class dbHandler extends Application {
 
                             if (seatList != null && !seatList.isEmpty()) {
 
-                                seatCategory.setSeats(seatList.get(0));
+                                seatCategory.setSeats(seatList);
 
                             }
 

@@ -1,27 +1,44 @@
 package sg.edu.np.mad.TicketFinder;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SeatCategory {
-    private Double seatCategoryPrice;
     private String category;
-    private String seats;
+    private double seatCategoryPrice;
+    private ArrayList<String> seats;
 
-    // default constructor
-    public SeatCategory(){}
+    // Default constructor
+    public SeatCategory() {}
 
-    // parameterized constructor
+    // Parameterized constructor
     public SeatCategory(Integer seatCategoryPrice, String category, String seats) {
         this.seatCategoryPrice = Double.valueOf(seatCategoryPrice);
         this.category = category;
-        this.seats = seats;
+        this.seats = new ArrayList<>(Arrays.asList(seats.split(",")));
     }
 
-    // getters
-    public Double getSeatCategoryPrice() { return seatCategoryPrice; }
-    public String getCategory() { return category; }
-    public String getSeats() { return seats; }
+    // Getters and setters
+    public String getCategory() {
+        return category;
+    }
 
-    // setters
-    public void setSeatCategoryPrice(Double price) { this.seatCategoryPrice = price; }
-    public void setCategory(String category) { this.category = category; } // Fixed setter
-    public void setSeats(String seats) { this.seats = seats; } // Fixed setter
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public double getSeatCategoryPrice() {
+        return seatCategoryPrice;
+    }
+
+    public void setSeatCategoryPrice(double seatCategoryPrice) {
+        this.seatCategoryPrice = seatCategoryPrice;
+    }
+
+    public ArrayList<String> getSeats() {
+        return seats;
+    }
+
+    public void setSeats(ArrayList<String> seats) {
+        this.seats = seats;
+    }
 }

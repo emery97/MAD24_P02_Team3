@@ -17,4 +17,7 @@
     <!--seat category-->
     <string name="select_seat_category">Select Seat Category</string>
     <string name = "seat_category_select">Select Item</string>
+    
+    <string name="select_seat_number">Select Seat Number</string>
+    <string name="seat_number_select">Select Item </string>
 </resources>
