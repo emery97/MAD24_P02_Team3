@@ -53,7 +53,8 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Category"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdown_menu"
@@ -79,14 +80,15 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Seat Number"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdown_menu2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:hint="@string/select_seat_number"
+                android:hint="Select Seat Number"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                 <AutoCompleteTextView
@@ -97,6 +99,79 @@
                     android:contentDescription="@string/select_seat_number"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- table for conclusion -->
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:layout_margin="10dp">
+
+                <!--table heading -->
+                <TableRow
+                    android:background="@color/white">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10sp"
+                        android:text="Seat Category"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10sp"
+                        android:text="Seat Number"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10sp"
+                        android:text="Quantity"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+                </TableRow>
+
+                <!--table data -->
+                <TableRow>
+                    <TextView
+                        android:id="@+id/selectedSeatCat"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10sp"
+                        android:text="@string/selected_seat_category"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/selectedSeatNum"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:padding="10sp"
+                        android:text="@string/selected_seat_number"
+                        android:textSize="12sp"/>
+                    <EditText
+                        android:id="@+id/editTextText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="5"
+                        android:inputType="number"
+                        android:textSize="14sp"/>
+                </TableRow>
+
+            </TableLayout>
+
         </LinearLayout>
     </ScrollView>
 

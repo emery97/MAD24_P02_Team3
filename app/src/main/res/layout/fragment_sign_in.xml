@@ -13,7 +13,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="70dp"
         android:ems="10"
-        android:hint="Enter your Username"
+        android:hint="Enter your Email"
         android:inputType="text"
         android:textSize="14sp" />
 

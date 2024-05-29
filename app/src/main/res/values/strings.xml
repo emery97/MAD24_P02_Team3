@@ -18,6 +18,12 @@
     <string name="select_seat_category">Select Seat Category</string>
     <string name = "seat_category_select">Select Item</string>
 
+    <!--seat number-->
     <string name="select_seat_number">Select Seat Number</string>
     <string name="seat_number_select">Select Item </string>
+
+    <!--conclusion-->
+    <string name = "selected_seat_category">seat cat select</string>
+    <string name = "selected_seat_number"> seat num select</string>
+
 </resources>

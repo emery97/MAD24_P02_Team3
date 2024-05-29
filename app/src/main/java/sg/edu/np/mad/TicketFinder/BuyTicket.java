@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,10 +20,9 @@ public class BuyTicket extends AppCompatActivity {
     private AutoCompleteTextView seatAutoCompleteTextView;
 
     private String chosenSeatCategory;
-    private int runTime ;
+    private int runTime =0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        runTime = 0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buy_ticket);
 
@@ -32,6 +32,10 @@ public class BuyTicket extends AppCompatActivity {
         // Initially disable the dropdowns
         autoCompleteTextView.setEnabled(false);
         seatAutoCompleteTextView.setEnabled(false);
+
+        // conclusion data
+        TextView selectedSeatCat= findViewById(R.id.selectedSeatCat);
+        TextView selectedSeatNum= findViewById(R.id.selectedSeatNum);
 
         dbHandler handler = new dbHandler();
         handler.getSeatCategoryData(new FirestoreCallback<SeatCategory>() {
@@ -71,6 +75,7 @@ public class BuyTicket extends AppCompatActivity {
                 filterSeatsByCategory(selectedItem);
                 runTime++;
                 Log.d("RUNTIME CHECK!!",String.valueOf(runTime));
+                selectedSeatCat.setText(selectedItem);
             }
         });
 
@@ -78,6 +83,7 @@ public class BuyTicket extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) parent.getItemAtPosition(position);
+                selectedSeatNum.setText(selectedItem);
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Log.d("seatNumberToastMessage","DONE " + selectedItem);
             }
@@ -98,6 +104,7 @@ public class BuyTicket extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                TextView selectedSeatNum= findViewById(R.id.selectedSeatNum);
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(BuyTicket.this, android.R.layout.simple_dropdown_item_1line, seatNumbers);
                 seatAutoCompleteTextView.setAdapter(adapter);
                 seatAutoCompleteTextView.setEnabled(true); // Enable the seat dropdown after setting the adapter
@@ -105,9 +112,10 @@ public class BuyTicket extends AppCompatActivity {
                 // reset seat number text if user chooses a new seat category
                 if (runTime >= 1){
                     seatAutoCompleteTextView.setText("");
+                    selectedSeatNum.setText("");
                     Log.d("runTime value at run", String.valueOf(runTime));
                 }
-                //
+
             }
         });
     }
