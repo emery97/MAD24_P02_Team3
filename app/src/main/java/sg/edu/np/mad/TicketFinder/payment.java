@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +41,9 @@ import java.util.Map;
 public class payment extends AppCompatActivity {
     private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode;
     private Button buyNow;
+    private Button bookingdetails;
     private TextView totalPricetext;
+    private Button cancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +65,17 @@ public class payment extends AppCompatActivity {
         editPostalCode = findViewById(R.id.editPostalCode);
         buyNow = findViewById(R.id.buyNow);
         totalPricetext = findViewById(R.id.totalpricedisplay);
+        bookingdetails = findViewById(R.id.bookingdetails);
+        cancel = findViewById(R.id.backbtn);
 
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
-        String seatCategory = getIntent().getStringExtra("seatCategory");
-        String seatNumber = getIntent().getStringExtra("seatNumber");
+
+        bookingdetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showBookingDetailsDialog();
+            }
+        });
 
         totalPricetext.setText("Total Price: $" + totalPrice);
 
@@ -74,6 +85,14 @@ public class payment extends AppCompatActivity {
                 processPayment();
             } else {
                 //Error Message
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(payment.this, BuyTicket.class);
+                startActivity(intent);
             }
         });
     }
@@ -143,5 +162,27 @@ public class payment extends AppCompatActivity {
         Intent intent = new Intent(payment.this, homepage.class);
         startActivity(intent);
         finish();
+    }
+
+    private void showBookingDetailsDialog() {
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        String seatCategory = getIntent().getStringExtra("seatCategory");
+        String seatNumber = getIntent().getStringExtra("seatNumber");
+        int quantity = getIntent().getIntExtra("quantity", 1);
+
+        Dialog dialog = new Dialog(payment.this);
+        dialog.setContentView(R.layout.bookingdetails);
+
+        TextView categoryText = dialog.findViewById(R.id.categoryText);
+        TextView numberText = dialog.findViewById(R.id.numberText);
+        TextView priceText = dialog.findViewById(R.id.priceText);
+        TextView quantityText = dialog.findViewById(R.id.quantityText);
+
+        categoryText.setText(seatCategory);
+        numberText.setText(seatNumber);
+        priceText.setText("Seat Price: $" + totalPrice);
+        quantityText.setText("Quantity: " + quantity);
+
+        dialog.show();
     }
 }

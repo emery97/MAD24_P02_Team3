@@ -211,11 +211,33 @@
         android:id="@+id/totalpricedisplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textSize="20sp"
+        android:layout_marginTop="20dp"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bookingdetails" />
+
+    <Button
+        android:id="@+id/bookingdetails"
+        android:layout_width="150dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="@color/black"
+        android:text="View Booking"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editPostalCode" />
+
+    <Button
+        android:id="@+id/backbtn"
+        android:layout_width="150dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#F65858"
+        android:text="Cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buyNow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
