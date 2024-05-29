@@ -78,6 +78,7 @@ public class BuyTicket extends AppCompatActivity {
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 filterSeatsByCategory(selectedItem);
                 runTime++;
+                selectedSeatCat.setText(selectedItem);
                 Log.d("RUNTIME CHECK!!",String.valueOf(runTime));
             }
         });
@@ -86,6 +87,7 @@ public class BuyTicket extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) parent.getItemAtPosition(position);
+                selectedSeatNum.setText(selectedItem);
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Log.d("seatNumberToastMessage","DONE " + selectedItem);
             }

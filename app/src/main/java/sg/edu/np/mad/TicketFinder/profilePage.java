@@ -26,7 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profilePage extends AppCompatActivity {
-    private TextView username, password, email;
+    private TextView username, password, email,regPassword;
     private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
@@ -39,6 +39,7 @@ public class profilePage extends AppCompatActivity {
     private String userId; // This should be the userId from Firestore document, not Firebase UID
     private static final String TAG = "ProfilePage";
 
+    private boolean isEditMode = false;
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class profilePage extends AppCompatActivity {
         email = findViewById(R.id.regEmail);
         editUsername = findViewById(R.id.editUsername);
         editPassword = findViewById(R.id.editPassword);
+        regPassword = findViewById(R.id.regPassword);
         editingIcon = findViewById(R.id.editingIcon);
         profilePicture = findViewById(R.id.profilePicture);
         showPassword = findViewById(R.id.showPassword);
@@ -85,7 +87,11 @@ public class profilePage extends AppCompatActivity {
         showPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                togglePasswordVisibility();
+                if (isEditMode) {
+                    togglePasswordVisibility();
+                } else {
+                    togglePasswordVisibilityNonEditMode();
+                }
             }
         });
 
@@ -93,6 +99,7 @@ public class profilePage extends AppCompatActivity {
         editingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isEditMode = true;
                 AllowEditing();
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
             }
@@ -104,6 +111,7 @@ public class profilePage extends AppCompatActivity {
             public void onClick(View v) {
                 actualPassword = editPassword.getText().toString();
                 UnallowEditing();
+                isEditMode = false;
                 updateUserInformation();
             }
         });
@@ -189,12 +197,24 @@ public class profilePage extends AppCompatActivity {
 
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
+            Log.d("SHOW PASSWORD", "togglePasswordVisibility: checked");
             editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         } else {
             editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
         editPassword.setSelection(editPassword.getText().length());
     }
+
+    private void togglePasswordVisibilityNonEditMode() {
+        if (showPassword.isChecked()) {
+            Log.d("SHOW PASSWORD", "togglePasswordVisibilityNonEditMode: checked");
+            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        } else {
+            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+        regPassword.requestLayout();
+    }
+
 
     private void AllowEditing() {
         username.setVisibility(View.GONE);
