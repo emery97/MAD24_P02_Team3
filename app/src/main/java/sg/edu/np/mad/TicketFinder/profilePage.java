@@ -72,7 +72,6 @@ public class profilePage extends AppCompatActivity {
             Intent intent = new Intent(profilePage.this, MainActivity.class);
             startActivity(intent);
             finish();
-            return;
         }
 
         userId = sharedPreferences.getString("userId", "N/A");

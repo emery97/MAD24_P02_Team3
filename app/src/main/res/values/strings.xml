@@ -23,7 +23,7 @@
     <string name="seat_number_select">Select Item </string>
 
     <!--conclusion-->
-    <string name = "selected_seat_category">seat cat select</string>
-    <string name = "selected_seat_number"> seat num select</string>
+    <string name = "selected_seat_category"></string>
+    <string name = "selected_seat_number"> </string>
 
 </resources>

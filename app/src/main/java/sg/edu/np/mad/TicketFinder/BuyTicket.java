@@ -2,6 +2,8 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,7 +37,7 @@ public class BuyTicket extends AppCompatActivity {
         autoCompleteTextView = findViewById(R.id.auto_complete_txt);
         seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
         booked = findViewById(R.id.button_booked);
-        quantityEditText = findViewById(R.id.editTextText);
+        quantityEditText = findViewById(R.id.quantity);
 
         // Initially disable the dropdowns
         autoCompleteTextView.setEnabled(false);
@@ -94,9 +96,12 @@ public class BuyTicket extends AppCompatActivity {
                 selectedSeatNum.setText(selectedItem);
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Log.d("seatNumberToastMessage","DONE " + selectedItem);
+                bookedAppear();
             }
         });
 
+        Log.d("QUANTITY EDIT TEXT", "onCreate: " + quantityEditText.getText().toString() );
+        bookedAppear();
         booked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,5 +162,74 @@ public class BuyTicket extends AppCompatActivity {
         }
         return 0.0;
     }
+
+    private void bookedAppear(){
+        // conclusion data
+        TextView selectedSeatCat= findViewById(R.id.selectedSeatCat);
+        TextView selectedSeatNum= findViewById(R.id.selectedSeatNum);
+        quantityEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not required
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try{
+                    // Update button visibility based on all conditions here
+                    if (selectedSeatCat.getText().toString().trim().length() > 0 &&
+                            selectedSeatNum.getText().toString().trim().length() > 0 &&
+                            Integer.parseInt(String.valueOf(quantityEditText.getText())) > 0) {
+                        // need to ensure user enter quantity > 0
+                        booked.setVisibility(View.VISIBLE);
+                    }
+                    if(Integer.parseInt(String.valueOf(quantityEditText.getText())) == 0){
+                        booked.setVisibility(View.INVISIBLE);
+                    }
+
+                }catch(Exception e){
+                    Toast.makeText(BuyTicket.this, "Please enter a valid quantity (numbers only)", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not required
+            }
+        });
+        seatAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not required
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("selected seat num change", "selectedSeatNum: " + selectedSeatNum.getText());
+                selectedSeatNum.setText(s.toString().trim());
+                if (selectedSeatNum == null || selectedSeatNum.getText().toString().trim().length() == 0){
+                    booked.setVisibility(View.INVISIBLE);
+                }
+                try{
+                    // Update button visibility based on all conditions here
+                    if (selectedSeatCat.getText().toString().trim().length() > 0 &&
+                            selectedSeatNum.getText().toString().trim().length() > 0 &&
+                            Integer.parseInt(String.valueOf(quantityEditText.getText())) > 0) {
+                        // need to ensure user enter quantity > 0
+                        booked.setVisibility(View.VISIBLE);
+                    }
+
+                }catch(Exception e){
+                    Toast.makeText(BuyTicket.this, "Please enter a valid quantity (numbers only)", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not required
+            }
+        });
+    }
+
+
 }
-//
