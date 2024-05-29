@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,13 +22,16 @@ public class BuyTicket extends AppCompatActivity {
 
     private String chosenSeatCategory;
     private int runTime =0;
+    private Button booked;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        runTime = 0;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buy_ticket);
 
         autoCompleteTextView = findViewById(R.id.auto_complete_txt);
         seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
+        booked = findViewById(R.id.button_booked);
 
         // Initially disable the dropdowns
         autoCompleteTextView.setEnabled(false);
@@ -75,7 +79,6 @@ public class BuyTicket extends AppCompatActivity {
                 filterSeatsByCategory(selectedItem);
                 runTime++;
                 Log.d("RUNTIME CHECK!!",String.valueOf(runTime));
-                selectedSeatCat.setText(selectedItem);
             }
         });
 
@@ -83,7 +86,6 @@ public class BuyTicket extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItem = (String) parent.getItemAtPosition(position);
-                selectedSeatNum.setText(selectedItem);
                 Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
                 Log.d("seatNumberToastMessage","DONE " + selectedItem);
             }
@@ -118,5 +120,14 @@ public class BuyTicket extends AppCompatActivity {
 
             }
         });
+    }
+
+    private double findSeatPrice(String seatNumber) {
+        for (SeatCategory seatCategory : seatCategoryList) {
+            if (seatCategory.getSeats().contains(seatNumber)) {
+                return seatCategory.getSeatCategoryPrice();
+            }
+        }
+        return 0.0;
     }
 }

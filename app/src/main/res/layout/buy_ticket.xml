@@ -80,15 +80,14 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Seat Number"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="18sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/dropdown_menu2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:hint="Select Seat Number"
+                android:hint="@string/select_seat_number"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                 <AutoCompleteTextView
@@ -171,6 +170,15 @@
                 </TableRow>
 
             </TableLayout>
+
+
+            <Button
+                android:id="@+id/button_booked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Book"
+                android:textSize="20sp" />
 
         </LinearLayout>
     </ScrollView>
