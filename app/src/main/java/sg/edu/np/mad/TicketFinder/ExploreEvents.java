@@ -89,7 +89,7 @@ public class ExploreEvents extends AppCompatActivity {
 
     private void setupRecyclerView() {
         recyclerView = findViewById(R.id.exploreView);
-        mAdapter = new EventAdapter(ExploreEvents.this, noEvents);
+        mAdapter = new EventAdapter(ExploreEvents.this, eventList);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
         setRecyclerViewLayoutManager(getResources().getConfiguration().orientation);
@@ -139,7 +139,7 @@ public class ExploreEvents extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.isEmpty()) {
-                    mAdapter.clear();
+                    mAdapter.setSearchList(eventList);
                     return true;
                 }
 
