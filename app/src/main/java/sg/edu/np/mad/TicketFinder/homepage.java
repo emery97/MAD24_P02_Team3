@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.ImageView;
 
@@ -49,7 +50,8 @@ public class homepage extends AppCompatActivity {
 
         // Initialize grid RecyclerView
         gridRecyclerView = findViewById(R.id.gridRecyclerView);
-        gridRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, getSpanCount());
+        gridRecyclerView.setLayoutManager(gridLayoutManager);
         gridItemAdapter = new EventAdapter(homepage.this, new ArrayList<>(), true); // Pass true for grid layout
         gridRecyclerView.setAdapter(gridItemAdapter);
 
@@ -114,5 +116,17 @@ public class homepage extends AppCompatActivity {
             }
         });
     }
+    private int getSpanCount() {
+        int orientation = getResources().getConfiguration().orientation;
+        return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 3 : 2;
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        GridLayoutManager layoutManager = (GridLayoutManager) gridRecyclerView.getLayoutManager();
+        if (layoutManager != null) {
+            layoutManager.setSpanCount(getSpanCount());
+        }
+    }
 }
