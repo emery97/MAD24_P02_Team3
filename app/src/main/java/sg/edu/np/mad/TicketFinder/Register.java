@@ -87,6 +87,11 @@ public class Register extends Fragment {
                     Log.d(TAG, "Incomplete form submission");
                     return;
                 }
+                else if (!phone.matches("\\d{8}")) {
+                    Toast.makeText(getActivity(), "Please enter an 8-digit, Singaporean phone number", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Invalid phone number");
+                    return;
+                }
 
                 createUserWithEmail(username, email, phone, password);
             }

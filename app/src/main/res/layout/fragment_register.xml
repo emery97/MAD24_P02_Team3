@@ -55,7 +55,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="280dp"
+        android:layout_marginTop="290dp"
         android:backgroundTint="#462109"
         android:text="Register"
         android:textSize="20sp" />
@@ -107,4 +107,13 @@
         android:textColor="#4C240A"
         android:textSize="16sp"
         tools:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/passwordReq"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="68dp"
+        android:layout_marginTop="254dp"
+        android:text="Password must be at least 6 characters."
+        android:textColor="#A19E99" />
 </FrameLayout>
