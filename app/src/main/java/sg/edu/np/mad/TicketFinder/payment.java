@@ -159,7 +159,7 @@ public class payment extends AppCompatActivity {
     }
 
     private void navigateToFeedback(){
-        Intent intent = new Intent(payment.this, homepage.class);
+        Intent intent = new Intent(payment.this, Feedback.class);
         startActivity(intent);
         finish();
     }
