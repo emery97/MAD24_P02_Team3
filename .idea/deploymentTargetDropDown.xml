@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BuyTicket">
+        <State />
+      </entry>
       <entry key="Feedback">
         <State>
           <targetSelectedWithDropDown>
@@ -38,10 +41,36 @@
         </State>
       </entry>
       <entry key="payment">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-30T16:06:50.256237900Z" />
+        </State>
       </entry>
       <entry key="profilePage">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-30T16:05:18.667140400Z" />
+        </State>
       </entry>
     </value>
   </component>
