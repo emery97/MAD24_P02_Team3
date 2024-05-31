@@ -17,6 +17,21 @@ Entertainment
 
 # Ticket Finder App Stage 1 Features
 
+## Login/Register Page
+
+- **Login/Register Fragment**:
+  - Provides a fragment that allows users to choose to login or register.
+  - Offers a seamless transition between login and registration forms.
+
+- **Firebase Integration**:
+  - Account information is checked through Firebase.
+  - Newly created accounts are updated in Firebase for secure management.
+
+- **Forget Password Option**:
+  - Available in the login fragment.
+  - Prompts a dialogue box asking users for their email.
+  - Users can press the cross to exit the dialogue.
+    
 ## Home Page
 - **Consistent Header**:
   - The header remains visible and consistent across all pages.
@@ -179,8 +194,7 @@ Entertainment
     - **Payment Method**
   - Ensures users have easy access to their booking details.
 
-  
-
+**INCLUDES RESPONSIVENESS FOR ALL PAGES**
 
 ## Features Allocation
 ### Stage 2 
