@@ -11,12 +11,27 @@ Entertainment
 ## Team members and student IDs
 1. S10258645 Lee Wei Ying
 2. S10262850 Ng Joe Yi
-3. S10262850 Ivan Koh Yung Chun
+3. S10262850 Koh Yung Chun Ivan
 4. S10262604 Koh Ye Chyang 
 5. S10260078 Tan Si Huei Chloe 
 
-# Ticket Finder App Features
+# Ticket Finder App Stage 1 Features
 
+## Login/Register Page
+
+- **Login/Register Fragment**:
+  - Provides a fragment that allows users to choose to login or register.
+  - Offers a seamless transition between login and registration forms.
+
+- **Firebase Integration**:
+  - Account information is checked through Firebase.
+  - Newly created accounts are updated in Firebase for secure management.
+
+- **Forget Password Option**:
+  - Available in the login fragment.
+  - Prompts a dialogue box asking users for their email.
+  - Users can press the cross to exit the dialogue.
+    
 ## Home Page
 - **Consistent Header**:
   - The header remains visible and consistent across all pages.
@@ -37,7 +52,7 @@ Entertainment
   - Contains navigation icons for easier movement through the app.
   - Designed to be intuitive and enhance the user experience.
 
- ## Event Details Page
+ ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang & Tan Si Huei Chloe]
 
 - **Dynamic Event Information**:
   - Event details are populated from data in Firebase.
@@ -84,7 +99,7 @@ Entertainment
   - Appears only when all information in the table is filled.
   - Ensures all necessary selections are made before proceeding.
 
-  ## Payment Details Page 
+  ## Payment Details Page [Koh Yung Chun Ivan & Koh Ye Chyang ]
 
 - **Card and Billing Information**:
   - Allows users to enter necessary card details and billing address.
@@ -109,7 +124,7 @@ Entertainment
    - Prompts users for feedback
    - Has Yes or No option
      
-  ## Feedback Page
+  ## Feedback Page [Koh Ye Chyang]
 
 - **Feedback Form**:
   - Allows users to enter their feedback in a message field.
@@ -126,7 +141,7 @@ Entertainment
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
  ## Footer Navigation
 
-### Search Button
+### Search Button 
 - **Event Search**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
@@ -139,7 +154,7 @@ Entertainment
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
-### Edit Profile Button
+### Edit Profile Button [Koh Yung Chun Ivan]
 - **View Account Information**:
   - Displays the user's account information.
   - Information is populated from Firebase.
@@ -165,7 +180,7 @@ Entertainment
   - Displays feedback in cards format.
   - Includes an exit button that returns users to the profile page.
 
-### Booking History Button
+### Booking History Button [Koh Ye Chyang]
 - **View Booking History**:
   - Shows the booking history of the user, populated from Firebase.
   - Provides a comprehensive view of all bookings made by the user.
@@ -179,20 +194,9 @@ Entertainment
     - **Payment Method**
   - Ensures users have easy access to their booking details.
 
-  
-
+**INCLUDES RESPONSIVENESS FOR ALL PAGES**
 
 ## Features Allocation
-### Stage 1
-1. Allow users to create an account (WEIYING)
-2. Allow users to search for their desired artists or events (CHLOE)
-3. Allow users to make payments through the app (YE CHYANG)
-4. Allow users to filter content (JOEYI)
-5. Allows users to update their account information (IVAN)
-6. Allow users to choose their seats and select their desired date (under booking details) (DO TOGETHER)
-7. Allow users to leave feedbacks after making payment (YE CHYANG)
-
-   
 ### Stage 2 
 1. Google Maps of the venue (CHLOE)
 2. When changing profile picture, allow user to take picture using the camera (IVAN)
