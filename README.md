@@ -17,7 +17,7 @@ Entertainment
 
 # Ticket Finder App Stage 1 Features
 
-## Login/Register Page [Koh Yung Chun Ivan / Lee Wei Ying]
+## Login/Register Page [Koh Yung Chun Ivan / Koh Ye Chyang]
 
 - **Login/Register Fragment**:
   - Provides a fragment that allows users to choose to login or register.
