@@ -15,8 +15,23 @@ Entertainment
 4. S10262604 Koh Ye Chyang 
 5. S10260078 Tan Si Huei Chloe 
 
-# Ticket Finder App Features
+# Ticket Finder App Stage 1 Features
 
+## Login/Register Page
+
+- **Login/Register Fragment**:
+  - Provides a fragment that allows users to choose to login or register.
+  - Offers a seamless transition between login and registration forms.
+
+- **Firebase Integration**:
+  - Account information is checked through Firebase.
+  - Newly created accounts are updated in Firebase for secure management.
+
+- **Forget Password Option**:
+  - Available in the login fragment.
+  - Prompts a dialogue box asking users for their email.
+  - Users can press the cross to exit the dialogue.
+    
 ## Home Page
 - **Consistent Header**:
   - The header remains visible and consistent across all pages.
@@ -179,20 +194,9 @@ Entertainment
     - **Payment Method**
   - Ensures users have easy access to their booking details.
 
-  
-
+**INCLUDES RESPONSIVENESS FOR ALL PAGES**
 
 ## Features Allocation
-### Stage 1
-1. Allow users to create an account (WEIYING)
-2. Allow users to search for their desired artists or events (CHLOE)
-3. Allow users to make payments through the app (YE CHYANG)
-4. Allow users to filter content (JOEYI)
-5. Allows users to update their account information (IVAN)
-6. Allow users to choose their seats and select their desired date (under booking details) (DO TOGETHER)
-7. Allow users to leave feedbacks after making payment (YE CHYANG)
-
-   
 ### Stage 2 
 1. Google Maps of the venue (CHLOE)
 2. When changing profile picture, allow user to take picture using the camera (IVAN)
