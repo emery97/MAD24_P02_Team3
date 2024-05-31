@@ -6,6 +6,7 @@ import static com.google.android.material.internal.ContextUtils.getActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -172,4 +173,33 @@ public class Feedback extends AppCompatActivity {
         Feedback.this.finish();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Handle configuration changes here, if necessary
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("imageUris", new ArrayList<>(imageUris));
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            ArrayList<Uri> savedImageUris = savedInstanceState.getParcelableArrayList("imageUris");
+            if (savedImageUris != null) {
+                imageUris.clear();
+                imageUris.addAll(savedImageUris);
+                // Notify the adapter that data set has changed
+                feedbackAdapter.notifyDataSetChanged();
+                // If there are images, make the ImageView visible
+                if (!imageUris.isEmpty()) {
+                    imageView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
 }
