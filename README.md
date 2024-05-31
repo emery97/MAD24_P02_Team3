@@ -11,7 +11,7 @@ Entertainment
 ## Team members and student IDs
 1. S10258645 Lee Wei Ying
 2. S10262850 Ng Joe Yi
-3. S10262850 Ivan Koh Yung Chun
+3. S10262850 Koh Yung Chun Ivan
 4. S10262604 Koh Ye Chyang 
 5. S10260078 Tan Si Huei Chloe 
 
@@ -37,7 +37,7 @@ Entertainment
   - Contains navigation icons for easier movement through the app.
   - Designed to be intuitive and enhance the user experience.
 
- ## Event Details Page
+ ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang]
 
 - **Dynamic Event Information**:
   - Event details are populated from data in Firebase.
@@ -84,7 +84,7 @@ Entertainment
   - Appears only when all information in the table is filled.
   - Ensures all necessary selections are made before proceeding.
 
-  ## Payment Details Page 
+  ## Payment Details Page [Koh Yung Chun Ivan & Koh Ye Chyang ]
 
 - **Card and Billing Information**:
   - Allows users to enter necessary card details and billing address.
@@ -109,7 +109,7 @@ Entertainment
    - Prompts users for feedback
    - Has Yes or No option
      
-  ## Feedback Page
+  ## Feedback Page [Koh Ye Chyang]
 
 - **Feedback Form**:
   - Allows users to enter their feedback in a message field.
@@ -126,7 +126,7 @@ Entertainment
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
  ## Footer Navigation
 
-### Search Button
+### Search Button 
 - **Event Search**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
@@ -139,7 +139,7 @@ Entertainment
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
-### Edit Profile Button
+### Edit Profile Button [Koh Yung Chun Ivan]
 - **View Account Information**:
   - Displays the user's account information.
   - Information is populated from Firebase.
@@ -165,7 +165,7 @@ Entertainment
   - Displays feedback in cards format.
   - Includes an exit button that returns users to the profile page.
 
-### Booking History Button
+### Booking History Button [Koh Ye Chyang]
 - **View Booking History**:
   - Shows the booking history of the user, populated from Firebase.
   - Provides a comprehensive view of all bookings made by the user.
