@@ -1,119 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F4F0E5"
+    android:orientation="vertical"
+    android:paddingLeft="36dp"
+    android:paddingTop="12dp"
+    android:paddingRight="36dp"
+    android:paddingBottom="44dp"
     tools:context=".Register">
+
+    <TextView
+        android:id="@+id/RegUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Username"
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        tools:textStyle="bold" />
 
     <EditText
         android:id="@+id/RegisterName"
-        android:layout_width="280dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="Enter your Username"
         android:inputType="text"
         android:textSize="14sp" />
 
-    <EditText
-        android:id="@+id/RegisterEmail"
-        android:layout_width="280dp"
+    <TextView
+        android:id="@+id/RegEmail"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="8dp"
+        android:text="Email"
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        tools:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/RegisterEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Email"
         android:inputType="textEmailAddress"
         android:textSize="14sp" />
 
-    <EditText
-        android:id="@+id/RegisterPhone"
-        android:layout_width="280dp"
+    <TextView
+        android:id="@+id/RegPh"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="8dp"
+        android:text="Phone Number"
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        tools:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/RegisterPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Phone Number"
         android:inputType="phone"
         android:textSize="14sp" />
 
-    <EditText
-        android:id="@+id/Registerpassword"
-        android:layout_width="280dp"
+    <TextView
+        android:id="@+id/RegPassword"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="220dp"
+        android:layout_marginTop="8dp"
+        android:text="Password"
+        android:textColor="#4C240A"
+        android:textSize="16sp"
+        tools:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/Registerpassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="New Password"
         android:inputType="textPassword"
         android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/passwordReq"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Password must be at least 6 characters."
+        android:textColor="#A19E99" />
 
     <Button
         android:id="@+id/Registerbtn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="290dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#462109"
         android:text="Register"
         android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/RegUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
-        android:layout_marginRight="102dp"
-        android:text="Username"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        tools:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/RegEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="85dp"
-        android:layout_marginRight="120dp"
-        android:text="Email"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        tools:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/RegPh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="145dp"
-        android:layout_marginRight="85dp"
-        android:text="Phone Number"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        tools:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/RegPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="205dp"
-        android:layout_marginRight="105dp"
-        android:text="Password"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        tools:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/passwordReq"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="68dp"
-        android:layout_marginTop="254dp"
-        android:text="Password must be at least 6 characters."
-        android:textColor="#A19E99" />
-</FrameLayout>
+</LinearLayout>

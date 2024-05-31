@@ -33,7 +33,6 @@ public class SignIn extends Fragment {
     private EditText emailField;
     private EditText passwordField;
     private Button submitButton;
-    private CheckBox Remember;
     private TextView forgotpassword;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -46,16 +45,11 @@ public class SignIn extends Fragment {
         emailField = view.findViewById(R.id.Email);
         passwordField = view.findViewById(R.id.Password);
         submitButton = view.findViewById(R.id.Submit);
-        Remember = view.findViewById(R.id.RememberMe);
         forgotpassword = view.findViewById(R.id.forgotPassword);
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         sharedPreferences = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
-        // Check if "Remember Me" was previously selected
-        if (sharedPreferences.getBoolean("RememberMe", false)) {
-            navigateToHomepage();
-        }
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +120,6 @@ public class SignIn extends Fragment {
                                 editor.putString("Email", document.getString("Email"));
                                 editor.putString("PhoneNum", document.getString("PhoneNum"));
                                 editor.putString("Password", newPassword);
-                                editor.putBoolean("RememberMe", Remember.isChecked());
                                 editor.apply();
 
                                 // Update password in Firestore
