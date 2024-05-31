@@ -102,6 +102,8 @@ public class profilePage extends AppCompatActivity {
                 isEditMode = true;
                 AllowEditing();
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
+                feedbackbutton.setVisibility(View.INVISIBLE);
+                logoutButton.setVisibility(View.INVISIBLE);
             }
         });
 
