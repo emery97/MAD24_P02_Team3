@@ -17,7 +17,7 @@ Entertainment
 
 # Ticket Finder App Stage 1 Features
 
-## Login/Register Page
+## Login/Register Page [Koh Yung Chun Ivan / Lee Wei Ying]
 
 - **Login/Register Fragment**:
   - Provides a fragment that allows users to choose to login or register.
@@ -32,7 +32,7 @@ Entertainment
   - Prompts a dialogue box asking users for their email.
   - Users can press the cross to exit the dialogue.
     
-## Home Page
+## Home Page [Ng Joe Yi]
 - **Consistent Header**:
   - The header remains visible and consistent across all pages.
     
@@ -141,7 +141,7 @@ Entertainment
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
  ## Footer Navigation
 
-### Search Button 
+### Search Button [Tan Si Huei Chloe, Ng Joe Yi]
 - **Event Search**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
@@ -154,7 +154,7 @@ Entertainment
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
-### Edit Profile Button [Koh Yung Chun Ivan]
+### Edit Profile Button [Koh Yung Chun Ivan, Lee Wei Ying]
 - **View Account Information**:
   - Displays the user's account information.
   - Information is populated from Firebase.
