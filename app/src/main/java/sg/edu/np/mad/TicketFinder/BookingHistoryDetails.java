@@ -1,5 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
+import static sg.edu.np.mad.TicketFinder.R.*;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
