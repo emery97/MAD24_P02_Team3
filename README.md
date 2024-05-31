@@ -52,7 +52,7 @@ Entertainment
   - Contains navigation icons for easier movement through the app.
   - Designed to be intuitive and enhance the user experience.
 
- ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang]
+ ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang & Tan Si Huei Chloe]
 
 - **Dynamic Event Information**:
   - Event details are populated from data in Firebase.
