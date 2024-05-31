@@ -118,7 +118,7 @@ public class homepage extends AppCompatActivity {
     }
     private int getSpanCount() {
         int orientation = getResources().getConfiguration().orientation;
-        return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 3 : 2;
+        return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 4 : 2;
     }
 
     @Override

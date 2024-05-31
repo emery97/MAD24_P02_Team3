@@ -1,87 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F4F0E5"
+    android:orientation="vertical"
+    android:paddingLeft="36dp"
+    android:paddingTop="12dp"
+    android:paddingRight="36dp"
+    android:paddingBottom="44dp"
     tools:context=".SignIn">
-
-    <EditText
-        android:id="@+id/Email"
-        android:layout_width="280dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="70dp"
-        android:ems="10"
-        android:hint="Enter your Email"
-        android:inputType="text"
-        android:textSize="14sp" />
-
-    <EditText
-        android:id="@+id/Password"
-        android:layout_width="280dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="150dp"
-        android:ems="10"
-        android:hint="Enter your Password"
-        android:inputType="textPassword"
-        android:textSize="14sp" />
-
-    <Button
-        android:id="@+id/Submit"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="250dp"
-        android:backgroundTint="#4C240A"
-        android:text="Enter"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/Passtxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="130dp"
-        android:layout_marginRight="97dp"
-        android:text="Password"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/emailTxt"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"
-        android:layout_marginRight="115dp"
         android:text="Email"
         android:textColor="#4C240A"
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <CheckBox
-        android:id="@+id/RememberMe"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/Email"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="180sp"
-        android:layout_marginRight="75sp"
-        android:backgroundTint="#4C240A"
-        android:buttonTint="#4C240A"
-        android:text="Remember Me"
+        android:ems="10"
+        android:hint="Enter your Email"
+        android:inputType="text"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/Passtxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Password"
         android:textColor="#4C240A"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/Password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:ems="10"
+        android:hint="Enter your Password"
+        android:inputType="textPassword"
         android:textSize="14sp" />
 
     <TextView
         android:id="@+id/forgotPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="195dp"
         android:text="Forgot password?"
         android:textColor="#E15250" />
-</FrameLayout>
+
+    <Button
+        android:id="@+id/Submit"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#4C240A"
+        android:text="Enter"
+        android:textSize="20sp" />
+
+</LinearLayout>
