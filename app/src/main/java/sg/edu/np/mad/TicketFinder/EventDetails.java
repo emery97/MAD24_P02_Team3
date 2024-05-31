@@ -2,9 +2,11 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -88,7 +90,18 @@ public class EventDetails extends AppCompatActivity {
             public void onClick(View view) {
                 // Create and display a dialog
                 Dialog mapDialog = new Dialog(EventDetails.this);
-                mapDialog.setContentView(R.layout.map_dialog);
+
+                // Check orientation
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    // Landscape mode
+                    mapDialog.setContentView(R.layout.horizontal_map_layout);
+                    // Set the dialog to match parent size
+                    mapDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                } else {
+                    // Portrait mode
+                    mapDialog.setContentView(R.layout.map_dialog);
+                }
+
                 ImageView mapImage = mapDialog.findViewById(R.id.mapImageView);
                 mapImage.setImageResource(R.drawable.seat_map_with_color_legend);
                 Button closeButton = mapDialog.findViewById(R.id.closeButton);
@@ -98,9 +111,12 @@ public class EventDetails extends AppCompatActivity {
                         mapDialog.dismiss();
                     }
                 });
+
+
                 mapDialog.show();
             }
         });
+
 
         // link to buy tickets page
         Button buyTicketsButton = findViewById(R.id.buyTicketsButton);
