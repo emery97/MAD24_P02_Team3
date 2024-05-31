@@ -31,7 +31,7 @@ public class Footer {
         bookingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, bookingHistory.class);
+                Intent intent = new Intent(activity, BookingHistoryDetails.class);
                 activity.startActivity(intent);
             }
         });

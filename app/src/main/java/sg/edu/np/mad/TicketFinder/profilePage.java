@@ -30,7 +30,7 @@ public class profilePage extends AppCompatActivity {
     private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
-    private Button saveButton, logoutButton;
+    private Button saveButton, logoutButton, feedbackbutton;
     private String actualPassword;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
@@ -61,6 +61,7 @@ public class profilePage extends AppCompatActivity {
         showPassword = findViewById(R.id.showPassword);
         saveButton = findViewById(R.id.saveButton);
         logoutButton = findViewById(R.id.logoutButton);
+        feedbackbutton = findViewById(R.id.Viewfeedbackbtn);
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -120,6 +121,14 @@ public class profilePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 logout();
+            }
+        });
+
+        feedbackbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(profilePage.this, ViewFeedback.class);
+                startActivity(intent);
             }
         });
     }

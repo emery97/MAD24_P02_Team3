@@ -226,6 +226,20 @@
                         android:textSize="15dp"
                         android:textStyle="bold" />
 
+                    <Button
+                        android:id="@+id/Viewfeedbackbtn"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginStart="148dp"
+                        android:layout_marginTop="10sp"
+                        android:background="#4C240A"
+                        android:backgroundTint="#4C240A"
+                        android:text="ViewFeedback"
+                        android:textColor="@color/white"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

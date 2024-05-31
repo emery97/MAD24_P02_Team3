@@ -136,7 +136,7 @@ public class Feedback extends AppCompatActivity {
         feedbackData.put("Email", email);
         feedbackData.put("Message", feedbackMessage);
         feedbackData.put("Category", feedbackType);
-        
+
         if (!imageUris.isEmpty()) {
             List<String> imageUrisString = new ArrayList<>();
             for (Uri uri : imageUris) {

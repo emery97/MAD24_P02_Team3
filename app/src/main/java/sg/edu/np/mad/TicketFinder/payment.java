@@ -1,14 +1,18 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.stripe.android.PaymentConfiguration;
-import com.stripe.android.model.StripePaymentSource;
-import com.stripe.android.paymentsheet.PaymentSheet;
-import com.stripe.android.paymentsheet.PaymentSheetResult;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,11 +40,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class payment extends AppCompatActivity {
+    private SharedPreferences sharedPreferences;
+    private Spinner paymentmethod;
     private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode;
     private Button buyNow;
     private Button bookingdetails;
     private TextView totalPricetext;
     private Button cancel;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,11 @@ public class payment extends AppCompatActivity {
             return insets;
         });
 
+        db = FirebaseFirestore.getInstance();
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("UserId", null);
+        String name = sharedPreferences.getString("Name", null);
+
         // Initialize UI components
         editCardNumber = findViewById(R.id.editCardNumber);
         editExpiry = findViewById(R.id.editExpiry);
@@ -67,6 +76,12 @@ public class payment extends AppCompatActivity {
         totalPricetext = findViewById(R.id.totalpricedisplay);
         bookingdetails = findViewById(R.id.bookingdetails);
         cancel = findViewById(R.id.backbtn);
+
+        paymentmethod = findViewById(R.id.paymentMethodSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.payment_methods, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        paymentmethod.setAdapter(adapter);
 
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
 
@@ -131,7 +146,40 @@ public class payment extends AppCompatActivity {
 
     private void processPayment() {
         Toast.makeText(payment.this, "Payment successful", Toast.LENGTH_SHORT).show();
+        postBookingDetailsToFirestore();
         new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before alert message
+    }
+
+    private void postBookingDetailsToFirestore() {
+        String userId = sharedPreferences.getString("UserId", null);
+        String name = sharedPreferences.getString("Name", null);
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        String seatCategory = getIntent().getStringExtra("seatCategory");
+        String seatNumber = getIntent().getStringExtra("seatNumber");
+        int quantity = getIntent().getIntExtra("quantity", 1);
+        String paymentMethod = paymentmethod.getSelectedItem().toString();
+
+        Map<String, Object> bookingDetails = new HashMap<>();
+        bookingDetails.put("userId", userId);
+        bookingDetails.put("Name", name);
+        bookingDetails.put("SeatCategory", seatCategory);
+        bookingDetails.put("SeatNumber", seatNumber);
+        bookingDetails.put("TotalPrice", totalPrice);
+        bookingDetails.put("Quantity", quantity);
+        bookingDetails.put("PaymentMethod", paymentMethod);
+
+        db.collection("BookingDetails").add(bookingDetails)
+                .addOnSuccessListener(documentReference -> {
+                    editCardNumber.setText("");
+                    editAddress.setText("");
+                    editCVV.setText("");
+                    editExpiry.setText("");
+                    editName.setText("");
+                    editPostalCode.setText("");
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showConfirmationDialog() {
@@ -159,7 +207,7 @@ public class payment extends AppCompatActivity {
     }
 
     private void navigateToFeedback(){
-        Intent intent = new Intent(payment.this, homepage.class);
+        Intent intent = new Intent(payment.this, Feedback.class);
         startActivity(intent);
         finish();
     }
@@ -180,7 +228,7 @@ public class payment extends AppCompatActivity {
 
         categoryText.setText(seatCategory);
         numberText.setText(seatNumber);
-        priceText.setText("Seat Price: $" + totalPrice);
+        priceText.setText("Price: $" + totalPrice);
         quantityText.setText("Quantity: " + quantity);
 
         dialog.show();

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".dbHandler"
@@ -30,7 +31,6 @@
         <activity
             android:name=".homepage"
             android:exported="true" />
-
         <activity
             android:name=".EventDetails"
             android:exported="true" />
@@ -51,7 +51,10 @@
             android:name=".BuyTicket"
             android:exported="true" />
         <activity
-            android:name=".bookingHistory"
+            android:name=".BookingHistoryDetails"
+            android:exported="true" />
+        <activity
+            android:name=".ViewFeedback"
             android:exported="true" />
 
         <meta-data
