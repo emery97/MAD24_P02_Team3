@@ -145,7 +145,7 @@ Entertainment
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
 
 ## Footer Navigation [NG Joe Yi]
-- The footer navigation includes links to the Homepage, Explore Events, Booking History, and Profile Page for easy access and seamless user experience.
+- The footer navigation includes icons that links to the **Homepage**, **Explore Events**, **Booking History**, and **Profile Page** for easy access and seamless user experience.
 
 ## Explore Event Page [Tan Si Huei Chloe, Ng Joe Yi]
 - **Event Search [Tan Si Huei Chloe]**:
