@@ -197,9 +197,9 @@ Entertainment
     - **Payment Method**
   - Ensures users have easy access to their booking details.
 
-  - **RecyclerView of Booking details**
-    - Displays a list of booking details that user had booked
-    - Booking details are dynamically GET from the firebase for the specific user
+- **RecyclerView of Booking details**
+  - Displays a list of booking details that user had booked
+  - Booking details are dynamically GET from the firebase for the specific user
 
 ### Responsiveness implementation [Lee Wei Ying, Ng Joe Yi , Tan Si Huei Chloe]
 ### Logo Implementation [Lee Wei Ying]
