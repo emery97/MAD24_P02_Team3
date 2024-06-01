@@ -47,7 +47,7 @@
                 android:adjustViewBounds="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/seat_map_with_color_legend" />
+                app:srcCompat="@drawable/bigger_font_data" />
 
             <TextView
 
