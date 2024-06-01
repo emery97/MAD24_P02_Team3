@@ -2,7 +2,10 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Madassignment" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#F4F0E5</item>
+        <item name="colorPrimaryVariant">#F4F0E5</item> <!-- Optional: to match the status bar -->
+        <item name="android:windowBackground">#F4F0E5</item>
+        <item name="android:colorBackground">#F4F0E5</item> <!-- This sets the app's background color -->
     </style>
 
     <style name="Theme.Madassignment" parent="Base.Theme.Madassignment" />
