@@ -195,7 +195,7 @@ Entertainment
   - Ensures users have easy access to their booking details.
 
 ### Responsiveness implementation [Lee Wei Ying]
-### Logo Implementationo [Lee Wei Ying]
+### Logo Implementation [Lee Wei Ying]
 
 ## Features Allocation
 ### Stage 2 
