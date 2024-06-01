@@ -191,6 +191,7 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to load user data
+    // Referenced from chatgpt
     private void loadUserData() {
         if (firebaseUser != null) {
             // Set username and email from SharedPreferences
@@ -231,6 +232,7 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to toggle password visibility in edit mode
+    // Referenced from chatgpt
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibility: checked");
@@ -318,6 +320,7 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to update user information
+    // Referenced from chatgpt
     private void updateUserInformation() {
         // Get updated name and password
         String updatedName = editUsername.getText().toString();
