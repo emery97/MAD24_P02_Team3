@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BuyTicket">
+        <State />
+      </entry>
       <entry key="Feedback">
         <State>
           <targetSelectedWithDropDown>
@@ -26,12 +29,12 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\jifie\.android\avd\Pixel_8_Pro_API_34.avd" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-06-01T04:41:30.986769100Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-06-01T16:27:39.076646300Z" />
         </State>
       </entry>
     </value>

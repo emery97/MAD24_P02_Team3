@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 public class BookingDetails {
     // attributes
+    private String concertName;
     private String seatCategory;
     private String seatNumber;
     private String totalPrice;
@@ -9,7 +10,8 @@ public class BookingDetails {
     private String paymentMethod;
 
     // Parameterized constructor
-    public BookingDetails(String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
+    public BookingDetails(String concertName,String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
+        this.concertName = concertName;
         this.seatCategory = seatCategory;
         this.seatNumber = seatNumber;
         this.totalPrice = totalPrice;
@@ -18,6 +20,9 @@ public class BookingDetails {
     }
 
     // Getters and setters
+    public String getConcertName(){
+        return concertName;
+    }
     public String getSeatCategory() {
         return seatCategory;
     }

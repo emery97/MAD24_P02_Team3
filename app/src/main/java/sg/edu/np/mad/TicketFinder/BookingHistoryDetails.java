@@ -63,6 +63,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                             bookingDetailsList.clear();
                             // Populate booking details list
                             for (QueryDocumentSnapshot document : querySnapshot) {
+                                String eventTitle = document.getString("ConcertTitle");
                                 String seatCategory = document.getString("SeatCategory");
                                 String seatNumber = document.getString("SeatNumber");
 
@@ -77,7 +78,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                 String paymentMethod = document.getString("PaymentMethod");
 
                                 // Create BookingDetails object and add to list
-                                BookingDetails bookingDetails = new BookingDetails(seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
+                                BookingDetails bookingDetails = new BookingDetails(eventTitle,seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                 bookingDetailsList.add(bookingDetails);
                             }
                             // Initialize and set adapter for RecyclerView
