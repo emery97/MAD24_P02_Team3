@@ -53,7 +53,7 @@ Entertainment
   - Contains navigation icons for easier movement through the app.
   - Designed to be intuitive and enhance the user experience.
 
- ## Event Details Page [Tan Si Huei Chloe]
+## Event Details Page [Tan Si Huei Chloe]
 
 - **Dynamic Event Information [Tan Si Huei Chloe]**:
   - Event details are populated from data in Firebase.
@@ -74,7 +74,7 @@ Entertainment
   - Directs users to the ticket purchasing page.
   - Ensures a seamless process for ticket acquisition.
 
-  ## Buy Tickets Page  [Lee Wei Ying]
+## Buy Tickets Page  [Lee Wei Ying]
 
 - **Image View of Map Including Seat Number**:
   - Displays a visual map of the venue with seating arrangements.
@@ -100,7 +100,7 @@ Entertainment
   - Appears only when all information in the table is filled.
   - Ensures all necessary selections are made before proceeding.
 
-  ## Payment Details Page [Koh Ye Chyang]
+## Payment Details Page [Koh Ye Chyang]
 
 - **Card and Billing Information**:
   - Allows users to enter necessary card details and billing address.
@@ -125,7 +125,7 @@ Entertainment
    - Prompts users for feedback
    - Has Yes or No option
      
-  ## Feedback Page [Koh Ye Chyang]
+## Feedback Page [Koh Ye Chyang]
 
 - **Feedback Form**:
   - Allows users to enter their feedback in a message field.
@@ -143,6 +143,7 @@ Entertainment
 
 - **Access Restrictions**:
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
+
 ## Footer Navigation
 
 ## Explore Event Page [Tan Si Huei Chloe, Ng Joe Yi]
@@ -203,6 +204,7 @@ Entertainment
   - Booking details are dynamically GET from the firebase for the specific user
 
 ### Responsiveness implementation [Lee Wei Ying, Ng Joe Yi , Tan Si Huei Chloe]
+
 ### Logo Implementation [Lee Wei Ying]
 
 ## Features Allocation
