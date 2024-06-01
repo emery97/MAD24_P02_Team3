@@ -46,7 +46,7 @@ Entertainment
   - Recommendations allows user to view the available list of events that are happening in singapore.
 
 - **Dynamic Event Picture**:
-  - The event picture displayed below the header changes randomly.
+  - The featured event picture displayed below the header changes randomly.
   - Each time the user refreshes the page, a new image is shown.
 
 - **User-Friendly Footer**:
@@ -154,6 +154,7 @@ Entertainment
 
 - **Filter Options [Ng Joe Yi]**:
   - Users can filter events by price, event type, or date.
+  - Users can reset filters by selecting "Any" for price range and event type, and by clicking "Clear Date" to reset the date.
   - Ensures users can find events that meet their preferences.
 
 - **RecyclerView of Events [Tan Si Huei Chloe]**:
