@@ -117,6 +117,7 @@ public class Register extends Fragment {
     }
 
     // Method to create user
+    // Reference from chatgpt and Firebase code
     private void createUserWithEmail(String username, String email, String phone, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
