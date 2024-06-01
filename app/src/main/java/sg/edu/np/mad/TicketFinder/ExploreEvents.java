@@ -176,7 +176,7 @@ public class ExploreEvents extends AppCompatActivity {
         Spinner priceRangeSpinner = view.findViewById(R.id.priceRangeSpinner);
         Spinner eventTypeSpinner = view.findViewById(R.id.eventTypeSpinner);
         Button selectDateButton = view.findViewById(R.id.selectDateButton);
-        Button clearDateButton = view.findViewById(R.id.clearDateButton);
+        Button clearFiltersButton = view.findViewById(R.id.clearFiltersButton);
         TextView selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
 
         // Populate filter options dynamically
@@ -202,6 +202,11 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
+        // ******************// FILTERING: REFERRED FROM BELOW // ******************
+        // based on general practices and examples from resources like:
+        // - Android Developers documentation: https://developer.android.com/guide/topics/ui/controls/spinner
+        // - Stack Overflow discussions
+        // https://www.geeksforgeeks.org/datepickerdialog-in-android/
         // ---------------------------------------------- filter for date
         selectDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,10 +215,18 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
+        /*
         clearDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearSelectedDate(selectedDateTextView); // Clear selected date
+            }
+        });*/
+
+        clearFiltersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearAllFilters(priceRangeSpinner, eventTypeSpinner, selectedDateTextView); // Clear all filters
             }
         });
 
@@ -259,31 +272,48 @@ public class ExploreEvents extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         // Format selected date and display it
-                        selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02 d",
+                        selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d",
                                 year, month + 1, dayOfMonth);
-                                selectedDateTextView.setText(selectedDate);
+                        selectedDateTextView.setText(selectedDate);
                     }
                 }, year, month, day);
         datePickerDialog.show();
     }
 
+    /*
     private void clearSelectedDate(TextView selectedDateTextView) {
         selectedDate = null; // Clear selected date
         selectedDateTextView.setText("No date selected"); // Update TextView
+    }*/
+
+    private void clearAllFilters(Spinner priceRangeSpinner, Spinner eventTypeSpinner, TextView selectedDateTextView) {
+        // Clear all selected filters
+        selectedPriceRange = null;
+        selectedEventType = null;
+        selectedDate = null;
+
+        // Reset the spinners and date text view
+        priceRangeSpinner.setSelection(0);
+        eventTypeSpinner.setSelection(0);
+        selectedDateTextView.setText("No date selected");
     }
+
+
     // ------------------------------------------------------ end of filter for date
 
+    // had help from chatgpt
     // ---------------------------------------------------- filter for event type
     private void setupEventTypeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> eventTypes = new HashSet<>();
-        eventTypes.add("Any"); // Add "Any" option first
         for (Event event : events) {
             eventTypes.add(event.getGenre()); // Add all genres found in event list
         }
         List<String> eventTypeList = new ArrayList<>(eventTypes);
+        eventTypeList.add(0, "Any"); // Add "Any" at the top
         setupSpinner(spinner, eventTypeList); // Display all genre options in spinner
 
         // Set default selection to "Any"
+        // It will also work without default position but i read that this will ensure cross functionality
         int defaultPosition = eventTypeList.indexOf("Any");
         spinner.setSelection(defaultPosition);
     }
@@ -305,7 +335,7 @@ public class ExploreEvents extends AppCompatActivity {
     // ------------------------------------------------------------ filter for price
     private void setupPriceRangeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> priceRanges = new HashSet<>();
-        priceRanges.add("Any"); // Add "Any" option
+        //priceRanges.add("Any"); // Add "Any" option
         // Go through all events and add any relevant price ranges
         for (Event event : events) {
             double price = event.getPrice();
@@ -319,7 +349,15 @@ public class ExploreEvents extends AppCompatActivity {
                 priceRanges.add("$101 - $200");
             }
         }
-        setupSpinner(spinner, new ArrayList<>(priceRanges)); // Display all price range options
+        List<String> priceRangeList = new ArrayList<>(priceRanges);
+        priceRangeList.add(0, "Any"); // Add "Any" at the top
+
+        setupSpinner(spinner, priceRangeList); // Display all price range options
+
+        // Set default selection to "Any"
+        // It will also work without default position but i read that this will ensure cross functionality
+        int defaultPosition = priceRangeList.indexOf("Any");
+        spinner.setSelection(defaultPosition);
     }
 
     // Return price range filtered list
