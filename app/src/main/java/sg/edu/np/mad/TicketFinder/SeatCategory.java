@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SeatCategory {
+    // Attributes
     private String category;
     private double seatCategoryPrice;
     private ArrayList<String> seats;
