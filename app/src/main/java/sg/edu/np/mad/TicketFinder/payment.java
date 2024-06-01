@@ -42,9 +42,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class payment extends AppCompatActivity {
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
     private Spinner paymentmethod;
-    private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode;
+
+    private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode; // EditText fields for payment details
     private Button buyNow;
     private Button bookingdetails;
     private TextView totalPricetext;
@@ -56,7 +57,7 @@ public class payment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Check orientation
+        // Check orientation and set layout accordingly
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // Landscape mode
             setContentView(R.layout.horizontal_payment);
@@ -67,7 +68,6 @@ public class payment extends AppCompatActivity {
             setContentView(R.layout.activity_payment);
         }
 
-        //setContentView(R.layout.activity_payment);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.testpaymentbtn), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -76,6 +76,8 @@ public class payment extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
+        // Get user data from SharedPreferences
         String userId = sharedPreferences.getString("UserId", null);
         String name = sharedPreferences.getString("Name", null);
 
@@ -91,14 +93,20 @@ public class payment extends AppCompatActivity {
         bookingdetails = findViewById(R.id.bookingdetails);
         cancel = findViewById(R.id.backbtn);
 
+        // Initialize payment method spinner
         paymentmethod = findViewById(R.id.paymentMethodSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.payment_methods, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         paymentmethod.setAdapter(adapter);
 
+        // Get total price from intent
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
 
+        // Set total price text
+        totalPricetext.setText("Total Price: $" + totalPrice);
+
+        // Handle click on booking details button
         bookingdetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,50 +114,55 @@ public class payment extends AppCompatActivity {
             }
         });
 
-        totalPricetext.setText("Total Price: $" + totalPrice);
-
+        // Handle click on buy now button
         buyNow.setOnClickListener(view -> {
             // Validate input fields
             if (validateInput()) {
                 processPayment();
             } else {
-                //Error Message
+                // Display error message
             }
         });
 
+        // Handle click on cancel button
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Navigate back to BuyTicket activity
                 Intent intent = new Intent(payment.this, BuyTicket.class);
                 startActivity(intent);
             }
         });
     }
 
-    // Method to validate input fields
     private boolean validateInput() {
+        // Get input values
         String cardNumber = editCardNumber.getText().toString();
+        String expiry = editExpiry.getText().toString();
+        String cvv = editCVV.getText().toString();
+        String name = editName.getText().toString();
+        String address = editAddress.getText().toString();
+        String postalCode = editPostalCode.getText().toString();
+
+        // Validate card number
         if (cardNumber.length() != 16) {
             Toast.makeText(payment.this, "Invalid Card Number", Toast.LENGTH_SHORT).show();
             return false;
         }
-        String expiry = editExpiry.getText().toString();
+
+        // Validate expiry date
         if (expiry.length() != 5){
             Toast.makeText(payment.this, "Input valid date", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        String cvv = editCVV.getText().toString();
+        // Validate CVV
         if (cvv.length() != 3){
-            Toast.makeText(payment.this, "Invalid Cvv Input", Toast.LENGTH_SHORT).show();
+            Toast.makeText(payment.this, "Invalid CVV Input", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        String name = editName.getText().toString();
-        String address = editAddress.getText().toString();
-        String postalCode = editPostalCode.getText().toString();
-
-
+        // Validate name, address, and postal code
         if (name.isEmpty() || address.isEmpty() || postalCode.isEmpty()) {
             Toast.makeText(payment.this, "Invalid Input", Toast.LENGTH_SHORT).show();
             return false;
@@ -159,20 +172,26 @@ public class payment extends AppCompatActivity {
     }
 
     private void processPayment() {
+        // Display payment success message
         Toast.makeText(payment.this, "Payment successful", Toast.LENGTH_SHORT).show();
+        // Post booking details to Firestore
         postBookingDetailsToFirestore();
-        new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before alert message
+        // Show confirmation dialog
+        new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
     }
 
     private void postBookingDetailsToFirestore() {
+        // Get user data from SharedPreferences
         String userId = sharedPreferences.getString("UserId", null);
         String name = sharedPreferences.getString("Name", null);
+        // Get booking details from intent
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         String seatCategory = getIntent().getStringExtra("seatCategory");
         String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
         String paymentMethod = paymentmethod.getSelectedItem().toString();
 
+        // Create booking details map
         Map<String, Object> bookingDetails = new HashMap<>();
         bookingDetails.put("userId", userId);
         bookingDetails.put("Name", name);
@@ -182,8 +201,10 @@ public class payment extends AppCompatActivity {
         bookingDetails.put("Quantity", quantity);
         bookingDetails.put("PaymentMethod", paymentMethod);
 
+        // Add booking details to Firestore
         db.collection("BookingDetails").add(bookingDetails)
                 .addOnSuccessListener(documentReference -> {
+                    // Clear input fields on success
                     editCardNumber.setText("");
                     editAddress.setText("");
                     editCVV.setText("");
@@ -197,8 +218,9 @@ public class payment extends AppCompatActivity {
     }
 
     private void showConfirmationDialog() {
+        // Build the confirmation dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Your Contribution Matter!");
+        builder.setTitle("Your Contribution Matters!");
         builder.setMessage("Provide your feedback on what to improve on our app!")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -210,6 +232,7 @@ public class payment extends AppCompatActivity {
                         navigateToHomepage();
                     }
                 });
+        // Show the dialog
         builder.create().show();
     }
 
@@ -227,21 +250,23 @@ public class payment extends AppCompatActivity {
     }
 
     private void showBookingDetailsDialog() {
+        // Get booking details from intent
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         String seatCategory = getIntent().getStringExtra("seatCategory");
         String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
 
+        // Create and show booking details dialog
         Dialog dialog = new Dialog(payment.this);
-
-
         dialog.setContentView(R.layout.bookingdetails);
 
+        // Initialize UI components in the dialog
         TextView categoryText = dialog.findViewById(R.id.categoryText);
         TextView numberText = dialog.findViewById(R.id.numberText);
         TextView priceText = dialog.findViewById(R.id.priceText);
         TextView quantityText = dialog.findViewById(R.id.quantityText);
 
+        // Set booking details in the dialog
         categoryText.setText(seatCategory);
         numberText.setText(seatNumber);
         priceText.setText("Price: $" + totalPrice);
