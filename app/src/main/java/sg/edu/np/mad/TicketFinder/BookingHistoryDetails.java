@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookingHistoryDetails extends AppCompatActivity {
-    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences; // Shared preferences for storing user data
     private FirebaseFirestore db;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView; // RecyclerView to display booking details
     private BookingDetailsAdapter bookingDetailsAdapter;
     private List<BookingDetails> bookingDetailsList = new ArrayList<>();
 
@@ -32,19 +32,25 @@ public class BookingHistoryDetails extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_booking_history_details);
 
+        // Initialize Firestore
         db = FirebaseFirestore.getInstance();
+        // Get shared preferences for user data
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Get user ID from shared preferences and fetch booking details
         String userId = sharedPreferences.getString("UserId", null);
         if (userId != null) {
             fetchBookingDetailsData(userId);
         }
 
+        // Set up footer
         Footer.setUpFooter(this);
     }
 
+    // Method to fetch booking details data from Firestore
     private void fetchBookingDetailsData(String userId) {
         db.collection("BookingDetails")
                 .whereEqualTo("userId", userId)
@@ -53,7 +59,9 @@ public class BookingHistoryDetails extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            // Clear existing booking details list
                             bookingDetailsList.clear();
+                            // Populate booking details list
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 String seatCategory = document.getString("SeatCategory");
                                 String seatNumber = document.getString("SeatNumber");
@@ -62,15 +70,17 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                 Double totalPrice = document.getDouble("TotalPrice");
                                 String totalPriceString = totalPrice != null ? String.valueOf(totalPrice) : null;
 
-                                // Retrieve Quantity as int and convert to String
+                                // Retrieve Quantity as long and convert to String
                                 Long quantityLong = document.getLong("Quantity");
                                 String quantityString = quantityLong != null ? String.valueOf(quantityLong) : null;
 
                                 String paymentMethod = document.getString("PaymentMethod");
 
+                                // Create BookingDetails object and add to list
                                 BookingDetails bookingDetails = new BookingDetails(seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                 bookingDetailsList.add(bookingDetails);
                             }
+                            // Initialize and set adapter for RecyclerView
                             bookingDetailsAdapter = new BookingDetailsAdapter(bookingDetailsList);
                             recyclerView.setAdapter(bookingDetailsAdapter);
                         } else {
