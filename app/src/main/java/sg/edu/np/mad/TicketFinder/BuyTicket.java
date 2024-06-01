@@ -72,6 +72,7 @@ public class BuyTicket extends AppCompatActivity {
                     }
                 }
 
+                // referenced from chatgpt
                 // Update the adapter with the new data
                 runOnUiThread(new Runnable() {
                     @Override
@@ -168,6 +169,7 @@ public class BuyTicket extends AppCompatActivity {
                 break;
             }
         }
+        // referenced from chatgpt
         // Update the seat number dropdown adapter
         runOnUiThread(new Runnable() {
             @Override
@@ -201,6 +203,8 @@ public class BuyTicket extends AppCompatActivity {
         // References to conclusion data
         TextView selectedSeatCat = findViewById(R.id.selectedSeatCat);
         TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
+
+        // referenced from chatgpt
         // Add a TextWatcher to quantityEditText
         quantityEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -231,6 +235,8 @@ public class BuyTicket extends AppCompatActivity {
                 // Not required
             }
         });
+
+        // referenced from chatgpt
         // Add a TextWatcher to seatAutoCompleteTextView
         seatAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
