@@ -54,7 +54,7 @@ Entertainment
 
  ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang & Tan Si Huei Chloe]
 
-- **Dynamic Event Information**:
+- **Dynamic Event Information [Tan Si Huei Chloe]**:
   - Event details are populated from data in Firebase.
   - Includes:
     - **Artist**: Name of the performing artist or group.
@@ -145,7 +145,7 @@ Entertainment
  ## Footer Navigation
 
 ### Search Button [Tan Si Huei Chloe, Ng Joe Yi]
-- **Event Search**:
+- **Event Search [Tan Si Huei Chloe]**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
 
@@ -153,7 +153,7 @@ Entertainment
   - Users can filter events by price, event type, or date.
   - Ensures users can find events that meet their preferences.
 
-- **RecyclerView of Events**:
+- **RecyclerView of Events [Tan Si Huei Chloe]**:
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
