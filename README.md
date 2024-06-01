@@ -144,7 +144,7 @@ Entertainment
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
  ## Footer Navigation
 
-### Search Button [Tan Si Huei Chloe, Ng Joe Yi]
+### Explore Events Page [Tan Si Huei Chloe, Ng Joe Yi]
 - **Event Search [Tan Si Huei Chloe]**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
@@ -157,7 +157,7 @@ Entertainment
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
-### Edit Profile Button [Koh Yung Chun Ivan, Lee Wei Ying]
+### Profile Page [Koh Yung Chun Ivan, Lee Wei Ying]
 - **View Account Information**:
   - Displays the user's account information.
   - Information is populated from Firebase.
@@ -183,7 +183,7 @@ Entertainment
   - Displays feedback in cards format.
   - Includes an exit button that returns users to the profile page.
 
-### Booking History Button [Koh Ye Chyang]
+### Booking History Page [Koh Ye Chyang]
 - **View Booking History**:
   - Shows the booking history of the user, populated from Firebase.
   - Provides a comprehensive view of all bookings made by the user.
