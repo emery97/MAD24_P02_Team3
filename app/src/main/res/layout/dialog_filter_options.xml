@@ -45,17 +45,26 @@
         android:id="@+id/selectDateButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Date"
+        android:layout_marginBottom="8dp"
         android:backgroundTint="#996666"
-        android:textColor="@android:color/white"
-        android:layout_marginBottom="16dp"/>
+        android:text="Select Date"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/selectedDateTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:paddingTop="8dp"
         android:text="No date selected"
-        android:textColor="#999999"/>
+        android:textColor="#999999" />
+
+    <Button
+        android:id="@+id/clearDateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#CAA2A2"
+        android:text="Clear Date"
+        android:textColor="@android:color/white" />
 </LinearLayout>

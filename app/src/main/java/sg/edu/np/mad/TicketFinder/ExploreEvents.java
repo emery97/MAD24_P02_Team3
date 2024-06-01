@@ -42,9 +42,6 @@ public class ExploreEvents extends AppCompatActivity {
     private String selectedEventType = null;
     private String selectedPriceRange = null;
 
-    // blank recycler view
-    ArrayList<Event> noEvents = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +53,7 @@ public class ExploreEvents extends AppCompatActivity {
             return insets;
         });
 
+        // gets restored filter options
         if (savedInstanceState != null) {
             selectedDate = savedInstanceState.getString("selectedDate");
             selectedEventType = savedInstanceState.getString("selectedEventType");
@@ -66,21 +64,24 @@ public class ExploreEvents extends AppCompatActivity {
         handler.getData(new FirestoreCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> retrievedEventList) {
+                // get event data
                 eventList.addAll(retrievedEventList);
                 mAdapter.notifyDataSetChanged();
                 applyFilters(); // Apply filters if they were restored
             }
         });
 
-        setupRecyclerView();
-        setupSearchToggle();
+        setupRecyclerView(); // shows events
+        setupSearchToggle(); // set search by artist/title
         setupSearchBar();
         setupFilterButton();
+        //set up footer
         Footer.setUpFooter(this);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // saves filter data for restoration
         super.onSaveInstanceState(outState);
         outState.putString("selectedDate", selectedDate);
         outState.putString("selectedEventType", selectedEventType);
@@ -88,37 +89,45 @@ public class ExploreEvents extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
+        //display events in recycler view
         recyclerView = findViewById(R.id.exploreView);
         mAdapter = new EventAdapter(ExploreEvents.this, eventList);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mAdapter);
+        // sets layout according to horizontal/vertical orientation
         setRecyclerViewLayoutManager(getResources().getConfiguration().orientation);
     }
 
     private void setRecyclerViewLayoutManager(int orientation) {
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            recyclerView.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns for landscape mode
+            // if horizontal, set 2 columns
+            recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this)); // 1 column for portrait mode
+            // if vertical, 1 column
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // sets layout according to new orientation
         setRecyclerViewLayoutManager(newConfig.orientation);
     }
 
     private void setupSearchToggle() {
+        //get toggle button
         Button searchToggle = findViewById(R.id.searchToggle);
         searchToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!searchByArtist) {
+                    // now searching by artist
                     searchByArtist = true;
                     searchToggle.setText("Search Artist");
                     Toast.makeText(ExploreEvents.this, "Now searching by artist...", Toast.LENGTH_SHORT).show();
                 } else {
+                    // now searching by title
                     searchByArtist = false;
                     searchToggle.setText("Search Title");
                     Toast.makeText(ExploreEvents.this, "Now searching by title...", Toast.LENGTH_SHORT).show();
@@ -128,8 +137,12 @@ public class ExploreEvents extends AppCompatActivity {
     }
 
     private void setupSearchBar() {
+        // get search bar
         SearchView searchEvents = findViewById(R.id.searchEvents);
+
+        // dont enter typing mode
         searchEvents.clearFocus();
+
         searchEvents.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -138,6 +151,7 @@ public class ExploreEvents extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                // if nothing is typed, show all events
                 if (newText.isEmpty()) {
                     mAdapter.setSearchList(eventList);
                     return true;
@@ -147,19 +161,24 @@ public class ExploreEvents extends AppCompatActivity {
 
                 for (Event event : eventList) {
                     if (searchByArtist) {
+                        // if event artist contains current search text, add to search list
                         if (event.getArtist().toLowerCase().contains(newText.toLowerCase())) {
                             searchList.add(event);
                         }
                     } else {
+                        // if event title contains current search text, add to search list
                         if (event.getTitle().toLowerCase().contains(newText.toLowerCase())) {
                             searchList.add(event);
                         }
                     }
                 }
 
+                // if there are no artists/titles matching the search text, alert user
                 if (searchList.isEmpty()) {
                     Toast.makeText(ExploreEvents.this, "No events found", Toast.LENGTH_SHORT).show();
                 }
+
+                // show all events in search list (if empty, shows nothing)
                 mAdapter.setSearchList(searchList);
 
                 return true;
@@ -168,12 +187,13 @@ public class ExploreEvents extends AppCompatActivity {
     }
 
     private void setupFilterButton() {
+        // get filter button
         ImageButton filterButton = findViewById(R.id.filterButton);
         filterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showFilterDialog();
-            }
+            } // opens filter menu
         });
     }
 
@@ -183,9 +203,11 @@ public class ExploreEvents extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_filter_options, null);
 
+        // get views
         Spinner priceRangeSpinner = view.findViewById(R.id.priceRangeSpinner);
         Spinner eventTypeSpinner = view.findViewById(R.id.eventTypeSpinner);
         Button selectDateButton = view.findViewById(R.id.selectDateButton);
+        Button clearDateButton = view.findViewById(R.id.clearDateButton);
         TextView selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
 
         // Use the existing getData method to populate the filters dynamically
@@ -221,11 +243,20 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
+        clearDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearSelectedDate(selectedDateTextView);
+            }
+        });
+
+        // apply / cancel function
         builder.setView(view)
                 .setTitle("Apply Filters")
                 .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //also any existing price range/event type filters
                         selectedPriceRange = priceRangeSpinner.getSelectedItem().toString();
                         selectedEventType = eventTypeSpinner.getSelectedItem().toString();
                         applyFilters();
@@ -235,6 +266,8 @@ public class ExploreEvents extends AppCompatActivity {
                 .create()
                 .show();
     }
+
+    // return date filtered list
     private ArrayList<Event> filterByDate(ArrayList<Event> events, String date) {
         ArrayList<Event> filteredList = new ArrayList<>();
         for (Event event : events) {
@@ -245,6 +278,7 @@ public class ExploreEvents extends AppCompatActivity {
         return filteredList;
     }
     private void showDatePickerDialog(TextView selectedDateTextView) {
+        // display calendar picker
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -254,11 +288,18 @@ public class ExploreEvents extends AppCompatActivity {
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        // setting date formatting
                         selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, month + 1, dayOfMonth);
+                        // displays selected date
                         selectedDateTextView.setText(selectedDate);
                     }
                 }, year, month, day);
         datePickerDialog.show();
+    }
+
+    private void clearSelectedDate(TextView selectedDateTextView) {
+        selectedDate = null; // or ""
+        selectedDateTextView.setText("No date selected"); // Clear the TextView
     }
     // ------------------------------------------------------ end of filter for date
 
@@ -267,15 +308,17 @@ public class ExploreEvents extends AppCompatActivity {
         Set<String> eventTypes = new HashSet<>();
         eventTypes.add("Any"); // Add "Any" option first
         for (Event event : events) {
-            eventTypes.add(event.getGenre());
+            eventTypes.add(event.getGenre()); // add all genres found in eventlist
         }
         List<String> eventTypeList = new ArrayList<>(eventTypes);
-        setupSpinner(spinner, eventTypeList);
+        setupSpinner(spinner, eventTypeList); // display all genre options in spinner
 
         // Set default selection to "Any"
         int defaultPosition = eventTypeList.indexOf("Any");
         spinner.setSelection(defaultPosition);
     }
+
+    // return genre filtered list
     private ArrayList<Event> filterByEventType(ArrayList<Event> events, String eventType) {
         ArrayList<Event> filteredList = new ArrayList<>();
         for (Event event : events) {
@@ -291,6 +334,7 @@ public class ExploreEvents extends AppCompatActivity {
     private void setupPriceRangeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> priceRanges = new HashSet<>();
         priceRanges.add("Any"); // Add "Any" option
+        // go through all events and add any relevant price ranges
         for (Event event : events) {
             double price = event.getPrice();
             if (price <= 20) {
@@ -301,11 +345,9 @@ public class ExploreEvents extends AppCompatActivity {
                 priceRanges.add("$51 - $100");
             } else if (price <= 200) {
                 priceRanges.add("$101 - $200");
-            } else {
-                priceRanges.add("$201+");
             }
         }
-        setupSpinner(spinner, new ArrayList<>(priceRanges));
+        setupSpinner(spinner, new ArrayList<>(priceRanges)); // display all price range options
     }
     private ArrayList<Event> filterByPriceRange(ArrayList<Event> events, String priceRange) {
         ArrayList<Event> filteredList = new ArrayList<>();
