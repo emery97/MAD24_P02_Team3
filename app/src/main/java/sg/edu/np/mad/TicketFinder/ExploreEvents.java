@@ -278,17 +278,19 @@ public class ExploreEvents extends AppCompatActivity {
     }
     // ------------------------------------------------------ end of filter for date
 
+    // had help from chatgpt
     // ---------------------------------------------------- filter for event type
     private void setupEventTypeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> eventTypes = new HashSet<>();
-        eventTypes.add("Any"); // Add "Any" option first
         for (Event event : events) {
             eventTypes.add(event.getGenre()); // Add all genres found in event list
         }
         List<String> eventTypeList = new ArrayList<>(eventTypes);
+        eventTypeList.add(0, "Any"); // Add "Any" at the top
         setupSpinner(spinner, eventTypeList); // Display all genre options in spinner
 
         // Set default selection to "Any"
+        // It will also work without default position but i read that this will ensure cross functionality
         int defaultPosition = eventTypeList.indexOf("Any");
         spinner.setSelection(defaultPosition);
     }
@@ -308,10 +310,9 @@ public class ExploreEvents extends AppCompatActivity {
     // ----------------------------------------------------  end of filter for event type
 
     // ------------------------------------------------------------ filter for price
-    // had help from chatgpt
     private void setupPriceRangeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> priceRanges = new HashSet<>();
-        priceRanges.add("Any"); // Add "Any" option
+        //priceRanges.add("Any"); // Add "Any" option
         // Go through all events and add any relevant price ranges
         for (Event event : events) {
             double price = event.getPrice();
@@ -325,7 +326,15 @@ public class ExploreEvents extends AppCompatActivity {
                 priceRanges.add("$101 - $200");
             }
         }
-        setupSpinner(spinner, new ArrayList<>(priceRanges)); // Display all price range options
+        List<String> priceRangeList = new ArrayList<>(priceRanges);
+        priceRangeList.add(0, "Any"); // Add "Any" at the top
+
+        setupSpinner(spinner, priceRangeList); // Display all price range options
+
+        // Set default selection to "Any"
+        // It will also work without default position but i read that this will ensure cross functionality
+        int defaultPosition = priceRangeList.indexOf("Any");
+        spinner.setSelection(defaultPosition);
     }
 
     // Return price range filtered list
