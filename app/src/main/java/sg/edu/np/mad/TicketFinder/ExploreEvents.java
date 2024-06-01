@@ -237,6 +237,8 @@ public class ExploreEvents extends AppCompatActivity {
     // Return date filtered list
     private ArrayList<Event> filterByDate(ArrayList<Event> events, String date) {
         ArrayList<Event> filteredList = new ArrayList<>();
+
+        // Filter for matching events
         for (Event event : events) {
             if (event.getDate().toString().equals(date)) {
                 filteredList.add(event);

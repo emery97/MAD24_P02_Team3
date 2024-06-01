@@ -11,12 +11,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackViewHolder> {
+    // displaying feedback images
+
     private List<Uri> imageUris;
 
+    // Constructor
     public FeedbackAdapter(List<Uri> imageUris) {
         this.imageUris = imageUris;
     }
 
+    //get views from xml
     @NonNull
     @Override
     public FeedbackViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -24,6 +28,7 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackViewHolder> {
         return new FeedbackViewHolder(view);
     }
 
+    // set data in item feedback image xml
     @Override
     public void onBindViewHolder(@NonNull FeedbackViewHolder holder, int position) {
         Uri imageUri = imageUris.get(position);
