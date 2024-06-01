@@ -33,6 +33,7 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
         BookingDetails bookingDetails = bookingDetailsList.get(position);
 
         // set values
+        holder.EventTitle.setText(bookingDetails.getConcertName());
         holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
         holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
         holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
@@ -47,10 +48,11 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
 
     // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
+        public TextView EventTitle,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            EventTitle = itemView.findViewById(R.id.EventTitle);
             seatCategory = itemView.findViewById(R.id.seatCategory);
             seatNumber = itemView.findViewById(R.id.seatNumber);
             totalPrice = itemView.findViewById(R.id.totalPrice);
