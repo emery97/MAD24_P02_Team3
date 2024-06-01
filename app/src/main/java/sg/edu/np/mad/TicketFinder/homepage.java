@@ -68,22 +68,27 @@ public class homepage extends AppCompatActivity {
         getEventList();
     }
 
+    // Method to load a random featured image from the event list
     private void loadFeaturedImage(ImageView imageView) {
         handler.getData(new FirestoreCallback<Event>() {
             @Override
             public void onCallback(ArrayList<Event> eventList) {
                 if (!eventList.isEmpty()) {
+
+                    // random so that featured image changes every time it loads
                     Random random = new Random();
                     int randomIndex = random.nextInt(eventList.size());
+
                     String imageUrl = eventList.get(randomIndex).getImgUrl();
                     Glide.with(homepage.this)
-                            .load(imageUrl)
-                            .into(imageView);
+                            .load(imageUrl)          // Load the image from the URL
+                            .into(imageView);        // Set the image into the provided ImageView
                 }
             }
         });
     }
 
+    // Method to fetch the event list and update the RecyclerViews
     private void getEventList() {
         handler.getData(new FirestoreCallback<Event>() {
             @Override
@@ -116,16 +121,21 @@ public class homepage extends AppCompatActivity {
             }
         });
     }
+
+    // Method to get the number of columns for the grid layout based on orientation
     private int getSpanCount() {
         int orientation = getResources().getConfiguration().orientation;
         return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 4 : 2;
     }
 
+    // Update the grid layout span count when the configuration changes
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        // Retrieve the current layout manager of the grid RecyclerView
         GridLayoutManager layoutManager = (GridLayoutManager) gridRecyclerView.getLayoutManager();
         if (layoutManager != null) {
+            // Update the span count of the grid layout manager based on the new config
             layoutManager.setSpanCount(getSpanCount());
         }
     }
