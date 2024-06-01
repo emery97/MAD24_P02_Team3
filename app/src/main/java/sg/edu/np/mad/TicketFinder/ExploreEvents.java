@@ -202,6 +202,11 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
+        // ******************// FILTERING: REFERRED FROM BELOW // ******************
+        // based on general practices and examples from resources like:
+        // - Android Developers documentation: https://developer.android.com/guide/topics/ui/controls/spinner
+        // - Stack Overflow discussions
+        // https://www.geeksforgeeks.org/datepickerdialog-in-android/
         // ---------------------------------------------- filter for date
         selectDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -303,6 +308,7 @@ public class ExploreEvents extends AppCompatActivity {
     // ----------------------------------------------------  end of filter for event type
 
     // ------------------------------------------------------------ filter for price
+    // had help from chatgpt
     private void setupPriceRangeSpinner(Spinner spinner, ArrayList<Event> events) {
         Set<String> priceRanges = new HashSet<>();
         priceRanges.add("Any"); // Add "Any" option
