@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Feedback extends AppCompatActivity {
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private SharedPreferences sharedPreferences;
+    private static final int PICK_IMAGE_REQUEST = 1; // Request code for image picker intent
+    private SharedPreferences sharedPreferences; // SharedPreferences to store and retrieve user data
     private Spinner feedback;
     private Button submitButton;
     private Button exitButton;
@@ -54,9 +54,10 @@ public class Feedback extends AppCompatActivity {
     private ImageView imageView;
     private Uri imageUri;
     private FirebaseFirestore db;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView; // To display list of selected images
     private FeedbackAdapter feedbackAdapter;
     private List<Uri> imageUris;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,14 +69,19 @@ public class Feedback extends AppCompatActivity {
             return insets;
         });
 
+        // Initialize Firestore instance
         db = FirebaseFirestore.getInstance();
+
+        // Initialize SharedPreferences to retrieve stored user data
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
+        // Retrieve stored user data from SharedPreferences
         String documentId = sharedPreferences.getString("Document", null);
         String userId = sharedPreferences.getString("UserId", null);
         String name = sharedPreferences.getString("Name", null);
         String email = sharedPreferences.getString("Email", null);
 
+        // Initialize UI components
         feedback = findViewById(R.id.Feedbacktype);
         submitButton = findViewById(R.id.submitbutton_feedback);
         exitButton = findViewById(R.id.exitbutton_feedback);
@@ -84,24 +90,29 @@ public class Feedback extends AppCompatActivity {
         imageView = findViewById(R.id.imageView);
         recyclerView = findViewById(R.id.recyclerView);
 
+        // Initialize list and adapter for RecyclerView
         imageUris = new ArrayList<>();
         feedbackAdapter = new FeedbackAdapter(imageUris);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(feedbackAdapter);
+
+        // Set click listener for attach image button
         attachImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFileChooser();
+                openFileChooser(); // Open file chooser to select image
             }
         });
 
+        // Set click listener for submit button
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitFeedback(documentId,name, email, userId);
+                submitFeedback(documentId, name, email, userId); // Submit feedback to Firestore
             }
         });
 
+        // Set click listener for exit button
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,6 +121,7 @@ public class Feedback extends AppCompatActivity {
         });
     }
 
+    // Method to open file chooser for image selection
     private void openFileChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -121,16 +133,20 @@ public class Feedback extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            imageUris.add(imageUri);
-            feedbackAdapter.notifyDataSetChanged();
-            imageView.setVisibility(View.VISIBLE);
+            imageUri = data.getData(); // Get URI of selected image
+            imageUris.add(imageUri); // Add URI to list of image URIs
+            feedbackAdapter.notifyDataSetChanged(); // Notify adapter that data set has changed
+            imageView.setVisibility(View.VISIBLE); // Show image view if an image is selected
         }
     }
 
-    private void submitFeedback(String documentId,String name, String email,String userId) {
-        String feedbackType = feedback.getSelectedItem().toString();
-        String feedbackMessage = message.getText().toString();
+    // Method to submit feedback to Firestore
+    private void submitFeedback(String documentId, String name, String email, String userId) {
+        // Get selected feedback type and inputted feedback message
+        String feedbackType = feedback.getSelectedItem().toString(); // Get selected feedback type
+        String feedbackMessage = message.getText().toString(); // Get feedback message
+
+        // Create a map to store feedback data
         Map<String, Object> feedbackData = new HashMap<>();
         feedbackData.put("userId", userId);
         feedbackData.put("Name", name);
@@ -138,20 +154,22 @@ public class Feedback extends AppCompatActivity {
         feedbackData.put("Message", feedbackMessage);
         feedbackData.put("Category", feedbackType);
 
+        // Add image URIs to feedback data if any images are selected
         if (!imageUris.isEmpty()) {
             List<String> imageUrisString = new ArrayList<>();
             for (Uri uri : imageUris) {
-                imageUrisString.add(uri.toString());
+                imageUrisString.add(uri.toString()); // Convert URI to string and add to list
             }
-            feedbackData.put("ImageURIs", imageUrisString);
+            feedbackData.put("ImageURIs", imageUrisString); // Add list of image URIs to feedback data
         }
 
-
+        // Add feedback data to Firestore
         db.collection("Feedback")
                 .add(feedbackData)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
+                        // Show success message and reset input fields
                         Toast.makeText(Feedback.this, "Feedback sent", Toast.LENGTH_SHORT).show();
                         message.setText("");
                         imageView.setImageURI(null);
@@ -161,12 +179,15 @@ public class Feedback extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        // Show failure message
                         Toast.makeText(Feedback.this, "Feedback not sent", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
+    // Method to navigate back to the homepage
     private void navigateToHomepage() {
+        // Show toast message and start homepage activity
         Toast.makeText(Feedback.this, "Going back to homepage", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(Feedback.this, homepage.class);
         startActivity(intent);
@@ -176,12 +197,12 @@ public class Feedback extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Handle configuration changes here, if necessary
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // Save the current state of imageUris list
         outState.putParcelableArrayList("imageUris", new ArrayList<>(imageUris));
     }
 
@@ -189,6 +210,7 @@ public class Feedback extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
+            // Restore the imageUris list from the saved state
             ArrayList<Uri> savedImageUris = savedInstanceState.getParcelableArrayList("imageUris");
             if (savedImageUris != null) {
                 imageUris.clear();
