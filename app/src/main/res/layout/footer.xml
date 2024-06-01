@@ -46,7 +46,7 @@
         android:layout_height="40dp"
         android:layout_marginTop="6dp"
         android:backgroundTint="#4C240A"
-        app:srcCompat="@drawable/booking_icon"
+        app:srcCompat="@drawable/booking_history_icon"
         app:tint="#F4F0E5" />
 
     <Space
