@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FeedbackDetailsViewHolder extends RecyclerView.ViewHolder {
+    //get views for feedback details item
     TextView categoryTextView;
     TextView messageTextView;
     ImageView imageView;

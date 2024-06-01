@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.FirebaseApp;
 
 public class MainActivity extends AppCompatActivity implements Register.OnRegistrationSuccessListener {
+    //login/register page
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +30,19 @@ public class MainActivity extends AppCompatActivity implements Register.OnRegist
             return insets;
         });
 
+        // remember login user
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         if (sharedPreferences.contains("UserId")) {
-            navigateToHomepage();
+            navigateToHomepage(); // if user has previously loggged in, go straight to homepage
         } else {
-            loadSignInFragment();
+            loadSignInFragment(); // else, show sign in page
         }
 
+        // get views for sign up/register buttons
         TextView signup = findViewById(R.id.signin);
         TextView register = findViewById(R.id.register);
 
+        // display sign up
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements Register.OnRegist
             }
         });
 
+        // display log in
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,12 +65,14 @@ public class MainActivity extends AppCompatActivity implements Register.OnRegist
         finish();  // Finish MainActivity so the user can't navigate back to it
     }
 
+    // setting sign in fragment
     private void loadSignInFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fraglayout, new SignIn());
         transaction.commit();
     }
 
+    //setting login fragment
     private void loadRegisterFragment() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fraglayout, new Register());

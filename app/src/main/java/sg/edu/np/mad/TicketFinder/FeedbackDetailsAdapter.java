@@ -12,21 +12,28 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 public class FeedbackDetailsAdapter extends RecyclerView.Adapter<FeedbackDetailsViewHolder> {
+    //displaying feedback details, including image
     private List<Feedbackclass> feedbackList;
 
+    //Constructor
     public FeedbackDetailsAdapter(List<Feedbackclass> feedbackList) {
         this.feedbackList = feedbackList;
     }
 
+    //get views from xml
     @Override
     public FeedbackDetailsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewfeedbackrecycler, parent, false);
         return new FeedbackDetailsViewHolder(view);
     }
 
+    // putting data xml
     @Override
     public void onBindViewHolder(FeedbackDetailsViewHolder holder, int position) {
+        //get feedback
         Feedbackclass feedbackclass = feedbackList.get(position);
+
+        // set data
         holder.categoryTextView.setText(feedbackclass.getCategory());
         holder.messageTextView.setText(feedbackclass.getMessage());
 
@@ -38,7 +45,7 @@ public class FeedbackDetailsAdapter extends RecyclerView.Adapter<FeedbackDetails
             Glide.with(holder.imageView.getContext())
                     .load(contentUri)
                     .into(holder.imageView);
-        } else {
+        } else { // If no image, don't display
             holder.imageView.setVisibility(View.GONE);
         }
     }
