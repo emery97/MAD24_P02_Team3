@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Event implements Serializable {
+    // attributes
     private String imgUrl;
     private String title;
     private String caption;
@@ -63,6 +64,7 @@ public class Event implements Serializable {
     public String getTime() { return time; }
     public void setTime(String time) { this.time = time; }
 
+    // toString method
     @Override
     public String toString() {
         return "Event{" +

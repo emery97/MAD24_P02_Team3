@@ -1,12 +1,14 @@
 package sg.edu.np.mad.TicketFinder;
 
 public class BookingDetails {
+    // attributes
     private String seatCategory;
     private String seatNumber;
     private String totalPrice;
     private String quantity;
     private String paymentMethod;
 
+    // Parameterized constructor
     public BookingDetails(String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
         this.seatCategory = seatCategory;
         this.seatNumber = seatNumber;

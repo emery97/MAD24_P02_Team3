@@ -33,17 +33,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         this.isGrid = isGrid;
     }
 
-
+    // shows filtered event list
     public void setSearchList(ArrayList<Event> searchList) {
-        this.eventList = searchList;
-        notifyDataSetChanged();
+        this.eventList = searchList; // sets this eventlist as the searchlist
+        notifyDataSetChanged(); // alert
     }
 
-    public void clear() {
-        eventList.clear();
-        notifyDataSetChanged();
-    }
-
+    //get views from xml
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         public ConstraintLayout eventCard;
         public ImageView eventImage;
@@ -65,11 +61,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public EventAdapter(Context context, ArrayList<Event> eventList) {
         this(context, eventList, false); // default to list layout
     }
-    /*
-    public EventAdapter(Context context, ArrayList<Event> eventList) {
-        this.context = context;
-        this.eventList = eventList;
-    }*/
 
     @Override
     public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -86,9 +77,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return new EventViewHolder(itemView);
     }
 
-
+    // putting data in each item_event / item_event_grid
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
+        // get event
         Event event = eventList.get(position);
 
         // format date
@@ -96,19 +88,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
         String formattedDate = eventObjDate.format(formatter);
 
-        // set text
+        // set title
         holder.eventTitle.setText(event.getTitle());
+        // set artist
         holder.eventArtist.setText(event.getArtist());
+        // set date
         holder.eventDate.setText(formattedDate);
+        // set image with Glide
         Glide.with(context)
                 .load(event.getImgUrl())
                 .into(holder.eventImage);
 
+        // when clicking on event, sends to the event's respective eventDetails page
         holder.eventCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, EventDetails.class);
-                intent.putExtra("event", event);
+                intent.putExtra("event", event); // sending event data
                 context.startActivity(intent);
             }
         });

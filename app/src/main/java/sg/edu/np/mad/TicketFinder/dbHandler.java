@@ -27,19 +27,24 @@ public class dbHandler extends Application {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
+    //get event datta
     public void getData(FirestoreCallback firestoreCallback) {
+        // connect to firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // reference events collections
         CollectionReference eventsCollection = db.collection("Events");
 
         eventsCollection.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // init event list
                         ArrayList<Event> eventList = new ArrayList<>();
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Event event = new Event();
 
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) { // for each event
+                                // create new event object and set values
+                                Event event = new Event();
                                 if (document.contains("EventImage")) {
                                     ArrayList<String> eventImages = (ArrayList<String>) document.get("EventImage");
                                     if (eventImages != null && !eventImages.isEmpty()) {
@@ -67,7 +72,7 @@ public class dbHandler extends Application {
                                 if (document.contains("Venue")) {
                                     event.setVenue(document.getString("Venue"));
                                 }
-                                if (document.contains("Date")) {
+                                if (document.contains("Date")) { //format date as LocalDate
                                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     String inputDate = document.getString("Date").substring(0, 10);
                                     LocalDate date = LocalDate.parse(inputDate, formatter);
@@ -77,10 +82,10 @@ public class dbHandler extends Application {
                                 if (document.contains("Time")) {
                                     event.setTime(document.getString("Time").substring(11, 16));
                                 }
-
+                                //add to eventlist
                                 eventList.add(event);
                             }
-                            firestoreCallback.onCallback(eventList);
+                            firestoreCallback.onCallback(eventList); // return eventlist
                             Log.d("dbHandler", "getData: Callback invoked with eventList size: " + eventList.size());
                         } else {
                             Log.w("eventError", "Error getting documents.", task.getException());
@@ -93,9 +98,6 @@ public class dbHandler extends Application {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         CollectionReference seatCategoryCollection = db.collection("SeatCategory");
-
-
-
 
         seatCategoryCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 

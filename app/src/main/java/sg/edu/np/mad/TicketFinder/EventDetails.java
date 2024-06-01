@@ -37,7 +37,7 @@ public class EventDetails extends AppCompatActivity {
             // get event object
             Intent intent = getIntent();
             Event eventObj = (Event) getIntent().getSerializableExtra("event");
-            Log.i("event", eventObj.toString()); // testing
+            Log.i("event", eventObj.toString()); // logs event data
 
             // initialise all views
             TextView title = findViewById(R.id.eventTitle);
@@ -51,7 +51,7 @@ public class EventDetails extends AppCompatActivity {
             TextView salesTiming = findViewById(R.id.eventGeneralSales);
             ImageView eventImg = findViewById(R.id.eventImg);
 
-            // date formatter (eg. 30 October 2023)
+            // set date formatter (eg. 30 October 2023)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
 
             // format eventdate
@@ -62,12 +62,12 @@ public class EventDetails extends AppCompatActivity {
             // format sales period date to string
             String salesDateString = salesDate.format(formatter);
 
-            // set image
+            // set image with Glide
             Glide.with(this)
                     .load(eventObj.getImgUrl())
                     .into(eventImg);
 
-            // setting text
+            // setting text data
             title.setText(eventObj.getTitle());
             caption.setText(eventObj.getCaption());
             artist.setText(eventObj.getArtist());
@@ -78,10 +78,9 @@ public class EventDetails extends AppCompatActivity {
             price.setText("$" + String.format("%.2f",eventObj.getPrice())); // set price to string with 2dp
             salesTiming.setText(salesDateString + ", " + eventObj.getTime()); // sales timing is 1 month before, same time
 
-        } catch (Exception e) {
+        } catch (Exception e) { // handles if eventdetails is directly accessed (for testing)
             Log.e("EDIntent", "no intent passed in");
         }
-
 
         // show map button
         Button showMapButton = findViewById(R.id.showMapButton);
@@ -128,6 +127,7 @@ public class EventDetails extends AppCompatActivity {
             }
         });
 
+        // set up footer
         Footer.setUpFooter(this);
     }
 }
