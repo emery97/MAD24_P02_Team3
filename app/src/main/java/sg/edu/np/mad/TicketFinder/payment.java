@@ -57,7 +57,7 @@ public class payment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Check orientation and set layout accordingly (Coded with the help of ChatGPT)
+        // Check orientation and set layout accordingly
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // Landscape mode
             setContentView(R.layout.horizontal_payment);

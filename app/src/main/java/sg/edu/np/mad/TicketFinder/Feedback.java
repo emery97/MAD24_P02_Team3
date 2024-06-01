@@ -201,14 +201,14 @@ public class Feedback extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) { //(Coded with the help of chatGPT)
+    protected void onSaveInstanceState(Bundle outState) { // Referenced from ChatGPT
         super.onSaveInstanceState(outState);
         // Save the current state of imageUris list
         outState.putParcelableArrayList("imageUris", new ArrayList<>(imageUris));
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) { //(Coded with the help of chatGPT)
+    protected void onRestoreInstanceState(Bundle savedInstanceState) { // Referenced from ChatGPT
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             // Restore the imageUris list from the saved state
