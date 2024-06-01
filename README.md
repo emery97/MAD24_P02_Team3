@@ -37,11 +37,12 @@ Entertainment
     
 - **Side Scroll View for "Upcoming Events"**: 
   - Displays a horizontal scrolling list of upcoming events.
-  - All events information is dynamically extracted from Firebase and populated on the interface.
+  - The top 3 events are displayed based on their upcoming dates.
+  - Event information is dynamically extracted from Firebase and populated on the interface.
 
 - **"Recommended for You" Section**:
   - Shows a recycler view of events recommended for the user.
-  - Recommendations are personalized based on user preferences.
+  - Recommendations allows user to view the available list of events that are happening in singapore.
 
 - **Dynamic Event Picture**:
   - The event picture displayed below the header changes randomly.
