@@ -59,12 +59,12 @@
         android:textColor="#999999" />
 
     <Button
-        android:id="@+id/clearDateButton"
+        android:id="@+id/clearFiltersButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="#CAA2A2"
-        android:text="Clear Date"
+        android:text="Clear Filters"
         android:textColor="@android:color/white" />
 </LinearLayout>

@@ -176,7 +176,7 @@ public class ExploreEvents extends AppCompatActivity {
         Spinner priceRangeSpinner = view.findViewById(R.id.priceRangeSpinner);
         Spinner eventTypeSpinner = view.findViewById(R.id.eventTypeSpinner);
         Button selectDateButton = view.findViewById(R.id.selectDateButton);
-        Button clearDateButton = view.findViewById(R.id.clearDateButton);
+        Button clearFiltersButton = view.findViewById(R.id.clearFiltersButton);
         TextView selectedDateTextView = view.findViewById(R.id.selectedDateTextView);
 
         // Populate filter options dynamically
@@ -215,10 +215,18 @@ public class ExploreEvents extends AppCompatActivity {
             }
         });
 
+        /*
         clearDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearSelectedDate(selectedDateTextView); // Clear selected date
+            }
+        });*/
+
+        clearFiltersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearAllFilters(priceRangeSpinner, eventTypeSpinner, selectedDateTextView); // Clear all filters
             }
         });
 
@@ -272,10 +280,25 @@ public class ExploreEvents extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    /*
     private void clearSelectedDate(TextView selectedDateTextView) {
         selectedDate = null; // Clear selected date
         selectedDateTextView.setText("No date selected"); // Update TextView
+    }*/
+
+    private void clearAllFilters(Spinner priceRangeSpinner, Spinner eventTypeSpinner, TextView selectedDateTextView) {
+        // Clear all selected filters
+        selectedPriceRange = null;
+        selectedEventType = null;
+        selectedDate = null;
+
+        // Reset the spinners and date text view
+        priceRangeSpinner.setSelection(0);
+        eventTypeSpinner.setSelection(0);
+        selectedDateTextView.setText("No date selected");
     }
+
+
     // ------------------------------------------------------ end of filter for date
 
     // had help from chatgpt
