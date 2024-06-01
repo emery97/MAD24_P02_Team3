@@ -154,7 +154,8 @@ Entertainment
 
 - **Filter Options [Ng Joe Yi]**:
   - Users can filter events by price, event type, or date.
-  - Users can reset filters by selecting "Any" for price range and event type, and by clicking "Clear Date" to reset the date.
+  - Price and event type options are dynamic and depend on the database.
+  - Users can clear the selected filters by using the "Clear Filters" button.
   - Ensures users can find events that meet their preferences.
 
 - **RecyclerView of Events [Tan Si Huei Chloe]**:
