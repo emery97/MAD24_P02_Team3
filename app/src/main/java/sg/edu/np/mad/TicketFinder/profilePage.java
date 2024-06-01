@@ -26,7 +26,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class profilePage extends AppCompatActivity {
-    private TextView username, password, email,regPassword;
+    // UI components
+    private TextView username, password, email, regPassword;
     private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
@@ -38,8 +39,8 @@ public class profilePage extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     private String userId; // This should be the userId from Firestore document, not Firebase UID
     private static final String TAG = "ProfilePage";
-
     private boolean isEditMode = false;
+
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,7 +50,7 @@ public class profilePage extends AppCompatActivity {
         // Set up footer
         Footer.setUpFooter(this);
 
-        // initialize UI components
+        // Initialize UI components
         username = findViewById(R.id.regUsername);
         password = findViewById(R.id.regPassword);
         email = findViewById(R.id.regEmail);
@@ -62,11 +63,15 @@ public class profilePage extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton);
         logoutButton = findViewById(R.id.logoutButton);
         feedbackbutton = findViewById(R.id.Viewfeedbackbtn);
+
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
+        // Initialise database components
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
 
+        // Check if user is authenticated
         if (firebaseUser == null) {
             // Redirect to login page if user is not authenticated
             Log.e(TAG, "FirebaseUser is null, redirecting to login");
@@ -75,15 +80,17 @@ public class profilePage extends AppCompatActivity {
             finish();
         }
 
+        // Get userId from SharedPreferences
         userId = sharedPreferences.getString("userId", "N/A");
         if (userId.equals("N/A")) {
             // Attempt to fetch the userId from Firestore using the email
             fetchUserId();
         } else {
+            // Load user data
             loadUserData();
         }
 
-        // onclicklistener for showing password
+        // OnClickListener for show password checkbox
         showPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,40 +102,47 @@ public class profilePage extends AppCompatActivity {
             }
         });
 
-        // onclicklistener for editing
+        // OnClickListener for editing icon
         editingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isEditMode = true;
                 AllowEditing();
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
+                // Other buttons are invisible
                 feedbackbutton.setVisibility(View.INVISIBLE);
                 logoutButton.setVisibility(View.INVISIBLE);
             }
         });
 
-        // onclicklistener for saving
+        // OnClickListener for save button
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get password from EditText
                 actualPassword = editPassword.getText().toString();
+                // Disable editing mode
                 UnallowEditing();
                 isEditMode = false;
+                // Update user information
                 updateUserInformation();
             }
         });
 
-        // onclicklistener for logging out
+        // OnClickListener for logout button
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Perform logout
                 logout();
             }
         });
 
+        // OnClickListener for feedback button
         feedbackbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Navigate to feedback activity
                 Intent intent = new Intent(profilePage.this, ViewFeedback.class);
                 startActivity(intent);
             }
@@ -138,11 +152,13 @@ public class profilePage extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Clear SharedPreferences if "RememberMe" is false
         if (!sharedPreferences.getBoolean("RememberMe", false)) {
             sharedPreferences.edit().clear().apply();
         }
     }
 
+    // Method to fetch userId from Firestore using email
     private void fetchUserId() {
         db.collection("Account").whereEqualTo("Email", firebaseUser.getEmail()).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -155,6 +171,7 @@ public class profilePage extends AppCompatActivity {
                         editor.putString("userId", userId);
                         editor.apply();
 
+                        // Load user data
                         loadUserData();
                     } else {
                         Log.e(TAG, "No matching document found in Firestore");
@@ -171,10 +188,13 @@ public class profilePage extends AppCompatActivity {
                 });
     }
 
+    // Method to load user data
     private void loadUserData() {
         if (firebaseUser != null) {
+            // Set username and email from SharedPreferences
             username.setText(sharedPreferences.getString("Name", "N/A"));
             email.setText(firebaseUser.getEmail());
+            // Set actual password from SharedPreferences
             actualPassword = sharedPreferences.getString("Password", "N/A");
             password.setText(actualPassword);
 
@@ -183,8 +203,10 @@ public class profilePage extends AppCompatActivity {
             // Fetch the latest user data from Firestore
             db.collection("Account").document(userId).get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
+                    // Set username and email from Firestore
                     username.setText(documentSnapshot.getString("Name"));
                     email.setText(documentSnapshot.getString("Email"));
+                    // Set actual password from Firestore
                     actualPassword = documentSnapshot.getString("Password");
                     password.setText(actualPassword);
 
@@ -205,6 +227,7 @@ public class profilePage extends AppCompatActivity {
         }
     }
 
+    // Method to toggle password visibility in edit mode
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibility: checked");
@@ -215,6 +238,7 @@ public class profilePage extends AppCompatActivity {
         editPassword.setSelection(editPassword.getText().length());
     }
 
+    // Method to toggle password visibility in non-edit mode
     private void togglePasswordVisibilityNonEditMode() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibilityNonEditMode: checked");
@@ -225,7 +249,7 @@ public class profilePage extends AppCompatActivity {
         regPassword.requestLayout();
     }
 
-
+    // Method to allow editing user information
     private void AllowEditing() {
         username.setVisibility(View.GONE);
         password.setVisibility(View.GONE);
@@ -239,6 +263,7 @@ public class profilePage extends AppCompatActivity {
         saveButton.setVisibility(View.VISIBLE);
     }
 
+    // Method to disable editing user information
     private void UnallowEditing() {
         username.setVisibility(View.VISIBLE);
         password.setVisibility(View.VISIBLE);
@@ -249,6 +274,7 @@ public class profilePage extends AppCompatActivity {
         saveButton.setVisibility(View.GONE);
     }
 
+    // Method to logout user
     private void logout() {
         mAuth.signOut();
         sharedPreferences.edit().clear().apply();
@@ -258,6 +284,7 @@ public class profilePage extends AppCompatActivity {
         finish();
     }
 
+    // Method to update user information in Firestore
     private void updateFirestore(String updatedName, String updatedEmail, String updatedPassword) {
         db.collection("Account").document(userId)
                 .update("Name", updatedName, "Password", updatedPassword)
@@ -280,7 +307,9 @@ public class profilePage extends AppCompatActivity {
                 });
     }
 
+    // Method to update user information
     private void updateUserInformation() {
+        // Get updated name and password
         String updatedName = editUsername.getText().toString();
         String updatedPassword = editPassword.getText().toString();
 
