@@ -121,7 +121,7 @@ public class Feedback extends AppCompatActivity {
         });
     }
 
-    // Method to open file chooser for image selection
+    // Method to open file chooser for image selection (Coded with the help of ChatGPT)
     private void openFileChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -194,20 +194,21 @@ public class Feedback extends AppCompatActivity {
         Feedback.this.finish();
     }
 
+    // Changing orientation without restarting
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) { //(Coded with the help of chatGPT)
         super.onSaveInstanceState(outState);
         // Save the current state of imageUris list
         outState.putParcelableArrayList("imageUris", new ArrayList<>(imageUris));
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(Bundle savedInstanceState) { //(Coded with the help of chatGPT)
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             // Restore the imageUris list from the saved state

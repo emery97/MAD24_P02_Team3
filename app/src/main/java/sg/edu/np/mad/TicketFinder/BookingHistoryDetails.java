@@ -55,7 +55,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
         db.collection("BookingDetails")
                 .whereEqualTo("userId", userId)
                 .get()
-                .addOnCompleteListener(task -> {
+                .addOnCompleteListener(task -> { // Coded with the help of chatGPT
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {

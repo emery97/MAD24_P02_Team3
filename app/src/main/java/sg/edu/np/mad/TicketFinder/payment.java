@@ -57,7 +57,7 @@ public class payment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Check orientation and set layout accordingly
+        // Check orientation and set layout accordingly (Coded with the help of ChatGPT)
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             // Landscape mode
             setContentView(R.layout.horizontal_payment);
@@ -93,7 +93,7 @@ public class payment extends AppCompatActivity {
         bookingdetails = findViewById(R.id.bookingdetails);
         cancel = findViewById(R.id.backbtn);
 
-        // Initialize payment method spinner
+        // Initialize payment method spinner (Referred to developer.android.com)
         paymentmethod = findViewById(R.id.paymentMethodSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.payment_methods, android.R.layout.simple_spinner_item);

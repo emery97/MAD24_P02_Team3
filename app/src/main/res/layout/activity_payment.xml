@@ -5,13 +5,14 @@
     android:id="@+id/testpaymentbtn"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".payment">
+    tools:context=".payment"
+    android:background="#F4F0E5">
 
     <View
         android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="83dp"
-        android:background="#4b0082"
+        android:background="#976954"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -230,7 +231,7 @@
                 android:layout_width="190dp"
                 android:layout_height="46dp"
                 android:layout_marginTop="3dp"
-                android:backgroundTint="#4b0082"
+                android:backgroundTint="#976954"
                 android:text="BUY NOW"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
