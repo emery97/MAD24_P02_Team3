@@ -33,10 +33,14 @@ public class EventDetails extends AppCompatActivity {
             return insets;
         });
 
+        // Declare a final array with one element to hold the event object. allows access being try and catch
+        final Event[] eventForTitle = new Event[1];
         try {
             // get event object
             Intent intent = getIntent();
-            Event eventObj = (Event) getIntent().getSerializableExtra("event");
+            Event eventObj = (Event) intent.getSerializableExtra("event");
+            eventForTitle[0] = eventObj;
+
             Log.i("event", eventObj.toString()); // logs event data
 
             // initialise all views
@@ -116,13 +120,22 @@ public class EventDetails extends AppCompatActivity {
             }
         });
 
-
         // link to buy tickets page
         Button buyTicketsButton = findViewById(R.id.buyTicketsButton);
         buyTicketsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent (EventDetails.this, BuyTicket.class);
+                // Create an intent to navigate from EventDetails to BuyTicket activity
+                Intent intent = new Intent(EventDetails.this, BuyTicket.class);
+
+                if (eventForTitle[0] != null){
+                    // Pass the event title to the BuyTicket activity
+                    intent.putExtra("eventTitle", eventForTitle[0].getTitle());
+                }else{
+                    Log.d("buyTicketsButton", "eventObj is null");
+                }
+
+                // Start the BuyTicket activity
                 startActivity(intent);
             }
         });
