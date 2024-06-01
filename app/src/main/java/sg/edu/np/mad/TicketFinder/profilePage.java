@@ -109,7 +109,7 @@ public class profilePage extends AppCompatActivity {
                 isEditMode = true;
                 AllowEditing();
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
-                // Other buttons are invisible
+                // Feedback and Logout buttons are invisible
                 feedbackbutton.setVisibility(View.INVISIBLE);
                 logoutButton.setVisibility(View.INVISIBLE);
             }
@@ -160,9 +160,11 @@ public class profilePage extends AppCompatActivity {
 
     // Method to fetch userId from Firestore using email
     private void fetchUserId() {
+        // Match account email to entry in database
         db.collection("Account").whereEqualTo("Email", firebaseUser.getEmail()).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
+                        // Get userId
                         DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
                         userId = documentSnapshot.getId();
 
@@ -173,7 +175,7 @@ public class profilePage extends AppCompatActivity {
 
                         // Load user data
                         loadUserData();
-                    } else {
+                    } else { // No matches in database
                         Log.e(TAG, "No matching document found in Firestore");
                         Toast.makeText(this, "No user data found. Please log in again.", Toast.LENGTH_SHORT).show();
                         mAuth.signOut();
@@ -182,7 +184,7 @@ public class profilePage extends AppCompatActivity {
                         finish();
                     }
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(e -> { // Error handling
                     Log.e(TAG, "Error fetching userId from Firestore", e);
                     Toast.makeText(this, "Error fetching user data. Please try again later.", Toast.LENGTH_SHORT).show();
                 });
@@ -218,9 +220,10 @@ public class profilePage extends AppCompatActivity {
                     editor.apply();
 
                     Log.d(TAG, "User data refreshed from Firestore");
-                } else {
+                } else { // No user found
                     Log.e(TAG, "No such document in Firestore");
                 }
+                // Error handling
             }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch user data from Firestore", e));
         } else {
             Log.e(TAG, "FirebaseUser is null in loadUserData");
@@ -251,26 +254,30 @@ public class profilePage extends AppCompatActivity {
 
     // Method to allow editing user information
     private void AllowEditing() {
+        // Regular fields not shown
         username.setVisibility(View.GONE);
         password.setVisibility(View.GONE);
 
+        // Replaced by editing fields
         editUsername.setVisibility(View.VISIBLE);
         editPassword.setVisibility(View.VISIBLE);
-
+        // Setting account data in editing fields
         editUsername.setText(username.getText());
         editPassword.setText(password.getText());
 
+        // Display save button
         saveButton.setVisibility(View.VISIBLE);
     }
 
     // Method to disable editing user information
     private void UnallowEditing() {
+        // Regular fields shown
         username.setVisibility(View.VISIBLE);
         password.setVisibility(View.VISIBLE);
 
+        // Editing fields and save button not shown
         editUsername.setVisibility(View.GONE);
         editPassword.setVisibility(View.GONE);
-
         saveButton.setVisibility(View.GONE);
     }
 
@@ -279,6 +286,8 @@ public class profilePage extends AppCompatActivity {
         mAuth.signOut();
         sharedPreferences.edit().clear().apply();
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+
+        // Navigate to login/register page
         Intent intent = new Intent(profilePage.this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -286,9 +295,10 @@ public class profilePage extends AppCompatActivity {
 
     // Method to update user information in Firestore
     private void updateFirestore(String updatedName, String updatedEmail, String updatedPassword) {
+        // Post to database
         db.collection("Account").document(userId)
                 .update("Name", updatedName, "Password", updatedPassword)
-                .addOnSuccessListener(aVoid -> {
+                .addOnSuccessListener(aVoid -> { // Upon posting
                     // Update SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("Name", updatedName);
@@ -301,7 +311,7 @@ public class profilePage extends AppCompatActivity {
                     // Reload user data to reflect changes
                     loadUserData();
                 })
-                .addOnFailureListener(e -> {
+                .addOnFailureListener(e -> { // Error handling
                     Log.e(TAG, "Failed to update profile in Firestore", e);
                     Toast.makeText(profilePage.this, "Failed to update profile in Firestore", Toast.LENGTH_SHORT).show();
                 });
@@ -315,18 +325,19 @@ public class profilePage extends AppCompatActivity {
 
         Log.d(TAG, "Updating user information with updatedName: " + updatedName + ", updatedPassword: " + updatedPassword);
 
-        if (firebaseUser != null) {
-            // Reauthenticate the user with current credentials
+        if (firebaseUser != null) { // Check if user exists
+            // Get email and password of user
             String currentEmail = firebaseUser.getEmail();
             String currentPassword = sharedPreferences.getString("Password", "N/A");
 
-            if (currentEmail != null && !currentPassword.equals("N/A")) {
+            if (currentEmail != null && !currentPassword.equals("N/A")) { // Check if user has both email and password
                 Log.d(TAG, "Current email: " + currentEmail + ", Current password: " + currentPassword); // Log current email and password
 
                 AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, currentPassword);
 
                 firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+                    // Reauthenticate user
+                    if (task.isSuccessful()) { //
                         Log.d(TAG, "User re-authenticated.");
                         Toast.makeText(this, "Re-Authentication success.", Toast.LENGTH_SHORT).show();
 
