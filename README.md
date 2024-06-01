@@ -144,14 +144,15 @@ Entertainment
 - **Access Restrictions**:
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
 
-## Footer Navigation
+## Footer Navigation [NG Joe Yi]
+- The footer navigation includes links to the Homepage, Explore Events, Booking History, and Profile Page for easy access and seamless user experience.
 
 ## Explore Event Page [Tan Si Huei Chloe, Ng Joe Yi]
 - **Event Search [Tan Si Huei Chloe]**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
 
-- **Filter Options**:
+- **Filter Options [Ng Joe Yi]**:
   - Users can filter events by price, event type, or date.
   - Ensures users can find events that meet their preferences.
 
