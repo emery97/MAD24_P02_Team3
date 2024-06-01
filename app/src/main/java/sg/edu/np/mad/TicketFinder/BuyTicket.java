@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class BuyTicket extends AppCompatActivity {
@@ -52,6 +54,12 @@ public class BuyTicket extends AppCompatActivity {
         autoCompleteTextView.setEnabled(false);
         seatAutoCompleteTextView.setEnabled(false);
 
+        // set chosenConcertTitle to concert user choose in event details page
+        // Get chosen concert title
+        TextView chosenConcertTitle = findViewById(R.id.concertTitleChosen);
+        String concertTitle = getIntent().getStringExtra("eventTitle");
+        chosenConcertTitle.setText(concertTitle);
+
         // Get references for conclusion data
         TextView selectedSeatCat = findViewById(R.id.selectedSeatCat);
         TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
@@ -86,6 +94,7 @@ public class BuyTicket extends AppCompatActivity {
                 });
             }
         });
+
 
         // Handle item selection in the seat category dropdown
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -134,6 +143,7 @@ public class BuyTicket extends AppCompatActivity {
         booked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String concertName = chosenConcertTitle.getText().toString().trim();
                 // Get selected seat number
                 String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
                 // Find price of selected seat
@@ -147,6 +157,7 @@ public class BuyTicket extends AppCompatActivity {
                 double totalPrice = seatPrice * quantity;
                 // Create intent to start payment activity
                 Intent intent = new Intent(BuyTicket.this, payment.class);
+                intent.putExtra("concertName", concertName);
                 intent.putExtra("totalPrice", totalPrice);
                 intent.putExtra("seatCategory", selectedSeatCategory);
                 intent.putExtra("seatNumber", selectedSeatNumber);

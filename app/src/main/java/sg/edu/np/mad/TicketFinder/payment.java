@@ -185,6 +185,7 @@ public class payment extends AppCompatActivity {
         String userId = sharedPreferences.getString("UserId", null);
         String name = sharedPreferences.getString("Name", null);
         // Get booking details from intent
+        String concertName = getIntent().getStringExtra("concertName");
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         String seatCategory = getIntent().getStringExtra("seatCategory");
         String seatNumber = getIntent().getStringExtra("seatNumber");
@@ -200,6 +201,7 @@ public class payment extends AppCompatActivity {
         bookingDetails.put("TotalPrice", totalPrice);
         bookingDetails.put("Quantity", quantity);
         bookingDetails.put("PaymentMethod", paymentMethod);
+        bookingDetails.put("ConcertTitle",concertName);
 
         // Add booking details to Firestore
         db.collection("BookingDetails").add(bookingDetails)
@@ -251,6 +253,7 @@ public class payment extends AppCompatActivity {
 
     private void showBookingDetailsDialog() {
         // Get booking details from intent
+        String concertName = getIntent().getStringExtra("concertName");
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         String seatCategory = getIntent().getStringExtra("seatCategory");
         String seatNumber = getIntent().getStringExtra("seatNumber");
@@ -261,12 +264,14 @@ public class payment extends AppCompatActivity {
         dialog.setContentView(R.layout.bookingdetails);
 
         // Initialize UI components in the dialog
+        TextView concertText = dialog.findViewById(R.id.concertText);
         TextView categoryText = dialog.findViewById(R.id.categoryText);
         TextView numberText = dialog.findViewById(R.id.numberText);
         TextView priceText = dialog.findViewById(R.id.priceText);
         TextView quantityText = dialog.findViewById(R.id.quantityText);
 
         // Set booking details in the dialog
+        concertText.setText(concertName);
         categoryText.setText(seatCategory);
         numberText.setText(seatNumber);
         priceText.setText("Price: $" + totalPrice);

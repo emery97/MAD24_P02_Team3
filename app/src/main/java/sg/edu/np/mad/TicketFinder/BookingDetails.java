@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 public class BookingDetails {
     // attributes
+    private String concertName;
     private String seatCategory;
     private String seatNumber;
     private String totalPrice;
