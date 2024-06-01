@@ -143,6 +143,7 @@ public class BuyTicket extends AppCompatActivity {
         booked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String concertName = chosenConcertTitle.getText().toString().trim();
                 // Get selected seat number
                 String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
                 // Find price of selected seat
@@ -156,6 +157,7 @@ public class BuyTicket extends AppCompatActivity {
                 double totalPrice = seatPrice * quantity;
                 // Create intent to start payment activity
                 Intent intent = new Intent(BuyTicket.this, payment.class);
+                intent.putExtra("concertName", concertName);
                 intent.putExtra("totalPrice", totalPrice);
                 intent.putExtra("seatCategory", selectedSeatCategory);
                 intent.putExtra("seatNumber", selectedSeatNumber);
