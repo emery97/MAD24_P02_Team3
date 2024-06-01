@@ -264,9 +264,9 @@ public class ExploreEvents extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         // Format selected date and display it
-                        selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02 d",
+                        selectedDate = String.format(Locale.getDefault(), "%d-%02d-%02d",
                                 year, month + 1, dayOfMonth);
-                                selectedDateTextView.setText(selectedDate);
+                        selectedDateTextView.setText(selectedDate);
                     }
                 }, year, month, day);
         datePickerDialog.show();
