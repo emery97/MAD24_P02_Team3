@@ -194,7 +194,8 @@ Entertainment
     - **Payment Method**
   - Ensures users have easy access to their booking details.
 
-**INCLUDES RESPONSIVENESS FOR ALL PAGES**
+### Responsiveness implementation [Lee Wei Ying]
+### Logo Implementationo [Lee Wei Ying]
 
 ## Features Allocation
 ### Stage 2 
