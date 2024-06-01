@@ -13,6 +13,7 @@ import java.util.List;
 public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAdapter.ViewHolder> {
     private List<BookingDetails> bookingDetailsList;
 
+    // Constructor
     public BookingDetailsAdapter(List<BookingDetails> bookingDetailsList) {
         this.bookingDetailsList = bookingDetailsList;
     }
@@ -20,13 +21,18 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //inflate booking details item
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.booking_details_item, parent, false);
         return new ViewHolder(view);
     }
 
+    // putting data in each booking details item xml
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // get booking details
         BookingDetails bookingDetails = bookingDetailsList.get(position);
+
+        // set values
         holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
         holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
         holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
@@ -39,6 +45,7 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
         return bookingDetailsList.size();
     }
 
+    // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
 

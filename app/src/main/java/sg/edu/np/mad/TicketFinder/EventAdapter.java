@@ -77,7 +77,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return new EventViewHolder(itemView);
     }
 
-    // putting data in each item_event / item_event_grid
+    // putting data in each item_event / item_event_grid xml
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
         // get event
@@ -88,11 +88,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
         String formattedDate = eventObjDate.format(formatter);
 
-        // set title
+        // set values
         holder.eventTitle.setText(event.getTitle());
-        // set artist
         holder.eventArtist.setText(event.getArtist());
-        // set date
         holder.eventDate.setText(formattedDate);
         // set image with Glide
         Glide.with(context)
