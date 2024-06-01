@@ -3,6 +3,7 @@ package sg.edu.np.mad.TicketFinder;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -242,9 +244,21 @@ public class ExploreEvents extends AppCompatActivity {
                         applyFilters();
                     }
                 })
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
+                .setNegativeButton("Cancel", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                int color = ContextCompat.getColor(ExploreEvents.this, R.color.dialogButtonColor);
+                Button applyButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                applyButton.setTextColor(color);
+
+                Button cancelButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                cancelButton.setTextColor(color);
+            }
+        });
+        dialog.show();
     }
 
     // Return date filtered list
@@ -277,6 +291,20 @@ public class ExploreEvents extends AppCompatActivity {
                         selectedDateTextView.setText(selectedDate);
                     }
                 }, year, month, day);
+
+        // Set an OnShowListener to modify the button text color
+        datePickerDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                int color = ContextCompat.getColor(ExploreEvents.this, R.color.dialogButtonColor);
+                Button positiveButton = datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE);
+                positiveButton.setTextColor(color);
+
+                Button negativeButton = datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE);
+                negativeButton.setTextColor(color);
+            }
+        });
+
         datePickerDialog.show();
     }
 
