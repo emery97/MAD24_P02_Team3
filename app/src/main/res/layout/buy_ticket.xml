@@ -12,30 +12,18 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <TextView
-        android:id="@+id/concertTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Concert Title"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center_horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include"></TextView>
     <TextView
         android:id="@+id/concertTitleChosen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Concert Title"
-        android:textSize="20sp"
+        android:textSize="30sp"
+        android:textStyle="bold"
         android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/concertTitle"></TextView>
+        app:layout_constraintTop_toBottomOf="@+id/include"></TextView>
 
 
     <ScrollView
