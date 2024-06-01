@@ -27,7 +27,7 @@ public class dbHandler extends Application {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
-    //get event datta
+    //get event data (coded with the help of ChatGPT)
     public void getData(FirestoreCallback firestoreCallback) {
         // connect to firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
