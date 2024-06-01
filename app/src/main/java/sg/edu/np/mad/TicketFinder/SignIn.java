@@ -119,6 +119,7 @@ public class SignIn extends Fragment {
     }
 
     // Fetch user details from Firestore after successful sign-in
+    // Referenced from chatgpt
     private void fetchUserDetailsFromFirestore(FirebaseUser user, String newPassword) {
         // Match userId to userId in database
         db.collection("Account")
