@@ -17,14 +17,15 @@ Entertainment
 
 # Ticket Finder App Stage 1 Features
 
-## Login/Register Page [Koh Yung Chun Ivan / Koh Ye Chyang]
+## Login/Register Page [Koh Yung Chun Ivan]
 - **Login/Register Fragment**:
   - Provides a fragment that allows users to choose to login or register.
   - Offers a seamless transition between login and registration forms.
 
 - **Firebase Integration**:
   - Account information is checked through Firebase.
-  - Newly created accounts are updated in Firebase for secure management.
+  - Newly created accounts are updated in Firebase for secure management using Firebase Authentication.
+  - Ensures user data is managed safely and efficiently, leveraging Firebase's robust authentication mechanisms.
 
 - **Forget Password Option**:
   - Available in the login fragment.
@@ -52,7 +53,7 @@ Entertainment
   - Contains navigation icons for easier movement through the app.
   - Designed to be intuitive and enhance the user experience.
 
- ## Event Details Page [Koh Yung Chun Ivan & Koh Ye Chyang & Tan Si Huei Chloe]
+ ## Event Details Page [Tan Si Huei Chloe]
 
 - **Dynamic Event Information [Tan Si Huei Chloe]**:
   - Event details are populated from data in Firebase.
@@ -99,7 +100,7 @@ Entertainment
   - Appears only when all information in the table is filled.
   - Ensures all necessary selections are made before proceeding.
 
-  ## Payment Details Page [Koh Yung Chun Ivan & Koh Ye Chyang ]
+  ## Payment Details Page [Koh Ye Chyang]
 
 - **Card and Billing Information**:
   - Allows users to enter necessary card details and billing address.
@@ -142,9 +143,9 @@ Entertainment
 
 - **Access Restrictions**:
   - Can only be accessed upon successful payment and by pressing "Yes" on the popup that prompts for feedback.
- ## Footer Navigation
+## Footer Navigation
 
-### Explore Events Page [Tan Si Huei Chloe, Ng Joe Yi]
+## Explore Event Page [Tan Si Huei Chloe, Ng Joe Yi]
 - **Event Search [Tan Si Huei Chloe]**:
   - Allows users to search events by title or artist.
   - Provides a user-friendly interface for quick event discovery.
@@ -157,18 +158,18 @@ Entertainment
   - Displays a list of different events at the bottom of the page.
   - Events are dynamically populated from Firebase.
 
-### Profile Page [Koh Yung Chun Ivan, Lee Wei Ying]
+## Profile Page [Koh Yung Chun Ivan]
 - **View Account Information**:
   - Displays the user's account information.
-  - Information is populated from Firebase.
+  - Data is dynamically populated from Firebase, ensuring it is always up-to-date.
 
 - **Edit Profile**:
   - Users can edit their profile information by pressing the pencil icon next to the fields.
-  - Provides an intuitive way to update personal details.
+  - Provides an intuitive and user-friendly way to make changes to personal details.
 
 - **Password Visibility Toggle**:
   - Users can check the checkbox to show their password.
-  - Enhances security by allowing users to verify their input.
+  - Allows users to verify their input for accuracy, enhancing security and reducing login erros.
 
 - **Logout Button**:
   - Allows users to log out of their account.
@@ -176,14 +177,14 @@ Entertainment
 
 - **Save Button**:
   - Allows users to save updated account information.
-  - Ensures changes are stored and reflected in their profile.
+  - Ensures changes are stored and reflected in their profile and stored in Firebase.
 
 - **View Feedback Page**:
-  - Accessed only through the profile page.
-  - Displays feedback in cards format.
+  - Accessed only through the profile page, ensuring it is secure.
+  - Displays feedback in cards format for easy viewing.
   - Includes an exit button that returns users to the profile page.
 
-### Booking History Page [Koh Ye Chyang]
+## Booking History Page [Koh Ye Chyang]
 - **View Booking History**:
   - Shows the booking history of the user, populated from Firebase.
   - Provides a comprehensive view of all bookings made by the user.
