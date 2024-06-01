@@ -132,6 +132,9 @@ Entertainment
 
 - **Attach Image Button**:
   - Allows users to attach an image from their file system to support their feedback.
+ 
+- **RecyclerView of Attached image**
+  - Displays a list of image that the user attached
 
 - **Submit Feedback Button**:
   - Sends the user back to the home page after submitting feedback.
@@ -193,6 +196,10 @@ Entertainment
     - **Quantity**
     - **Payment Method**
   - Ensures users have easy access to their booking details.
+
+  - **RecyclerView of Booking details**
+    - Displays a list of booking details that user had booked
+    - Booking details are dynamically GET from the firebase for the specific user
 
 ### Responsiveness implementation [Lee Wei Ying, Ng Joe Yi , Tan Si Huei Chloe]
 ### Logo Implementation [Lee Wei Ying]
