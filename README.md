@@ -11,7 +11,7 @@ Entertainment
 ## Team members and student IDs
 1. S10258645 Lee Wei Ying
 2. S10262850 Ng Joe Yi
-3. S10262850 Koh Yung Chun Ivan
+3. S10262491 Koh Yung Chun Ivan
 4. S10262604 Koh Ye Chyang 
 5. S10260078 Tan Si Huei Chloe 
 
