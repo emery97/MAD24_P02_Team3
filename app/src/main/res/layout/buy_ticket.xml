@@ -190,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Book"
+                android:background="#976954"
                 android:textSize="20sp"
                 android:visibility="invisible"
                 android:backgroundTint="#996666" />
