@@ -191,7 +191,9 @@
                 android:layout_marginTop="20dp"
                 android:text="Book"
                 android:textSize="20sp"
-                android:visibility="invisible" />
+                android:visibility="invisible"
+                android:backgroundTint="#996666" />
+
 
 
         </LinearLayout>
