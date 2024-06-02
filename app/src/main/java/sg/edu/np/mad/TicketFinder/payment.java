@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -234,9 +235,21 @@ public class payment extends AppCompatActivity {
                         navigateToHomepage();
                     }
                 });
+        // Create the dialog
+        AlertDialog dialog = builder.create();
+
         // Show the dialog
-        builder.create().show();
+        dialog.show();
+
+        // Get the buttons and set their custom styles
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        // Apply the custom styles
+        positiveButton.setTextColor(Color.parseColor("#976954"));
+        negativeButton.setTextColor(Color.parseColor("#976954"));
     }
+
 
     private void navigateToHomepage() {
         Toast.makeText(payment.this, "Going back to homepage", Toast.LENGTH_SHORT).show();
