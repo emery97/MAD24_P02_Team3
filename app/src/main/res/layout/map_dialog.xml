@@ -14,7 +14,7 @@
         android:id="@+id/closeButton"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="#4b0082"
+        android:backgroundTint="#996666"
         android:text="Close"
         android:layout_marginTop="10dp"
         android:layout_centerHorizontal="true"
