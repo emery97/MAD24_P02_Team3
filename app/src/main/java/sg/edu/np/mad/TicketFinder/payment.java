@@ -250,7 +250,6 @@ public class payment extends AppCompatActivity {
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
 
-
     private void navigateToHomepage() {
         Toast.makeText(payment.this, "Going back to homepage", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(payment.this, homepage.class);
