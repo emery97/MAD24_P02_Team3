@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,9 +16,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,7 +38,7 @@ public class profilePage extends AppCompatActivity {
     private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
-    private Button saveButton, logoutButton, feedbackbutton;
+    private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton;
     private String actualPassword;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
@@ -63,6 +70,7 @@ public class profilePage extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton);
         logoutButton = findViewById(R.id.logoutButton);
         feedbackbutton = findViewById(R.id.Viewfeedbackbtn);
+        deleteAccountButton = findViewById(R.id.deleteAccountButton);
 
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
@@ -147,6 +155,26 @@ public class profilePage extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // OnClickListener for delete account button
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show confirmation dialog
+                new AlertDialog.Builder(profilePage.this)
+                        .setTitle("Delete Account")
+                        .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // User confirmed to delete the account
+                                deleteAccount();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
     }
 
     @Override
@@ -191,7 +219,6 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to load user data
-    // Referenced from chatgpt
     private void loadUserData() {
         if (firebaseUser != null) {
             // Set username and email from SharedPreferences
@@ -224,7 +251,6 @@ public class profilePage extends AppCompatActivity {
                 } else { // No user found
                     Log.e(TAG, "No such document in Firestore");
                 }
-                // Error handling
             }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch user data from Firestore", e));
         } else {
             Log.e(TAG, "FirebaseUser is null in loadUserData");
@@ -232,7 +258,6 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to toggle password visibility in edit mode
-    // Referenced from chatgpt
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibility: checked");
@@ -300,7 +325,8 @@ public class profilePage extends AppCompatActivity {
         // Post to database
         db.collection("Account").document(userId)
                 .update("Name", updatedName, "Password", updatedPassword)
-                .addOnSuccessListener(aVoid -> { // Upon posting
+                .addOnSuccessListener(aVoid -> {
+                    // Upon posting
                     // Update SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("Name", updatedName);
@@ -313,14 +339,14 @@ public class profilePage extends AppCompatActivity {
                     // Reload user data to reflect changes
                     loadUserData();
                 })
-                .addOnFailureListener(e -> { // Error handling
+                .addOnFailureListener(e -> {
+                    // Error handling
                     Log.e(TAG, "Failed to update profile in Firestore", e);
                     Toast.makeText(profilePage.this, "Failed to update profile in Firestore", Toast.LENGTH_SHORT).show();
                 });
     }
 
     // Method to update user information
-    // Referenced from chatgpt
     private void updateUserInformation() {
         // Get updated name and password
         String updatedName = editUsername.getText().toString();
@@ -328,19 +354,21 @@ public class profilePage extends AppCompatActivity {
 
         Log.d(TAG, "Updating user information with updatedName: " + updatedName + ", updatedPassword: " + updatedPassword);
 
-        if (firebaseUser != null) { // Check if user exists
+        if (firebaseUser != null) {
+            // Check if user exists
             // Get email and password of user
             String currentEmail = firebaseUser.getEmail();
             String currentPassword = sharedPreferences.getString("Password", "N/A");
 
-            if (currentEmail != null && !currentPassword.equals("N/A")) { // Check if user has both email and password
-                Log.d(TAG, "Current email: " + currentEmail + ", Current password: " + currentPassword); // Log current email and password
+            if (currentEmail != null && !currentPassword.equals("N/A")) {
+                // Check if user has both email and password
+                Log.d(TAG, "Current email: " + currentEmail + ", Current password: " + currentPassword);
 
                 AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, currentPassword);
 
                 firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
                     // Reauthenticate user
-                    if (task.isSuccessful()) { //
+                    if (task.isSuccessful()) {
                         Log.d(TAG, "User re-authenticated.");
                         Toast.makeText(this, "Re-Authentication success.", Toast.LENGTH_SHORT).show();
 
@@ -369,6 +397,55 @@ public class profilePage extends AppCompatActivity {
         } else {
             Log.e(TAG, "FirebaseUser is null");
             Toast.makeText(profilePage.this, "Failed to update profile: FirebaseUser not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Method to delete user account
+    private void deleteAccount() {
+        if (firebaseUser != null) {
+            // Get user ID from SharedPreferences
+            String userId = sharedPreferences.getString("userId", "N/A");
+
+            // Delete user from Firestore
+            db.collection("Account").document(userId)
+                    .delete()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // Delete user from Firebase Authentication
+                            firebaseUser.delete()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                // Clear SharedPreferences and logout user
+                                                sharedPreferences.edit().clear().apply();
+                                                Toast.makeText(profilePage.this, "Account deleted successfully", Toast.LENGTH_SHORT).show();
+
+                                                // Redirect to login page
+                                                Intent intent = new Intent(profilePage.this, MainActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            } else {
+                                                // Error handling for Firebase Authentication deletion
+                                                Log.e(TAG, "Error deleting user from Firebase Authentication", task.getException());
+                                                Toast.makeText(profilePage.this, "Error deleting account: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Error handling for Firestore deletion
+                            Log.e(TAG, "Error deleting user from Firestore", e);
+                            Toast.makeText(profilePage.this, "Error deleting account: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Log.e(TAG, "FirebaseUser is null");
+            Toast.makeText(this, "User is not authenticated", Toast.LENGTH_SHORT).show();
         }
     }
 }

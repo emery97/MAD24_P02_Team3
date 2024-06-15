@@ -244,6 +244,19 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
+                    <Button
+                        android:id="@+id/deleteAccountButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:backgroundTint="#FF0000"
+                        android:text="Delete Account"
+                        android:textColor="@color/white"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
