@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name = "colored_checkbox" parent = "Theme.AppCompat.Light">
+        <!--checked box color-->
+        <item name = "colorAccent">@android:color/holo_red_light</item>
+        <!--uncheck box color-->
+         <item name = "android:textColorSecondary">@android:color/darker_gray</item>
+    </style>
+</resources>

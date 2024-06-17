@@ -162,6 +162,7 @@
 
                     <CheckBox
                         android:id="@+id/showPassword"
+                        android:theme="@style/colored_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
@@ -171,6 +172,7 @@
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/editPassword"
                         app:layout_constraintTop_toBottomOf="@+id/editPassword" />
+
 
                     <TextView
                         android:id="@+id/email"
