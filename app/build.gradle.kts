@@ -30,7 +30,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -52,4 +51,12 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+
+    //for google auth and calendar integrations
+    implementation ("com.google.android.gms:play-services-auth:20.3.0")
+    implementation ("com.google.firebase:firebase-firestore:24.3.0")
+
+    //so that we can easily control permissions
+    implementation ("pub.devrel:easypermissions:3.0.0")
 }
+

@@ -40,6 +40,22 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- footer -->
+
+    <Button
+        android:id="@+id/connectToGoogleCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:backgroundTint="#996666"
+        android:fontFamily="@font/abel"
+        android:text="Connect To Google Calendar"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <include
         android:id="@+id/footer"
         layout="@layout/footer"
@@ -48,5 +64,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
