@@ -157,7 +157,7 @@ Entertainment
   - Price and event type options are dynamic and depend on the database.
   - Users can clear the selected filters by using the "Clear Filters" button.
   - Ensures users can find events that meet their preferences.
-  - Made scrollable to ensure responsiveness in horizontal orientation.
+  - Made scrollable to ensure responsiveness in landscape orientation.
 
 - **RecyclerView of Events [Tan Si Huei Chloe]**:
   - Displays a list of different events at the bottom of the page.
