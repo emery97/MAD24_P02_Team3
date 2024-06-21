@@ -296,6 +296,7 @@
                 android:backgroundTint="#E15250"
                 android:fontFamily="@font/abel"
                 android:text="BUY TICKETS"
+                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"

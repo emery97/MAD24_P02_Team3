@@ -17,12 +17,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/black"
             android:entries="@array/feedback_methods" />
 
         <EditText
             android:id="@+id/Feedback_msg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/black"
             android:hint="Message" />
 
         <Button
@@ -31,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:backgroundTint="#E15250"
+            android:textColor="@color/white"
             android:text="Attach Image" />
 
         <ImageView
@@ -46,6 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:backgroundTint="#E15250"
+            android:textColor="@color/white"
             android:text="Submit Feedback" />
 
         <Button
@@ -54,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:backgroundTint="#E15250"
+            android:textColor="@color/white"
             android:text="Exit" />
     </LinearLayout>
 

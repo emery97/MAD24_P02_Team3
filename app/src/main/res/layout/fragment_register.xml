@@ -29,6 +29,9 @@
         android:ems="10"
         android:hint="Enter your Username"
         android:inputType="text"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:textSize="14sp" />
 
     <TextView
@@ -49,6 +52,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Email"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:inputType="textEmailAddress"
         android:textSize="14sp" />
 
@@ -70,6 +76,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Phone Number"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:inputType="phone"
         android:textSize="14sp" />
 
@@ -92,6 +101,9 @@
         android:ems="10"
         android:hint="New Password"
         android:inputType="textPassword"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:textSize="14sp" />
 
     <TextView
@@ -110,6 +122,7 @@
         android:layout_marginTop="20dp"
         android:backgroundTint="#462109"
         android:text="Register"
+        android:textColor="@color/white"
         android:textSize="20sp" />
 
 </LinearLayout>

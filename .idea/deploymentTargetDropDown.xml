@@ -2,6 +2,28 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BookingHistoryDetails">
+        <State />
+      </entry>
+      <entry key="BuyTicket (1)">
+        <State />
+      </entry>
+      <entry key="Feedback">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="RFCT51MA73H" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-06-21T09:59:45.401025500Z" />
+        </State>
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -10,13 +32,32 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_8_Pro_API_33.avd" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-06-15T07:52:54.229192Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-06-21T09:57:20.039621500Z" />
         </State>
+      </entry>
+      <entry key="payment (1)">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-06-21T14:51:55.107895400Z" />
+        </State>
+      </entry>
+      <entry key="profilePage">
+        <State />
       </entry>
     </value>
   </component>

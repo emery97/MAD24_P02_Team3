@@ -28,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/recyclerView"
+        android:textColor="@color/black"
         android:layout_marginTop="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView

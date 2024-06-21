@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "sg.edu.np.mad.TicketFinder"
+    namespace = "sg.edu.np.mad.TicketFinderSG"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "sg.edu.np.mad.TicketFinder"
+        applicationId = "sg.edu.np.mad.TicketFinderSG"
         minSdk = 33
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

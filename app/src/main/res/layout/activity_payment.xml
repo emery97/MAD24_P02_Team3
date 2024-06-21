@@ -36,9 +36,10 @@
         android:layout_height="30sp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="15dp"
+        android:textColor="@color/black"
+        android:entries="@array/payment_methods"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
-        android:entries="@array/payment_methods" />
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -57,6 +58,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
                 android:text="Card Details"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -68,7 +70,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
                 android:text="Card Number"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -81,6 +83,9 @@
                 android:ems="10"
                 android:inputType="number"
                 android:maxLength="16"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardNumber" />
 
@@ -91,7 +96,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="15dp"
                 android:text="Expiry"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editCardNumber" />
@@ -104,6 +109,9 @@
                 android:ems="10"
                 android:inputType="date"
                 android:maxLength="5"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/expiry" />
 
@@ -112,9 +120,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="124dp"
+                android:layout_marginEnd="144dp"
                 android:text="CVV"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editCardNumber" />
@@ -127,6 +135,9 @@
                 android:ems="10"
                 android:inputType="number"
                 android:maxLength="3"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toEndOf="@+id/editExpiry"
                 app:layout_constraintTop_toBottomOf="@+id/cvv" />
 
@@ -137,7 +148,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="15dp"
                 android:text="Name"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editExpiry" />
@@ -149,6 +160,9 @@
                 android:layout_marginStart="16dp"
                 android:ems="10"
                 android:inputType="text"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name" />
 
@@ -159,6 +173,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="34dp"
                 android:text="Billing Address"
+                android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editTextText4" />
@@ -170,7 +185,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="20dp"
                 android:text="Address"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
@@ -180,6 +195,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:ems="10"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 android:inputType="text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/address" />
@@ -191,7 +209,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="15dp"
                 android:text="Postal Code"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editAddress" />
 
@@ -201,6 +219,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:ems="10"
+                android:textColorHint="@color/black"
+                android:backgroundTint="@color/black"
+                android:textColor="@color/black"
                 android:inputType="number"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/postalCode" />
@@ -212,6 +233,7 @@
                 android:layout_marginTop="15dp"
                 android:backgroundTint="@color/black"
                 android:text="View Booking"
+                android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editPostalCode" />
@@ -222,6 +244,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:textSize="30sp"
+                android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bookingdetails" />
@@ -233,6 +256,7 @@
                 android:layout_marginTop="3dp"
                 android:backgroundTint="#976954"
                 android:text="BUY NOW"
+                android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/totalpricedisplay" />
@@ -244,6 +268,7 @@
                 android:layout_marginTop="15dp"
                 android:backgroundTint="#F65858"
                 android:text="Cancel"
+                android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/buyNow" />

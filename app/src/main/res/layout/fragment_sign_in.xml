@@ -29,6 +29,9 @@
         android:ems="10"
         android:hint="Enter your Email"
         android:inputType="text"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:textSize="14sp" />
 
     <TextView
@@ -49,6 +52,9 @@
         android:ems="10"
         android:hint="Enter your Password"
         android:inputType="textPassword"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        android:backgroundTint="@color/black"
         android:textSize="14sp" />
 
     <TextView
@@ -66,6 +72,7 @@
         android:layout_marginTop="8dp"
         android:backgroundTint="#4C240A"
         android:text="Enter"
+        android:textColor="@color/white"
         android:textSize="20sp" />
 
 </LinearLayout>

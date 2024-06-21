@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Concert Title"
+        android:textColor="@color/black"
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center_horizontal"
@@ -58,6 +59,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Category"
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -67,6 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:textColorHint="@color/black"
                 android:hint="@string/select_seat_category">
 
                 <AutoCompleteTextView
@@ -75,6 +78,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/select_seat_category"
                     android:inputType="none"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -85,6 +89,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Seat Number"
+                android:textColor="@color/black"
                 android:textSize="18sp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -93,6 +98,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:textColorHint="@color/black"
                 android:hint="@string/select_seat_number">
 
                 <AutoCompleteTextView
@@ -101,6 +107,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/select_seat_number"
                     android:inputType="none"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -122,6 +129,7 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="Seat Category"
+                        android:textColor="@color/black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -132,6 +140,7 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="Seat Number"
+                        android:textColor="@color/black"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:background="@drawable/border_for_table"/>
@@ -143,6 +152,7 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="Quantity"
+                        android:textColor="@color/black"
                         android:textSize="14sp"
                         android:textStyle="bold"></TextView>
                 </TableRow>
@@ -158,6 +168,7 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="@string/selected_seat_category"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
 
                     <TextView
@@ -168,6 +179,7 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="@string/selected_seat_number"
+                        android:textColor="@color/black"
                         android:textSize="12sp"
                         android:background="@drawable/border_for_table"/>
 
@@ -178,6 +190,7 @@
                         android:layout_weight="1"
                         android:ems="5"
                         android:inputType="number"
+                        android:textColor="@color/black"
                         android:textSize="14sp" />
                 </TableRow>
 
@@ -190,6 +203,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Book"
+                android:textColor="@color/white"
                 android:textSize="20sp"
                 android:visibility="invisible"
                 android:backgroundTint="#976954" />
