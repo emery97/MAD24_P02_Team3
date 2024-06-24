@@ -1,63 +1,69 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/eventCard"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_width="200dp"
+    android:layout_height="300dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
 
-    <ImageView
-        android:id="@+id/eventImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/eventDate"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Event Date"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/eventImage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <ImageView
+            android:id="@+id/eventImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintWidth_percent="1"
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/eventArtist"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Event Artist"
-        android:textColor="#4C240A"
-        android:textSize="16sp"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/eventDate"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="4dp"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/eventImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-    <TextView
-        android:id="@+id/eventTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="Event Title"
-        android:textColor="#4C240A"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/eventArtist"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/eventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Event Title"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/eventDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Event Date"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/eventArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Event Artist"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:gravity="center" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,18 @@
+<!-- res/drawable/button_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#D3D3D3"/> <!-- Color when button is pressed -->
+            <corners android:radius="8dp"/> <!-- Rounded corners -->
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#FFFFFF"/> <!-- Default color -->
+            <stroke
+                android:width="1dp"
+                android:color="#000000"/> <!-- Border color -->
+            <corners android:radius="8dp"/> <!-- Rounded corners -->
+        </shape>
+    </item>
+</selector>
