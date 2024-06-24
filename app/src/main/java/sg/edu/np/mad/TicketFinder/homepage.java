@@ -205,32 +205,32 @@ public class homepage extends AppCompatActivity {
         Footer.setUpFooter(this);
 
         // Load the featured image
-        ImageView featuredImage = findViewById(R.id.featuredImage);
-        loadFeaturedImage(featuredImage);
+//        ImageView featuredImage = findViewById(R.id.featuredImage);
+//        loadFeaturedImage(featuredImage);
 
         // Fetch event list
         getEventList();
     }
 
     // Method to load a random featured image from the event list
-    private void loadFeaturedImage(ImageView imageView) {
-        handler.getData(new FirestoreCallback<Event>() {
-            @Override
-            public void onCallback(ArrayList<Event> eventList) {
-                if (!eventList.isEmpty()) {
-
-                    // random so that featured image changes every time it loads
-                    Random random = new Random();
-                    int randomIndex = random.nextInt(eventList.size());
-
-                    String imageUrl = eventList.get(randomIndex).getImgUrl();
-                    Glide.with(homepage.this)
-                            .load(imageUrl)          // Load the image from the URL
-                            .into(imageView);        // Set the image into the provided ImageView
-                }
-            }
-        });
-    }
+//    private void loadFeaturedImage(ImageView imageView) {
+//        handler.getData(new FirestoreCallback<Event>() {
+//            @Override
+//            public void onCallback(ArrayList<Event> eventList) {
+//                if (!eventList.isEmpty()) {
+//
+//                    // random so that featured image changes every time it loads
+//                    Random random = new Random();
+//                    int randomIndex = random.nextInt(eventList.size());
+//
+//                    String imageUrl = eventList.get(randomIndex).getImgUrl();
+//                    Glide.with(homepage.this)
+//                            .load(imageUrl)          // Load the image from the URL
+//                            .into(imageView);        // Set the image into the provided ImageView
+//                }
+//            }
+//        });
+//    }
 
     // Method to fetch the event list and update the RecyclerViews
     private void getEventList() {
