@@ -8,6 +8,7 @@ public class BookingDetails {
     private String totalPrice;
     private String quantity;
     private String paymentMethod;
+    private boolean expanded;
 
     // Parameterized constructor
     public BookingDetails(String concertName,String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
@@ -17,6 +18,7 @@ public class BookingDetails {
         this.totalPrice = totalPrice;
         this.quantity = quantity;
         this.paymentMethod = paymentMethod;
+        this.expanded = false;
     }
 
     // Getters and setters
@@ -61,5 +63,13 @@ public class BookingDetails {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
 }

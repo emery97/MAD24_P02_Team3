@@ -3,6 +3,8 @@ package sg.edu.np.mad.TicketFinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,15 +32,40 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // get booking details
+//        BookingDetails bookingDetails = bookingDetailsList.get(position);
+//
+//        // set values
+//        holder.EventTitle.setText(bookingDetails.getConcertName());
+//        holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
+//        holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
+//        holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
+//        holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
+//        holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
         BookingDetails bookingDetails = bookingDetailsList.get(position);
 
-        // set values
+        // Bind initial data
         holder.EventTitle.setText(bookingDetails.getConcertName());
-        holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
-        holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
-        holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
-        holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
-        holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
+
+        // Handle expansion state
+        boolean isExpanded = bookingDetails.isExpanded();
+        holder.expandableLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
+
+        if (isExpanded) {
+            holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
+            holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
+            holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
+            holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
+            holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
+            holder.viewMoreButton.setText("View Less");
+        } else {
+            holder.viewMoreButton.setText("View More");
+        }
+
+        // Handle click listener for view more button
+        holder.viewMoreButton.setOnClickListener(v -> {
+            bookingDetails.setExpanded(!isExpanded);
+            notifyItemChanged(position);
+        });
     }
 
     @Override
@@ -49,6 +76,8 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
     // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView EventTitle,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
+        LinearLayout expandableLayout;
+        Button viewMoreButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -58,6 +87,8 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
             totalPrice = itemView.findViewById(R.id.totalPrice);
             quantity = itemView.findViewById(R.id.quantity);
             paymentMethod = itemView.findViewById(R.id.paymentMethod);
+            expandableLayout = itemView.findViewById(R.id.expandableLayout);
+            viewMoreButton = itemView.findViewById(R.id.viewMoreButton);
         }
     }
 }
