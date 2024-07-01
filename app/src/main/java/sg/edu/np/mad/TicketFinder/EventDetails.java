@@ -16,7 +16,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
 import com.bumptech.glide.Glide;
+import com.github.chrisbanes.photoview.PhotoView;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -33,17 +36,14 @@ public class EventDetails extends AppCompatActivity {
             return insets;
         });
 
-        // Declare a final array with one element to hold the event object. allows access being try and catch
         final Event[] eventForTitle = new Event[1];
         try {
-            // get event object
             Intent intent = getIntent();
             Event eventObj = (Event) intent.getSerializableExtra("event");
             eventForTitle[0] = eventObj;
 
-            Log.i("event", eventObj.toString()); // logs event data
+            Log.i("event", eventObj.toString());
 
-            // initialise all views
             TextView title = findViewById(R.id.eventTitle);
             TextView caption = findViewById(R.id.eventCaption);
             TextView artist = findViewById(R.id.eventArtist);
@@ -55,23 +55,17 @@ public class EventDetails extends AppCompatActivity {
             TextView salesTiming = findViewById(R.id.eventGeneralSales);
             ImageView eventImg = findViewById(R.id.eventImg);
 
-            // set date formatter (eg. 30 October 2023)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
 
-            // format eventdate
             String eventDateString = eventObj.getDate().format(formatter);
 
-            // get sales period (subtract 1 month from eventDate)
             LocalDate salesDate = eventObj.getDate().minusMonths(1);
-            // format sales period date to string
             String salesDateString = salesDate.format(formatter);
 
-            // set image with Glide
             Glide.with(this)
                     .load(eventObj.getImgUrl())
                     .into(eventImg);
 
-            // setting text data
             title.setText(eventObj.getTitle());
             caption.setText(eventObj.getCaption());
             artist.setText(eventObj.getArtist());
@@ -79,33 +73,27 @@ public class EventDetails extends AppCompatActivity {
             timing.setText(eventDateString + ", " + eventObj.getTime());
             venue.setText(eventObj.getVenue());
             description.setText(eventObj.getDescription());
-            price.setText("$" + String.format("%.2f",eventObj.getPrice())); // set price to string with 2dp
-            salesTiming.setText(salesDateString + ", " + eventObj.getTime()); // sales timing is 1 month before, same time
+            price.setText("$" + String.format("%.2f", eventObj.getPrice()));
+            salesTiming.setText(salesDateString + ", " + eventObj.getTime());
 
-        } catch (Exception e) { // handles if eventdetails is directly accessed (for testing)
+        } catch (Exception e) {
             Log.e("EDIntent", "no intent passed in");
         }
 
-        // show map button
         Button showMapButton = findViewById(R.id.showMapButton);
         showMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Create and display a dialog
                 Dialog mapDialog = new Dialog(EventDetails.this);
 
-                // Check orientation
                 if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    // Landscape mode
                     mapDialog.setContentView(R.layout.horizontal_map_layout);
-                    // Set the dialog to match parent size
                     mapDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 } else {
-                    // Portrait mode
                     mapDialog.setContentView(R.layout.map_dialog);
                 }
 
-                ImageView mapImage = mapDialog.findViewById(R.id.mapImageView);
+                PhotoView mapImage = mapDialog.findViewById(R.id.mapImageView);
                 mapImage.setImageResource(R.drawable.seat_map_with_color_legend);
                 Button closeButton = mapDialog.findViewById(R.id.closeButton);
                 closeButton.setOnClickListener(new View.OnClickListener() {
@@ -115,33 +103,27 @@ public class EventDetails extends AppCompatActivity {
                     }
                 });
 
-
                 mapDialog.show();
             }
         });
 
-        // link to buy tickets page
         Button buyTicketsButton = findViewById(R.id.buyTicketsButton);
         buyTicketsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Create an intent to navigate from EventDetails to BuyTicket activity
                 Intent intent = new Intent(EventDetails.this, BuyTicket.class);
 
-                if (eventForTitle[0] != null){
-                    // Pass the event title to the BuyTicket activity
+                if (eventForTitle[0] != null) {
                     intent.putExtra("eventTitle", eventForTitle[0].getTitle());
                     intent.putExtra("eventTiming", eventForTitle[0].getDate().format(DateTimeFormatter.ofPattern("dd LLLL yyyy")) + ", " + eventForTitle[0].getTime());
-                }else{
+                } else {
                     Log.d("buyTicketsButton", "eventObj is null");
                 }
 
-                // Start the BuyTicket activity
                 startActivity(intent);
             }
         });
 
-        // set up footer
         Footer.setUpFooter(this);
     }
 }

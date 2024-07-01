@@ -5,21 +5,33 @@
     android:layout_width="400dp"
     android:layout_height="600dp">
 
-    <ImageView
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Double Tap To Zoom In"
+        android:layout_centerHorizontal="true"
+        android:textSize="50px"
+        android:layout_marginTop="40px">
+
+    </TextView>
+
+    <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/mapImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/bigger_font_data" />
+        android:src="@drawable/bigger_font_data"
+        tools:ignore="MissingClass" />
+
     <Button
         android:id="@+id/closeButton"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:backgroundTint="#976954"
         android:text="Close"
-        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:layout_marginTop="5dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"/>
-
-
+        android:layout_marginBottom="10dp" />
+    <!--976954-->
 </RelativeLayout>
