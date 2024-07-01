@@ -11,6 +11,7 @@
         android:text="Double Tap To Zoom In"
         android:layout_centerHorizontal="true"
         android:textSize="50px"
+        android:textColor="@color/black"
         android:layout_marginTop="40px">
 
     </TextView>
