@@ -41,11 +41,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Event Date"
-            android:textColor="#757575"
+            android:textColor="#000000"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/eventTitle"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/eventImage"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/eventTitle" />
 
         <TextView
             android:id="@+id/eventArtist"
@@ -53,11 +53,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Event Artist"
-            android:textColor="#757575"
+            android:textColor="#000000"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/eventDate"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/eventImage"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/eventDate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
