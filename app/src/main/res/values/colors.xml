@@ -7,5 +7,7 @@
     <color name="buttonBackground">#6200EE</color>
     <color name="recyclerViewBackground">#FFFFFF</color>
     <color name="dialogButtonColor">#976954</color>
+    <color name="yellow">#DDA448</color>
+    <color name="light_gray">#D3D3D3</color>
 
 </resources>

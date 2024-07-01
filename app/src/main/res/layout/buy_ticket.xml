@@ -26,7 +26,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"></TextView>
 
-
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
@@ -40,18 +39,16 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <ImageView
+            <!-- Replace ImageView with PhotoView -->
+            <com.github.chrisbanes.photoview.PhotoView
                 android:id="@+id/imageMap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:adjustViewBounds="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/bigger_font_data" />
 
             <TextView
-
                 android:id="@+id/category"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -183,7 +180,6 @@
 
             </TableLayout>
 
-
             <Button
                 android:id="@+id/button_booked"
                 android:layout_width="match_parent"
@@ -193,8 +189,6 @@
                 android:textSize="20sp"
                 android:visibility="invisible"
                 android:backgroundTint="#976954" />
-
-
 
         </LinearLayout>
     </ScrollView>

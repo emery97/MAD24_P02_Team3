@@ -33,5 +33,10 @@
         <item>Venue 3</item>
         <item>Venue 4</item>
     </string-array>
-
+    <!-- for selecting seats -->
+    <string name="back_button">Back</string>
+    <string name="select_seat">Select Seat</string>
+    <string name="total_price">Total Price:</string>
+    <string name="price_value">$0</string>
+    <string name="Continue">Continue</string>
 </resources>

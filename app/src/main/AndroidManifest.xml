@@ -56,7 +56,11 @@
         <activity
             android:name=".ViewFeedback"
             android:exported="true" />
-
+        <!--CHECKING SELECT SEATS -->
+        <activity
+            android:name=".SelectSeats"
+            android:configChanges="orientation|screenSize"
+            android:exported="true" />
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

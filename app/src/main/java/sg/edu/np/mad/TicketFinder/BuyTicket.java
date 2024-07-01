@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
@@ -64,6 +64,10 @@ public class BuyTicket extends AppCompatActivity {
         TextView selectedSeatCat = findViewById(R.id.selectedSeatCat);
         TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
 
+        // Initialize PhotoView
+        PhotoView imageMap = findViewById(R.id.imageMap);
+        imageMap.setImageResource(R.drawable.bigger_font_data);
+
         // Fetch seat category data from Firestore
         dbHandler handler = new dbHandler();
         handler.getSeatCategoryData(new FirestoreCallback<SeatCategory>() {
@@ -94,7 +98,6 @@ public class BuyTicket extends AppCompatActivity {
                 });
             }
         });
-
 
         // Handle item selection in the seat category dropdown
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
