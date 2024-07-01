@@ -162,11 +162,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class homepage extends AppCompatActivity {
@@ -285,24 +290,30 @@ public class homepage extends AppCompatActivity {
                         }
                     });
 
-                    // Filter out top 3 upcoming events
-                    List<Event> topEvents = eventList.subList(0, Math.min(eventList.size(), 3));
-
-                    // Convert List to ArrayList cos need to ensure compatibility
-                    // with the setSearchList() method of the EventAdapter
-                    ArrayList<Event> topEventsArrayList = new ArrayList<>(topEvents);
+                    // Filter out top 3 upcoming events closest to today
+                    ArrayList<Event> topEventsArrayList = new ArrayList<>();
+                    for (Event event : eventList) {
+                        if (topEventsArrayList.size() < 3) {
+                            topEventsArrayList.add(event);
+                        } else {
+                            break;
+                        }
+                    }
 
                     runOnUiThread(() -> {
-                        horizontalItemAdapter.setSearchList(topEventsArrayList); //changed
+                        // Update the "Upcoming Events" RecyclerView
+                        horizontalItemAdapter.setSearchList(topEventsArrayList);
 
-                        // Exclude the first 3 items from eventList
+                        // Exclude the first 3 items from eventList for "Recommended for You"
                         List<Event> remainingEvents = eventList.subList(Math.min(3, eventList.size()), eventList.size());
-                        gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents)); //changed
+                        gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents));
                     });
                 }
             }
         });
     }
+
+
 
 
     // Method to fetch events for the selected venue and update the RecyclerViews
@@ -325,15 +336,40 @@ public class homepage extends AppCompatActivity {
                         }
                     }
 
+                    // Filter out past events
+                    ArrayList<Event> upcomingEvents = new ArrayList<>();
+                    LocalDate currentDate = LocalDate.now(); // Get the current date
+
+                    for (Event event : filteredEvents) {
+                        if (!event.getDate().isBefore(currentDate)) {
+                            upcomingEvents.add(event);
+                        }
+                    }
+
+                    // Sort the filtered events by date
+                    Collections.sort(upcomingEvents, new Comparator<Event>() {
+                        @Override
+                        public int compare(Event event1, Event event2) {
+                            return event1.getDate().compareTo(event2.getDate());
+                        }
+                    });
+
                     runOnUiThread(() -> {
-                        // Update both RecyclerViews with filtered events
-                        horizontalItemAdapter.setSearchList(filteredEvents);
-                        gridItemAdapter.setSearchList(filteredEvents);
+                        // Get the top 3 upcoming events
+                        ArrayList<Event> topEvents = new ArrayList<>(upcomingEvents.subList(0, Math.min(3, upcomingEvents.size())));
+
+                        // Update the "Upcoming Events" RecyclerView
+                        horizontalItemAdapter.setSearchList(topEvents);
+
+                        // Exclude the first 3 items from upcomingEvents for "Recommended for You"
+                        List<Event> remainingEvents = upcomingEvents.subList(Math.min(3, upcomingEvents.size()), upcomingEvents.size());
+                        gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents));
                     });
                 }
             }
         });
     }
+
 
 
     // Method to get the number of columns for the grid layout based on orientation
