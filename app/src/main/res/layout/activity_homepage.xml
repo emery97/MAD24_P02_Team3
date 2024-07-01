@@ -65,7 +65,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:entries="@array/venue_array" /> <!-- dummy data until api is set-->
+                    android:spinnerMode="dropdown" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

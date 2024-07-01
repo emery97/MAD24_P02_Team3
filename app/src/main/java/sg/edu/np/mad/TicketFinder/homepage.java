@@ -146,8 +146,11 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-
+import android.widget.Spinner;
+import android.widget.AdapterView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -173,6 +176,7 @@ public class homepage extends AppCompatActivity {
     private RecyclerView gridRecyclerView;
     private EventAdapter gridItemAdapter;
     private dbHandler handler = new dbHandler();
+    private Spinner venueSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +188,41 @@ public class homepage extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        // Initialize Spinner
+        venueSpinner = findViewById(R.id.venueSpinner);
+
+        // Fetch and set venue data
+        handler.getVenues(new FirestoreCallback<String>() {
+            @Override
+            public void onCallback(ArrayList<String> venueList) {
+                // Ensure "Singapore" is the first item in the venue list
+                if (!venueList.contains("Singapore")) {
+                    venueList.add(0, "Singapore");
+                } else {
+                    venueList.remove("Singapore");
+                    venueList.add(0, "Singapore");
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(homepage.this, android.R.layout.simple_spinner_item, venueList);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                venueSpinner.setAdapter(adapter);
+            }
+        });
+
+        // Set OnItemSelectedListener to Spinner
+        venueSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedVenue = parent.getItemAtPosition(position).toString();
+                fetchEventsForVenue(selectedVenue);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
         });
 
         // Initialize horizontal RecyclerView for "Top 3 Upcoming Events" //changed
@@ -264,6 +303,38 @@ public class homepage extends AppCompatActivity {
             }
         });
     }
+
+
+    // Method to fetch events for the selected venue and update the RecyclerViews
+    private void fetchEventsForVenue(String venue) {
+        handler.getData(new FirestoreCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> eventList) {
+                if (eventList != null && !eventList.isEmpty()) {
+                    ArrayList<Event> filteredEvents;
+                    if (venue.equals("Singapore")) {
+                        // Show all events if "Singapore" is selected
+                        filteredEvents = new ArrayList<>(eventList);
+                    } else {
+                        // Filter events by selected venue
+                        filteredEvents = new ArrayList<>();
+                        for (Event event : eventList) {
+                            if (event.getVenue().equals(venue)) {
+                                filteredEvents.add(event);
+                            }
+                        }
+                    }
+
+                    runOnUiThread(() -> {
+                        // Update both RecyclerViews with filtered events
+                        horizontalItemAdapter.setSearchList(filteredEvents);
+                        gridItemAdapter.setSearchList(filteredEvents);
+                    });
+                }
+            }
+        });
+    }
+
 
     // Method to get the number of columns for the grid layout based on orientation
     private int getSpanCount() {

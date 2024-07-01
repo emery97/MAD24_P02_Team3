@@ -93,6 +93,32 @@ public class dbHandler extends Application {
                     }
                 });
     }
+
+    public void getVenues(FirestoreCallback<String> firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsCollection = db.collection("Events");
+
+        eventsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> venues = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (document.contains("Venue")) {
+                            String venue = document.getString("Venue");
+                            if (!venues.contains(venue)) {
+                                venues.add(venue);
+                            }
+                        }
+                    }
+                    firestoreCallback.onCallback(venues);
+                } else { //
+                    Log.w("venueError", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
     public void getSeatCategoryData(FirestoreCallback<SeatCategory> firestoreCallback){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
