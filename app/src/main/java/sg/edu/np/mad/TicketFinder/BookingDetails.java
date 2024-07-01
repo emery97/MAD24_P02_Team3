@@ -1,5 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
+import java.util.Date;
+
 public class BookingDetails {
     // attributes
     private String concertName;
@@ -8,11 +10,15 @@ public class BookingDetails {
     private String totalPrice;
     private String quantity;
     private String paymentMethod;
+    private String time;
+    private String purchaseTimeString;
     private boolean expanded;
 
     // Parameterized constructor
-    public BookingDetails(String concertName,String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
+    public BookingDetails(String concertName,String purchaseTimeString,String time,String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
         this.concertName = concertName;
+        this.purchaseTimeString = purchaseTimeString;
+        this.time = time;
         this.seatCategory = seatCategory;
         this.seatNumber = seatNumber;
         this.totalPrice = totalPrice;
@@ -72,4 +78,21 @@ public class BookingDetails {
     public void setExpanded(boolean expanded) {
         this.expanded = expanded;
     }
+
+    public String gettime() {
+        return time;
+    }
+    public void settime(String time) {
+        this.time = time;
+    }
+
+    public String getpurcasetime() {
+        return purchaseTimeString;
+    }
+
+    public void setpurchasetime(String time) {
+        this.purchaseTimeString = purchaseTimeString;
+    }
+
+
 }

@@ -31,20 +31,12 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
     // putting data in each booking details item xml
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // get booking details
-//        BookingDetails bookingDetails = bookingDetailsList.get(position);
-//
-//        // set values
-//        holder.EventTitle.setText(bookingDetails.getConcertName());
-//        holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
-//        holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
-//        holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
-//        holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
-//        holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
         BookingDetails bookingDetails = bookingDetailsList.get(position);
 
         // Bind initial data
         holder.EventTitle.setText(bookingDetails.getConcertName());
+        holder.eventDate.setText(bookingDetails.gettime());
+        holder.Datebought.setText(bookingDetails.getpurcasetime());
 
         // Handle expansion state
         boolean isExpanded = bookingDetails.isExpanded();
@@ -75,13 +67,15 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
 
     // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView EventTitle,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
+        public TextView EventTitle,Datebought,eventDate,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
         LinearLayout expandableLayout;
         Button viewMoreButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             EventTitle = itemView.findViewById(R.id.EventTitle);
+            eventDate = itemView.findViewById(R.id.eventDate);
+            Datebought = itemView.findViewById(R.id.Datebought);
             seatCategory = itemView.findViewById(R.id.seatCategory);
             seatNumber = itemView.findViewById(R.id.seatNumber);
             totalPrice = itemView.findViewById(R.id.totalPrice);

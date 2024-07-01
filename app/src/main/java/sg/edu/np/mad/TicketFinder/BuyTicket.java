@@ -155,6 +155,7 @@ public class BuyTicket extends AppCompatActivity {
                 int quantity = Integer.parseInt(quantityText);
                 // Calculate total price
                 double totalPrice = seatPrice * quantity;
+                String eventTiming = getIntent().getStringExtra("eventTiming");
                 // Create intent to start payment activity
                 Intent intent = new Intent(BuyTicket.this, payment.class);
                 intent.putExtra("concertName", concertName);
@@ -162,6 +163,7 @@ public class BuyTicket extends AppCompatActivity {
                 intent.putExtra("seatCategory", selectedSeatCategory);
                 intent.putExtra("seatNumber", selectedSeatNumber);
                 intent.putExtra("quantity", quantity);
+                intent.putExtra("eventTiming",eventTiming);
                 startActivity(intent);
             }
         });

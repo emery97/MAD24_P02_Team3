@@ -26,11 +26,12 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/eventDate"
+            android:id="@+id/Datebought"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5sp"
             android:layout_gravity="center_horizontal"
-            android:text="Event Date"
+            android:text="Date"
             android:textColor="@color/black"
             android:textSize="18sp" />
 
@@ -57,6 +58,16 @@
 
             <TextView
                 android:id="@+id/seatNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Seat Number"
+                android:layout_marginTop="10sp"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/eventDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

@@ -34,6 +34,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
@@ -192,6 +193,7 @@ public class payment extends AppCompatActivity {
         String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
         String paymentMethod = paymentmethod.getSelectedItem().toString();
+        String Time = getIntent().getStringExtra("eventTiming");
 
         // Create booking details map
         Map<String, Object> bookingDetails = new HashMap<>();
@@ -203,6 +205,8 @@ public class payment extends AppCompatActivity {
         bookingDetails.put("Quantity", quantity);
         bookingDetails.put("PaymentMethod", paymentMethod);
         bookingDetails.put("ConcertTitle",concertName);
+        bookingDetails.put("EventTime", Time);
+        bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
 
         // Add booking details to Firestore
         db.collection("BookingDetails").add(bookingDetails)
@@ -270,6 +274,7 @@ public class payment extends AppCompatActivity {
         String seatCategory = getIntent().getStringExtra("seatCategory");
         String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
+        String eventTiming = getIntent().getStringExtra("eventTiming");
 
         // Create and show booking details dialog
         Dialog dialog = new Dialog(payment.this);
@@ -281,6 +286,7 @@ public class payment extends AppCompatActivity {
         TextView numberText = dialog.findViewById(R.id.numberText);
         TextView priceText = dialog.findViewById(R.id.priceText);
         TextView quantityText = dialog.findViewById(R.id.quantityText);
+        TextView timingText = dialog.findViewById(R.id.timingText);
 
         // Set booking details in the dialog
         concertText.setText(concertName);
@@ -288,7 +294,7 @@ public class payment extends AppCompatActivity {
         numberText.setText(seatNumber);
         priceText.setText("Price: $" + totalPrice);
         quantityText.setText("Quantity: " + quantity);
-
+        timingText.setText(eventTiming);
         dialog.show();
     }
 }

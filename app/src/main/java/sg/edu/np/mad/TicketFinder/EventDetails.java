@@ -131,6 +131,7 @@ public class EventDetails extends AppCompatActivity {
                 if (eventForTitle[0] != null){
                     // Pass the event title to the BuyTicket activity
                     intent.putExtra("eventTitle", eventForTitle[0].getTitle());
+                    intent.putExtra("eventTiming", eventForTitle[0].getDate().format(DateTimeFormatter.ofPattern("dd LLLL yyyy")) + ", " + eventForTitle[0].getTime());
                 }else{
                     Log.d("buyTicketsButton", "eventObj is null");
                 }
