@@ -362,13 +362,14 @@ public class homepage extends AppCompatActivity {
                         horizontalItemAdapter.setSearchList(topEvents);
 
                         // Exclude the first 3 items from upcomingEvents for "Recommended for You"
-                        List<Event> remainingEvents = upcomingEvents.subList(Math.min(3, upcomingEvents.size()), upcomingEvents.size());
-                        gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents));
+                        ArrayList<Event> remainingEvents = new ArrayList<>(upcomingEvents.subList(Math.min(3, upcomingEvents.size()), upcomingEvents.size()));
+                        gridItemAdapter.setSearchList(remainingEvents);
                     });
                 }
             }
         });
     }
+
 
 
 
