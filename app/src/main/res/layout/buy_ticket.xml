@@ -4,34 +4,38 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0E5">
+    android:background="@color/white">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/app_logo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/app_logo" />
 
     <TextView
         android:id="@+id/concertTitleChosen"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
         android:text="Concert Title"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:gravity="center_horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include"></TextView>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollView2"
+        android:layout_marginTop="25dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/footer"
-        app:layout_constraintTop_toBottomOf="@id/concertTitleChosen">
+        app:layout_constraintTop_toBottomOf="@id/concertTitleChosen"
+        app:layout_constraintBottom_toTopOf="@id/footer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,10 +43,9 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <!-- Replace ImageView with PhotoView -->
             <com.github.chrisbanes.photoview.PhotoView
                 android:id="@+id/imageMap"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:adjustViewBounds="true"
@@ -53,12 +56,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:text="Category"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="25sp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:padding="10dp"
                 android:id="@+id/dropdown_menu"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -73,6 +76,7 @@
                     android:contentDescription="@string/select_seat_category"
                     android:inputType="none"
                     android:textSize="16sp" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -82,9 +86,10 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:text="Seat Number"
-                android:textSize="18sp" />
+                android:textSize="25sp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:padding="10dp"
                 android:id="@+id/dropdown_menu2"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -98,15 +103,19 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/select_seat_number"
                     android:inputType="none"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
+
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- table for conclusion -->
             <TableLayout
+                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:background="@android:color/white">
+                android:background="@android:color/white"
+                android:stretchColumns="1"> <!-- Ensure columns stretch -->
 
                 <!--table heading -->
                 <TableRow
@@ -119,33 +128,32 @@
                         android:gravity="center"
                         android:padding="10sp"
                         android:text="Seat Category"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="@color/black"
                         android:padding="10sp"
                         android:text="Seat Number"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:background="@drawable/border_for_table"/>
+                        android:background="@drawable/border_for_table" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="@color/black"
                         android:padding="10sp"
                         android:text="Quantity"
-                        android:textSize="14sp"
-                        android:textStyle="bold"></TextView>
+                        android:textSize="14sp" />
                 </TableRow>
 
                 <!--table data -->
-                <TableRow  android:background="@drawable/border_for_table">
+                <TableRow android:background="@drawable/border_for_table">
 
                     <TextView
                         android:id="@+id/selectedSeatCat"
@@ -166,7 +174,7 @@
                         android:padding="10sp"
                         android:text="@string/selected_seat_number"
                         android:textSize="12sp"
-                        android:background="@drawable/border_for_table"/>
+                        android:background="@drawable/border_for_table" />
 
                     <EditText
                         android:id="@+id/quantity"
@@ -198,6 +206,7 @@
         layout="@layout/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="0dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
