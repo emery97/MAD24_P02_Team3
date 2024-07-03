@@ -5,19 +5,20 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView chatRecyclerView;
     private EditText messageInput;
     private Button sendButton;
+    private Button exitButton;
     private ChatAdapter chatAdapter;
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
@@ -28,9 +29,10 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        chatRecyclerView = findViewById(R.id.chatRecyclerView);
-        messageInput = findViewById(R.id.messageInput);
-        sendButton = findViewById(R.id.sendButton);
+        chatRecyclerView = findViewById(R.id.recyclerView);
+        messageInput = findViewById(R.id.editTextMessage);
+        sendButton = findViewById(R.id.buttonSend);
+        exitButton = findViewById(R.id.exitButton);
 
         messageList = new ArrayList<>();
         chatAdapter = new ChatAdapter(messageList);
@@ -67,6 +69,13 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // Close the activity
+            }
+        });
     }
 
     private void handleBotResponse(String messageText) {
@@ -83,25 +92,39 @@ public class ChatActivity extends AppCompatActivity {
         String bestResponse = null;
         int bestMatchScore = 0;
 
-        for (String question : chatbotResponsesMap.keySet()) {
-            int matchScore = getMatchScore(messageText, question);
-            if (matchScore > bestMatchScore) {
-                bestMatchScore = matchScore;
-                bestResponse = chatbotResponsesMap.get(question);
+        for (HashMap.Entry<String, String> entry : chatbotResponsesMap.entrySet()) {
+            String question = entry.getKey();
+            String answer = entry.getValue();
+
+            int questionMatchScore = getMatchScore(messageText, question);
+            int answerMatchScore = getMatchScore(messageText, answer);
+
+            if (questionMatchScore > bestMatchScore) {
+                bestMatchScore = questionMatchScore;
+                bestResponse = answer;
+            }
+
+            if (answerMatchScore > bestMatchScore) {
+                bestMatchScore = answerMatchScore;
+                bestResponse = answer;
             }
         }
 
         return bestMatchScore > 0 ? bestResponse : null;
     }
 
-    private int getMatchScore(String messageText, String question) {
+    private int getMatchScore(String messageText, String text) {
+        // Normalize both messageText and text by removing punctuation and converting to lower case
+        messageText = messageText.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase();
+        text = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase();
+
         String[] messageWords = messageText.split("\\s+");
-        String[] questionWords = question.split("\\s+");
+        String[] textWords = text.split("\\s+");
         int matchCount = 0;
 
         for (String messageWord : messageWords) {
-            for (String questionWord : questionWords) {
-                if (messageWord.equalsIgnoreCase(questionWord)) {
+            for (String textWord : textWords) {
+                if (messageWord.equalsIgnoreCase(textWord)) {
                     matchCount++;
                 }
             }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -13,13 +14,15 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="#1B2B40"
         android:elevation="4dp"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Event Details" />
+        app:title="Event Details"
+        app:titleTextColor="@android:color/white" />
+
 
     <ScrollView
         android:layout_width="0dp"
@@ -262,7 +265,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:backgroundTint="#E15250"
+                        android:backgroundTint="#D9AA52"
                         android:text="View Seat Map"
                         android:textColor="@color/white" />
 
@@ -271,7 +274,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:backgroundTint="#000000"
+                        android:backgroundTint="#1B2B40"
                         android:text="Buy Tickets"
                         android:textColor="@color/white" />
 
@@ -286,9 +289,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_chatbot"
-        app:backgroundTint="#FF5757"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_faq_icon"
+        android:scaleType="centerInside"
+        android:padding="0dp"
+        app:backgroundTint="#CDCDCD"
+        app:maxImageSize="48dp"
+        app:layout_constraintBottom_toTopOf="@id/footer"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <include
@@ -299,4 +305,3 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
