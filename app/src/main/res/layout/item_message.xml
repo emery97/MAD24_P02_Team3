@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="0dp">
+
+    <!-- Bot Icon -->
+    <ImageView
+        android:id="@+id/botIcon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginEnd="0dp"
+        android:src="@drawable/ic_chatbot"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Bot Message Container -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/botMessageContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:visibility="visible"
+        app:layout_constraintStart_toEndOf="@id/botIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="#E15250"
+        app:cardCornerRadius="8dp">
+
+        <TextView
+            android:id="@+id/botMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:maxWidth="250dp"
+            android:textColor="@android:color/white"/>
+    </androidx.cardview.widget.CardView>
+
+    <!-- User Icon -->
+    <ImageView
+        android:id="@+id/userIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/profileimage"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- User Message Container -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/userMessageContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@id/userIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="#D9AA52"
+        app:cardCornerRadius="8dp">
+
+    <TextView
+        android:id="@+id/userMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:maxWidth="250dp"
+        android:textColor="@android:color/black"/>
+</androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

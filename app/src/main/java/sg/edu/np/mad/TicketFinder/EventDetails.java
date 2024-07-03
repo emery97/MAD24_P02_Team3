@@ -124,6 +124,15 @@ public class EventDetails extends AppCompatActivity {
             }
         });
 
+        // Set up the chatbot button click listener
+        findViewById(R.id.chatbotButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventDetails.this, ChatActivity.class);
+                startActivity(intent);
+            }
+        });
+
         Footer.setUpFooter(this);
     }
 }

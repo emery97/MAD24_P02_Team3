@@ -27,6 +27,34 @@ public class dbHandler extends Application {
         FirebaseFirestore.setLoggingEnabled(true);
     }
 
+    public void getChatbotResponses(FirestoreCallback<ChatbotResponse> firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference faqCollection = db.collection("FAQ");
+
+        faqCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<ChatbotResponse> responseList = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        ChatbotResponse response = new ChatbotResponse();
+                        if (document.contains("Question")) {
+                            response.setQuestion(document.getString("Question"));
+                        }
+                        if (document.contains("Answer")) {
+                            response.setAnswer(document.getString("Answer"));
+                        }
+                        responseList.add(response);
+                    }
+                    firestoreCallback.onCallback(responseList);
+                    Log.d("dbHandler", "getChatbotResponses: Callback invoked with responseList size: " + responseList.size());
+                } else {
+                    Log.w("responseError", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
     //get event data (coded with the help of ChatGPT)
     public void getData(FirestoreCallback firestoreCallback) {
         // connect to firestore
