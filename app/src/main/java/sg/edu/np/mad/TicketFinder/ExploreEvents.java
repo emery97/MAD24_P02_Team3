@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -49,6 +50,7 @@ public class ExploreEvents extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("ExploreEvents", "onCreate called");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -113,6 +115,7 @@ public class ExploreEvents extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        Log.d("ExploreEvents", "onConfigurationChanged called");
         // Adjust layout manager on configuration change
         setRecyclerViewLayoutManager(newConfig.orientation);
     }
@@ -141,6 +144,9 @@ public class ExploreEvents extends AppCompatActivity {
         // Initialize search bar
         SearchView searchEvents = findViewById(R.id.searchEvents);
         searchEvents.clearFocus(); // Don't enter typing mode by default
+        int searchPlateId = searchEvents.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
+        View searchPlate = findViewById(searchPlateId);
+        searchPlate.setBackgroundResource(0);
 
         searchEvents.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

@@ -66,6 +66,7 @@
         android:layout_marginTop="8dp"
         android:backgroundTint="#4C240A"
         android:text="Enter"
+        android:textColor="#FEFEFE"
         android:textSize="20sp" />
 
 </LinearLayout>
