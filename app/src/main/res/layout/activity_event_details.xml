@@ -148,7 +148,7 @@
 
                     <Button
                         android:id="@+id/showVenueMap"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:backgroundTint="#D9AA52"
                         android:text="Show Venue Details"

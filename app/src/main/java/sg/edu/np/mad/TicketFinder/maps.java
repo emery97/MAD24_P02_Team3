@@ -57,7 +57,8 @@ public class maps extends FragmentActivity implements OnMapReadyCallback {
 
         if (eventLocation != null) {
             this.gMap.addMarker(new MarkerOptions().position(eventLocation).title("Event is Here"));
-            this.gMap.moveCamera(CameraUpdateFactory.newLatLng(eventLocation));
+            float zoomLevel = 17.0f; // Set the zoom level (1.0 - 21.0)
+            this.gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation, zoomLevel));
         } else {
             Log.e("maps", "Event location is null");
         }
