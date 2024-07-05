@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:name=".dbHandler"
@@ -20,6 +22,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".maps"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -28,9 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ChatActivity">
-        </activity>
+        <activity android:name=".ChatActivity"></activity>
         <activity
             android:name=".homepage"
             android:exported="true" />
@@ -58,15 +61,19 @@
             android:exported="true" />
         <activity
             android:name=".ViewFeedback"
-            android:exported="true" />
-        <!--CHECKING SELECT SEATS -->
+            android:exported="true" /> <!-- CHECKING SELECT SEATS -->
         <activity
             android:name=".SelectSeats"
             android:configChanges="orientation|screenSize"
             android:exported="true" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAtrYJH3VUAJgo-qhxicKkjihd8pPSuEII" />
     </application>
 
 </manifest>

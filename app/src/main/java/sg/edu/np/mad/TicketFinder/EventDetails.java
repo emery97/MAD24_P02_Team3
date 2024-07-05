@@ -80,7 +80,20 @@ public class EventDetails extends AppCompatActivity {
             Log.e("EDIntent", "no intent passed in");
         }
 
+        //show venue details
+        Button showVenueMapButton = findViewById(R.id.showVenueMap);
+        showVenueMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(EventDetails.this, maps.class);
+                intent.putExtra("event", eventForTitle[0]); // sending event data
+                startActivity(intent);
+            }
+        });
+
+        //show seat map
         Button showMapButton = findViewById(R.id.showMapButton);
+
         showMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

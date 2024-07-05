@@ -51,6 +51,7 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
-    implementation("com.github.chrisbanes:PhotoView:2.3.0") // Ensure this is correct
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
 
 }

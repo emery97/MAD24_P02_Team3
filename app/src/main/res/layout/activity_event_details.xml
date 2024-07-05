@@ -146,6 +146,14 @@
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
+                    <Button
+                        android:id="@+id/showVenueMap"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#D9AA52"
+                        android:text="Show Venue Details"
+                        android:textColor="#FFFFFF" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -163,7 +171,6 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/eventDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Description"
@@ -172,6 +179,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/eventDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -196,7 +204,6 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/eventTicketPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Ticket Price"
@@ -205,6 +212,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/eventTicketPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -229,7 +237,6 @@
                     android:padding="16dp">
 
                     <TextView
-                        android:id="@+id/eventGeneralSales"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="General Sales"
@@ -238,6 +245,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/eventGeneralSales"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
