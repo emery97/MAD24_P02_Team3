@@ -282,4 +282,23 @@ public class dbHandler extends Application {
         });
     }
 
+    public void getUserPreferences(String userId, FirestoreCallback<UserPreferences> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Preferences").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        UserPreferences preferences = documentSnapshot.toObject(UserPreferences.class);
+                        ArrayList<UserPreferences> preferenceList = new ArrayList<>();
+                        preferenceList.add(preferences);
+                        callback.onCallback(preferenceList);
+                    } else {
+                        callback.onCallback(new ArrayList<>()); // Return empty list if no preferences found
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("preferencesError", "Error getting user preferences.", e);
+                    callback.onCallback(new ArrayList<>()); // Return empty list in case of failure
+                });
+    }
+
 }
