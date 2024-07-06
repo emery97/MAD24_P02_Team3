@@ -53,5 +53,6 @@ dependencies {
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
-
+    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
 }
