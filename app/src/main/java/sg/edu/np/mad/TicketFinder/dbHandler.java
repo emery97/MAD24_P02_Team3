@@ -256,4 +256,30 @@ public class dbHandler extends Application {
 
 
     }
+
+    // Get event types
+    public void getEventTypes(FirestoreCallback<String> firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsCollection = db.collection("Events");
+
+        eventsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> eventTypeList = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        String genre = document.getString("Genre");
+                        if (genre != null && !eventTypeList.contains(genre)) {
+                            eventTypeList.add(genre);
+                        }
+                    }
+                    firestoreCallback.onCallback(eventTypeList);
+                } else {
+                    firestoreCallback.onCallback(new ArrayList<>()); // Return empty list in case of failure
+                    Log.w("eventTypeError", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
 }

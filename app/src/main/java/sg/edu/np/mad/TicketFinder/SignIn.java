@@ -2,7 +2,6 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,6 +38,12 @@ public class SignIn extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private SharedPreferences sharedPreferences;
+
+    private OnLoginSuccessListener loginSuccessListener;
+
+    public void setOnLoginSuccessListener(OnLoginSuccessListener listener) {
+        this.loginSuccessListener = listener;
+    }
 
     // Creating the view
     @Override
@@ -143,7 +148,9 @@ public class SignIn extends Fragment {
                                 // Update password in Firestore
                                 updatePasswordInFirestore(document.getId(), newPassword);
 
-                                navigateToHomepage();
+                                if (loginSuccessListener != null) {
+                                    loginSuccessListener.onLoginSuccess();
+                                }
                                 break;
                             }
                         } else {
@@ -165,14 +172,6 @@ public class SignIn extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e("SignIn", "Error updating password in Firestore", e);
                 });
-    }
-
-    // Navigate to Homepage after successful sign-in
-    private void navigateToHomepage() {
-        Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(), homepage.class);
-        startActivity(intent);
-        getActivity().finish();
     }
 
     // Display a dialog for password reset
@@ -228,5 +227,10 @@ public class SignIn extends Fragment {
                         }
                     }
                 });
+    }
+
+    // Interface for login success listener
+    public interface OnLoginSuccessListener {
+        void onLoginSuccess();
     }
 }
