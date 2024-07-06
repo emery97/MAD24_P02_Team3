@@ -6,29 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".payment"
-    android:background="#F4F0E5">
+    android:background="@color/white">
 
-    <View
-        android:id="@+id/header"
-        android:layout_width="wrap_content"
-        android:layout_height="83dp"
-        android:background="#976954"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/titlePayment"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="Payment Details"
-        android:textColor="@color/white"
-        android:textSize="24sp"
+        android:background="#1B2B40"
+        android:elevation="4dp"
+        android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/header" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Payment"
+        app:titleTextColor="@android:color/white" />
+
 
     <Spinner
         android:id="@+id/paymentMethodSpinner"
@@ -37,7 +30,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         android:entries="@array/payment_methods" />
 
     <ScrollView
@@ -205,46 +198,80 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/postalCode" />
 
+            <androidx.cardview.widget.CardView
+                android:id="@+id/priceCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_margin="35px"
+                app:layout_constraintTop_toBottomOf="@+id/editPostalCode">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/priceTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Total Price"
+                    android:textColor="@color/black"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/totalpricedisplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textSize="20sp"
+                    android:text="PRICE"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/editPostalCode" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <Button
                 android:id="@+id/bookingdetails"
-                android:layout_width="150dp"
-                android:layout_height="46dp"
-                android:layout_marginTop="15dp"
-                android:backgroundTint="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40px"
+                android:layout_margin="100px"
                 android:text="View Booking"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1B2B40"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editPostalCode" />
+                app:layout_constraintTop_toBottomOf="@+id/priceCard" />
 
-            <TextView
-                android:id="@+id/totalpricedisplay"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/buyNow"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:textSize="30sp"
+                android:backgroundTint="#D9AA52"
+                android:layout_marginHorizontal="100px"
+                android:text="Buy Now"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bookingdetails" />
 
             <Button
-                android:id="@+id/buyNow"
-                android:layout_width="190dp"
-                android:layout_height="46dp"
-                android:layout_marginTop="3dp"
-                android:backgroundTint="#976954"
-                android:text="BUY NOW"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/totalpricedisplay" />
-
-            <Button
                 android:id="@+id/backbtn"
-                android:layout_width="150dp"
-                android:layout_height="46dp"
-                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="100px"
                 android:backgroundTint="#F65858"
+                android:layout_marginTop="8dp"
                 android:text="Cancel"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.761"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/buyNow" />
 
