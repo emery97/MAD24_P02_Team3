@@ -151,7 +151,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -257,7 +256,7 @@ public class homepage extends AppCompatActivity {
         preferences = new UserPreferences(choice1, choice2, choice3);
 
         // Display a toast message indicating the retrieved preferences
-        Toast.makeText(this, "Preferences retrieved: " + choice1 + ", " + choice2 + ", " + choice3, Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "Preferences retrieved: " + choice1 + ", " + choice2 + ", " + choice3, Toast.LENGTH_LONG).show(); //for testing
     }
 
     // Method to fetch the event list and update the RecyclerViews
