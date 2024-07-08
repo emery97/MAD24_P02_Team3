@@ -26,6 +26,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -39,11 +41,24 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
+// notification
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
 
 public class payment extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
@@ -57,6 +72,7 @@ public class payment extends AppCompatActivity {
     private FirebaseFirestore db;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,8 +273,10 @@ public class payment extends AppCompatActivity {
         builder.setMessage("Would you like to save your event to your Google Calendar?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        connectToGoogleAccount();
-                        showConfirmationDialog();
+                        if (checkAndRequestPermissions()) {
+                            connectToGoogleAccount();
+                            showConfirmationDialog();
+                        }
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -277,6 +295,50 @@ public class payment extends AppCompatActivity {
         // Apply the custom styles
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
+    }
+
+    private boolean checkAndRequestPermissions() {
+        String[] permissions = {
+                android.Manifest.permission.WRITE_CALENDAR,
+                android.Manifest.permission.READ_CALENDAR
+        };
+        ArrayList<String> listPermissionsNeeded = new ArrayList<>();
+
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                listPermissionsNeeded.add(permission);
+            }
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            Map<String, Integer> perms = new HashMap<>();
+            // Initialize the map with permissions
+            perms.put(android.Manifest.permission.WRITE_CALENDAR, PackageManager.PERMISSION_GRANTED);
+            perms.put(android.Manifest.permission.READ_CALENDAR, PackageManager.PERMISSION_GRANTED);
+            // Fill with actual results from user
+            for (int i = 0; i < permissions.length; i++) {
+                perms.put(permissions[i], grantResults[i]);
+            }
+            // Check for both permissions
+            if (perms.get(android.Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED
+                    && perms.get(android.Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+                // All permissions are granted
+                connectToGoogleAccount();
+            } else {
+                // Permission is denied (this is the first time, when "never ask again" is not checked)
+                Log.d("permission", "Some permissions are not granted. Ask again.");
+            }
+        }
     }
 
     private void showConfirmationDialog() {
@@ -360,33 +422,35 @@ public class payment extends AppCompatActivity {
 
         // Log the event details for debugging
         Log.d("EVENT DETAILS", "Title: " + concertName);
-        Log.d("EVENT VENUE",  eventVenue);
+        Log.d("EVENT VENUE", eventVenue);
+        Log.d("EVENT TIME", eventTiming);
+
+        // Parse the eventTiming to set the start and end times
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm");
+        LocalDateTime startDateTime = LocalDateTime.parse(eventTiming, formatter);
+        LocalDateTime endDateTime = startDateTime.plusHours(3); // Assuming the event lasts for 3 hours
+
+        // Convert the start and end times to GregorianCalendar
+        GregorianCalendar startDate = GregorianCalendar.from(startDateTime.atZone(ZoneId.of("Asia/Singapore")));
+        GregorianCalendar endDate = GregorianCalendar.from(endDateTime.atZone(ZoneId.of("Asia/Singapore")));
 
         // Create the calendar event intent with the concert details
-        Intent intent = new Intent(Intent.ACTION_INSERT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra(CalendarContract.Events.TITLE, concertName);
-        intent.putExtra(CalendarContract.Events.DESCRIPTION, "Seat: " + seatCategory + ", " + seatNumber);
-        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventVenue);
+        Intent calendarIntent = new Intent(Intent.ACTION_INSERT);
+        calendarIntent.setType("vnd.android.cursor.item/event");
+        calendarIntent.putExtra(CalendarContract.Events.TITLE, concertName);
+        calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, "Seat: " + seatCategory + ", " + seatNumber);
+        calendarIntent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventVenue);
 
-        // Set the event start and end time in Singapore time
-        GregorianCalendar startDate = new GregorianCalendar(2024, 5, 14, 19, 0);
-        GregorianCalendar endDate = new GregorianCalendar(2024, 5, 14, 22, 0);
+        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate.getTimeInMillis());
+        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTimeInMillis());
+        calendarIntent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, "Asia/Singapore");
+        calendarIntent.putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PRIVATE);
+        calendarIntent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
 
-        // Convert the start and end times to Singapore time zone
-        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
-        startDate.setTimeZone(singaporeTimeZone);
-        endDate.setTimeZone(singaporeTimeZone);
+        // Start the calendar intent
+        startActivity(calendarIntent);
 
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate.getTimeInMillis());
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTimeInMillis());
-        intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, singaporeTimeZone.getID());
-        intent.putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PRIVATE);
-        intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
-
-        startActivity(intent);
     }
-
 
     private void listCalendarIntentHandlers() {
         Intent intent = new Intent(Intent.ACTION_VIEW)
