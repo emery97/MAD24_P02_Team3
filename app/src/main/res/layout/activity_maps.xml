@@ -81,6 +81,29 @@
                     android:backgroundTint="#D9AA52"
                     android:text="Go To Google Maps"
                     android:textColor="#FFFFFF" />
+
+                <ImageView
+                    android:id="@+id/venueImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="8dp"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/openingHours"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Opening Hours"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/userReviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="User Reviews"
+                    android:textSize="16sp" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
