@@ -127,6 +127,7 @@ public class EventDetails extends AppCompatActivity {
                 Intent intent = new Intent(EventDetails.this, BuyTicket.class);
 
                 if (eventForTitle[0] != null) {
+                    intent.putExtra("event", eventForTitle[0]); // Pass the Event object
                     intent.putExtra("eventTitle", eventForTitle[0].getTitle());
                     intent.putExtra("eventTiming", eventForTitle[0].getDate().format(DateTimeFormatter.ofPattern("dd LLLL yyyy")) + ", " + eventForTitle[0].getTime());
                 } else {
