@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -68,6 +71,27 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
         TextView name = findViewById(R.id.venueName);
         name.setText(eventObj.getVenue());
+
+        Button gMapButton = findViewById(R.id.gMapButton);
+        gMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (venueAddress != null) {
+                    double latitude = venueAddress.getLatitude();
+                    double longitude = venueAddress.getLongitude();
+                    String uri = "google.navigation:q=" + latitude + "," + longitude;
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    intent.setPackage("com.google.android.apps.maps");
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    } else {
+                        Log.e("maps", "Google Maps app is not installed");
+                    }
+                } else {
+                    Log.e("maps", "Venue address is null");
+                }
+            }
+        });
     }
 
     @Override
