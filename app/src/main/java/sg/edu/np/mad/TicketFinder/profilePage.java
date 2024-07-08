@@ -1,11 +1,16 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +25,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,20 +39,31 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 public class profilePage extends AppCompatActivity {
+    private static final int PICK_IMAGE_REQUEST = 1; // CHANGED
+    private static final int CAMERA_REQUEST_CODE = 2; // CHANGED
+    private static final int CAMERA_PERMISSION_CODE = 3; // CHANGED
+
     // UI components
     private TextView username, password, email, regPassword;
     private EditText editUsername, editPassword;
     private ImageView editingIcon, profilePicture;
     private CheckBox showPassword;
-    private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton;
+    private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton, uploadProfilePicButton; // CHANGED
     private String actualPassword;
     private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    private String userId; // This should be the userId from Firestore document, not Firebase UID
+    private FirebaseStorage storage; // CHANGED
+    private StorageReference storageReference; // CHANGED
+    private String userId;
     private static final String TAG = "ProfilePage";
     private boolean isEditMode = false;
 
@@ -71,6 +90,7 @@ public class profilePage extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
         feedbackbutton = findViewById(R.id.Viewfeedbackbtn);
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
+        uploadProfilePicButton = findViewById(R.id.uploadProfilePicButton); // CHANGED
 
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
@@ -78,6 +98,8 @@ public class profilePage extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
+        storage = FirebaseStorage.getInstance(); // CHANGED
+        storageReference = storage.getReference(); // CHANGED
 
         // Check if user is authenticated
         if (firebaseUser == null) {
@@ -109,6 +131,8 @@ public class profilePage extends AppCompatActivity {
                 }
             }
         });
+
+        // OnClickListener for editing icon
         editingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,6 +142,7 @@ public class profilePage extends AppCompatActivity {
                 deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
                 feedbackbutton.setVisibility(View.INVISIBLE);
                 logoutButton.setVisibility(View.INVISIBLE);
+                uploadProfilePicButton.setVisibility(View.VISIBLE); // CHANGED
             }
         });
 
@@ -171,6 +196,14 @@ public class profilePage extends AppCompatActivity {
                         .setNegativeButton(android.R.string.no, null)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
+            }
+        });
+
+        // OnClickListener for upload profile picture button // CHANGED
+        uploadProfilePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImageOptions();
             }
         });
     }
@@ -246,6 +279,16 @@ public class profilePage extends AppCompatActivity {
                     editor.apply();
 
                     Log.d(TAG, "User data refreshed from Firestore");
+
+                    // Load profile picture if available
+                    String profilePicUrl = documentSnapshot.getString("ProfilePicUrl"); // CHANGED
+                    if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+                        // Load profile picture using a library like Glide or Picasso
+                        Glide.with(this)
+                                .load(profilePicUrl)
+                                .circleCrop() // CHANGED
+                                .into(profilePicture);
+                    }
                 } else { // No user found
                     Log.e(TAG, "No such document in Firestore");
                 }
@@ -293,6 +336,7 @@ public class profilePage extends AppCompatActivity {
         // Display save button
         saveButton.setVisibility(View.VISIBLE);
         deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
+        uploadProfilePicButton.setVisibility(View.VISIBLE); // CHANGED
     }
 
     // Method to disable editing user information
@@ -306,6 +350,7 @@ public class profilePage extends AppCompatActivity {
         editPassword.setVisibility(View.GONE);
         saveButton.setVisibility(View.GONE);
         deleteAccountButton.setVisibility(View.GONE); // Hide delete button after editing
+        uploadProfilePicButton.setVisibility(View.GONE); // CHANGED
         feedbackbutton.setVisibility(View.VISIBLE);
         logoutButton.setVisibility(View.VISIBLE);
     }
@@ -323,16 +368,17 @@ public class profilePage extends AppCompatActivity {
     }
 
     // Method to update user information in Firestore
-    private void updateFirestore(String updatedName, String updatedEmail, String updatedPassword) {
+    private void updateFirestore(String updatedName, String updatedEmail, String updatedPassword, String profilePicUrl) { // CHANGED
         // Post to database
         db.collection("Account").document(userId)
-                .update("Name", updatedName, "Password", updatedPassword)
+                .update("Name", updatedName, "Password", updatedPassword, "ProfilePicUrl", profilePicUrl) // CHANGED
                 .addOnSuccessListener(aVoid -> {
                     // Upon posting
                     // Update SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("Name", updatedName);
                     editor.putString("Password", updatedPassword);
+                    editor.putString("ProfilePicUrl", profilePicUrl); // CHANGED
                     editor.apply();
 
                     Log.d(TAG, "Profile updated successfully in Firestore.");
@@ -353,6 +399,7 @@ public class profilePage extends AppCompatActivity {
         // Get updated name and password
         String updatedName = editUsername.getText().toString();
         String updatedPassword = editPassword.getText().toString();
+        String profilePicUrl = sharedPreferences.getString("ProfilePicUrl", ""); // CHANGED
 
         Log.d(TAG, "Updating user information with updatedName: " + updatedName + ", updatedPassword: " + updatedPassword);
 
@@ -380,7 +427,7 @@ public class profilePage extends AppCompatActivity {
                                 Log.d(TAG, "User password updated.");
 
                                 // Update profile in Firestore
-                                updateFirestore(updatedName, currentEmail, updatedPassword);
+                                updateFirestore(updatedName, currentEmail, updatedPassword, profilePicUrl);
                             } else {
                                 Log.e(TAG, "Error updating password in Firebase Auth", passwordUpdateTask.getException());
                                 Toast.makeText(profilePage.this, "Failed to update password in Firebase Auth", Toast.LENGTH_SHORT).show();
@@ -448,6 +495,108 @@ public class profilePage extends AppCompatActivity {
         } else {
             Log.e(TAG, "FirebaseUser is null");
             Toast.makeText(this, "User is not authenticated", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Method to show image options // CHANGED
+    private void showImageOptions() {
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(profilePage.this);
+        builder.setTitle("Upload Profile Picture");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals("Take Photo")) {
+                    if (ContextCompat.checkSelfPermission(profilePage.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(profilePage.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+                    } else {
+                        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(takePicture, CAMERA_REQUEST_CODE);
+                    }
+                } else if (options[item].equals("Choose from Gallery")) {
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto, PICK_IMAGE_REQUEST);
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) { // CHANGED
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(takePicture, CAMERA_REQUEST_CODE);
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { // CHANGED
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_REQUEST) {
+                Uri selectedImage = data.getData();
+                uploadImageToFirebase(selectedImage);
+            } else if (requestCode == CAMERA_REQUEST_CODE) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                uploadImageToFirebase(getImageUri(this, photo));
+            }
+        }
+    }
+
+    // Method to get URI from bitmap // CHANGED
+    private Uri getImageUri(Context context, Bitmap photo) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), photo, "Title", null);
+        return Uri.parse(path);
+    }
+
+    // Method to upload image to Firebase Storage // CHANGED
+    private void uploadImageToFirebase(Uri imageUri) {
+        if (imageUri != null) {
+            StorageReference ref = storageReference.child("profile_pictures/" + userId + ".jpg");
+            ref.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String profilePicUrl = uri.toString();
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString("ProfilePicUrl", profilePicUrl);
+                                    editor.apply();
+
+                                    // Update Firestore with the new profile picture URL
+                                    updateFirestore(username.getText().toString(), firebaseUser.getEmail(), actualPassword, profilePicUrl);
+
+                                    // Load profile picture using a library like Glide or Picasso
+                                    Glide.with(profilePage.this)
+                                            .load(profilePicUrl)
+                                            .circleCrop() // CHANGED
+                                            .into(profilePicture);
+
+                                    profilePicture.setVisibility(View.VISIBLE); // CHANGED
+
+                                    Toast.makeText(profilePage.this, "Profile picture uploaded successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(profilePage.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     }
 }

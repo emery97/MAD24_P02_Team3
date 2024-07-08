@@ -17,46 +17,58 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="18dp">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/header"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="230dp"
+                android:layout_marginBottom="23dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="8dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="16dp">
 
                     <ImageView
                         android:id="@+id/profilePicture"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        app:srcCompat="@drawable/profileimage"
+                        android:layout_gravity="center"
                         android:background="@drawable/profileimage"
                         android:padding="4dp"
-                        android:layout_gravity="center"/>
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/profileimage" />
+
+                    <Button
+                        android:id="@+id/uploadProfilePicButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Upload Profile Picture"
+                        android:layout_gravity="center"
+                        android:backgroundTint="#D9AA52"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"/>
 
                     <ImageView
                         android:id="@+id/editingIcon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:srcCompat="@drawable/edittingicon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="8dp"/>
+                        android:layout_marginTop="8dp"
+                        app:srcCompat="@drawable/edittingicon" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/headerCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="8dp">
 
@@ -98,7 +110,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="8dp">
 
@@ -152,7 +164,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="28dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="8dp">
 
