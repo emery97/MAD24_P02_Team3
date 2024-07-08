@@ -11,10 +11,13 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -53,8 +56,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
     private TextView textViewEventDate;
     private TextView textViewTemperature;
     private TextView textViewForecast, textViewWeatherDate,textViewWeatherDetails;
-
-
+    private TextView textViewCountdownTimer;
+    private CountDownTimer countDownTimer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +70,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
         });
 
         createNotificationChannel();
+
+        textViewCountdownTimer = findViewById(R.id.textViewCountdownTimer);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -125,6 +130,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
             if (isEventDateWithinNextFourDays(eventDate)) {
                 fetchWeatherData(eventDate);
             }
+
+            calculateCountdown(eventDate);
         }
     }
 
@@ -282,33 +289,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
                         disableSwitch();
                     } else {
                         // Time picker dialog
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                                (view1, hourOfDay, minute) -> {
-                                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    calendar.set(Calendar.MINUTE, minute);
-                                    calendar.set(Calendar.SECOND, 0);
-
-                                    // Call method to schedule notification
-                                    scheduleNotification(eventIdentifier, calendar);
-                                },
-                                calendar.get(Calendar.HOUR_OF_DAY),
-                                calendar.get(Calendar.MINUTE),
-                                false);
-
-                        // Handle cancel event of time picker dialog
-                        timePickerDialog.setOnCancelListener(dialog -> {
-                            // Set default time to 12 PM if user cancels without selecting time
-                            if (isDateAfterEventDate(calendar)) {
-                                calendar.set(Calendar.HOUR_OF_DAY, 12);
-                                calendar.set(Calendar.MINUTE, 0);
-                                calendar.set(Calendar.SECOND, 0);
-                            }
-
-                            // Call method to schedule notification
-                            scheduleNotification(eventIdentifier, calendar);
-                        });
-
-                        timePickerDialog.show();
+                        showTimePickerDialog(eventIdentifier, calendar);
                     }
                 },
                 calendar.get(Calendar.YEAR),
@@ -325,36 +306,78 @@ public class Bookingdetailsmore extends AppCompatActivity {
                 Toast.makeText(this, "Please select a date on or before the event date", Toast.LENGTH_SHORT).show();
                 disableSwitch();
             } else {
-                // Time picker dialog (default time to 12 PM)
-                TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                        (view, hourOfDay, minute) -> {
-                            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                            calendar.set(Calendar.MINUTE, minute);
-                            calendar.set(Calendar.SECOND, 0);
+                // Set default time to 12 PM
+                calendar.set(Calendar.HOUR_OF_DAY, 12);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
 
-                            // Call method to schedule notification
-                            scheduleNotification(eventIdentifier, calendar);
-                        },
-                        12, 0, false); // Default time set to 12 PM
+                // Call method to schedule notification
+                scheduleNotification(eventIdentifier, calendar);
+            }
+        });
 
-                timePickerDialog.setOnCancelListener(dialog1 -> {
-                    // Set default time to 12 PM if user cancels without selecting time
-                    if (isDateAfterEventDate(calendar)) {
-                        calendar.set(Calendar.HOUR_OF_DAY, 12);
-                        calendar.set(Calendar.MINUTE, 0);
-                        calendar.set(Calendar.SECOND, 0);
-                    }
+        // Set button text color for datePickerDialog
+        datePickerDialog.setOnShowListener(dialog -> {
+            // Get the positive (OK) button of the date picker dialog
+            Button positiveButton = datePickerDialog.getButton(DatePickerDialog.BUTTON_POSITIVE);
+            if (positiveButton != null) {
+                positiveButton.setTextColor(Color.BLACK);
+            }
 
-                    // Call method to schedule notification
-                    scheduleNotification(eventIdentifier, calendar);
-                });
-
-                timePickerDialog.show();
+            // Get the negative (Cancel) button of the date picker dialog
+            Button negativeButton = datePickerDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE);
+            if (negativeButton != null) {
+                negativeButton.setTextColor(Color.BLACK);
             }
         });
 
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); // Disable past dates
+
         datePickerDialog.show();
+    }
+
+    private void showTimePickerDialog(String eventIdentifier, Calendar calendar) {
+        // Time picker dialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                (view, hourOfDay, minute) -> {
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, 0);
+
+                    // Call method to schedule notification
+                    scheduleNotification(eventIdentifier, calendar);
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                false);
+
+        // Handle cancel event of time picker dialog
+        timePickerDialog.setOnCancelListener(dialog -> {
+            // Set default time to 12 PM if user cancels without selecting time
+            calendar.set(Calendar.HOUR_OF_DAY, 12);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+
+            // Call method to schedule notification
+            scheduleNotification(eventIdentifier, calendar);
+        });
+
+        // Set button text color for timePickerDialog
+        timePickerDialog.setOnShowListener(dialog -> {
+            // Get the positive (OK) button of the time picker dialog
+            Button positiveButton = timePickerDialog.getButton(TimePickerDialog.BUTTON_POSITIVE);
+            if (positiveButton != null) {
+                positiveButton.setTextColor(Color.BLACK);
+            }
+
+            // Get the negative (Cancel) button of the time picker dialog
+            Button negativeButton = timePickerDialog.getButton(TimePickerDialog.BUTTON_NEGATIVE);
+            if (negativeButton != null) {
+                negativeButton.setTextColor(Color.BLACK);
+            }
+        });
+
+        timePickerDialog.show();
     }
 
     private void scheduleNotification(String eventIdentifier, Calendar calendar) {
@@ -430,5 +453,57 @@ public class Bookingdetailsmore extends AppCompatActivity {
     private void disableSwitch() {
         Switch switchNotification = findViewById(R.id.switchNotification);
         switchNotification.setChecked(false);
+    }
+
+    private void calculateCountdown(String eventDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+        try {
+            Date eventDateTime = dateFormat.parse(eventDate);
+            long eventTimeMillis = eventDateTime.getTime();
+            long currentTimeMillis = System.currentTimeMillis();
+            long timeDiffMillis = eventTimeMillis - currentTimeMillis;
+
+            if (timeDiffMillis > 0) {
+                countDownTimer = new CountDownTimer(timeDiffMillis, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        long seconds = millisUntilFinished / 1000;
+                        long minutes = seconds / 60;
+                        long hours = minutes / 60;
+                        long days = hours / 24;
+
+                        // Format the countdown text
+                        String countdownText = String.format(Locale.getDefault(),
+                                "%02d:%02d:%02d:%02d",
+                                days, hours % 24, minutes % 60, seconds % 60);
+
+                        // Update the countdown timer TextView
+                        textViewCountdownTimer.setText(countdownText);
+                        textViewCountdownTimer.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        // Optionally, handle onFinish actions
+                        textViewCountdownTimer.setText("Event started");
+                    }
+                };
+                countDownTimer.start();
+            } else {
+                // Handle case where event time is in the past or very near future
+                textViewCountdownTimer.setText("Event started or is very near");
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Stop the countdown timer to avoid memory leaks
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }
