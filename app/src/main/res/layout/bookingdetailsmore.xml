@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Bookingdetailsmore">
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewEventTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Title"
+        android:textSize="24sp"
+        app:layout_constraintTop_toBottomOf="@id/include"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"/>
+
+    <TextView
+        android:id="@+id/textViewEventDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Date"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewEventTitle"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewDateBought"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date Bought"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewEventDate"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewSeatCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seat Category"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewDateBought"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewSeatNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seat Number"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewSeatCategory"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewTotalPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Price"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewSeatNumber"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewQuantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quantity"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewTotalPrice"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewPaymentMethod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Payment Method"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewQuantity"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="8dp"/>
+
+
+    <TextView
+        android:id="@+id/textViewWeatherDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Date"
+        android:visibility="gone"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        app:layout_constraintTop_toBottomOf="@id/textViewPaymentMethod" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/wallet_holo_blue_light"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewWeatherDate">
+
+        <!-- Temperature TextView -->
+
+        <!-- Weather Icon ImageView -->
+
+        <!-- Forecast TextView -->
+
+        <TextView
+            android:id="@+id/textViewTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="136dp"
+            android:layout_marginTop="68dp"
+            android:text="Temperature"
+            android:visibility="gone"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageViewWeatherIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="40dp"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/textViewTemperature"
+            app:layout_constraintHorizontal_bias="0.512"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Weather Details TextView -->
+        <TextView
+            android:id="@+id/textViewForecast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:text="Forecast"
+            android:visibility="gone"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTemperature" />
+
+        <TextView
+            android:id="@+id/textViewWeatherDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:text="Weather Details"
+            android:textSize="18sp"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewForecast" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Switch
+        android:id="@+id/switchNotification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enable Notifications"
+        app:layout_constraintTop_toBottomOf="@id/container"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

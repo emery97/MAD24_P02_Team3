@@ -2,11 +2,43 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="BookingHistoryDetails">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-07-06T11:33:42.663352700Z" />
+        </State>
+      </entry>
+      <entry key="MainActivity">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>
       <entry key="weather">
-        <State />
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-07-06T09:23:29.400690600Z" />
+        </State>
       </entry>
     </value>
   </component>
