@@ -1,11 +1,10 @@
 package sg.edu.np.mad.TicketFinder;
 
-import static sg.edu.np.mad.TicketFinder.R.*;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,12 +24,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.IOException;
+
 public class BookingHistoryDetails extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // Shared preferences for storing user data
     private FirebaseFirestore db;
     private RecyclerView recyclerView; // RecyclerView to display booking details
     private BookingDetailsAdapter bookingDetailsAdapter;
     private List<BookingDetails> bookingDetailsList = new ArrayList<>();
+    private RecyclerView weatherRecyclerView;
+    private bookingweatheradapter weatherAdapter;
+    private List<bkweather> weatherItemList = new ArrayList<>();
+    private final TextView[] weatherTexts = new TextView[4];
+    private static final String TAG = "BookingHistoryDetails";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +60,19 @@ public class BookingHistoryDetails extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        weatherRecyclerView = findViewById(R.id.weatherRecyclerView);
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        weatherRecyclerView.setLayoutManager(horizontalLayoutManager);
+        weatherAdapter = new bookingweatheradapter(weatherItemList);
+        weatherRecyclerView.setAdapter(weatherAdapter);
+
         // Get user ID from shared preferences and fetch booking details
         String userId = sharedPreferences.getString("UserId", null);
         if (userId != null) {
             fetchBookingDetailsData(userId);
         }
+
+        fetchWeatherData();
 
         // Set up footer
         Footer.setUpFooter(this);
@@ -61,7 +83,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
         db.collection("BookingDetails")
                 .whereEqualTo("userId", userId)
                 .get()
-                .addOnCompleteListener(task -> { // Coded with the help of chatGPT
+                .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
@@ -89,7 +111,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                 String purchaseTimeString = formatTimestamp(purchaseTimeTimestamp);
 
                                 // Create BookingDetails object and add to list
-                                BookingDetails bookingDetails = new BookingDetails(eventTitle,purchaseTimeString,time,seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
+                                BookingDetails bookingDetails = new BookingDetails(eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                 bookingDetailsList.add(bookingDetails);
                             }
 
@@ -106,6 +128,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                     return 0;
                                 }
                             });
+
                             // Initialize and set adapter for RecyclerView
                             bookingDetailsAdapter = new BookingDetailsAdapter(bookingDetailsList);
                             recyclerView.setAdapter(bookingDetailsAdapter);
@@ -125,5 +148,58 @@ public class BookingHistoryDetails extends AppCompatActivity {
             return sdf.format(date);
         }
         return "";
+    }
+
+    private void fetchWeatherData() {
+        OkHttpClient client = new OkHttpClient();
+        String url = "https://api.data.gov.sg/v1/environment/4-day-weather-forecast";
+        Request request = new Request.Builder().url(url).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "Error fetching weather data", e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    try {
+                        JSONObject jsonObject = new JSONObject(responseData);
+                        JSONArray itemsArray = jsonObject.getJSONArray("items");
+                        if (itemsArray.length() > 0) {
+                            JSONObject itemObject = itemsArray.getJSONObject(0);
+                            JSONArray forecastsArray = itemObject.getJSONArray("forecasts");
+                            for (int i = 0; i < forecastsArray.length(); i++) {
+                                JSONObject forecastObject = forecastsArray.getJSONObject(i);
+                                String date = forecastObject.getString("date");
+                                String forecast = forecastObject.getString("forecast");
+                                JSONObject temperatureObject = forecastObject.getJSONObject("temperature");
+                                int lowTemp = temperatureObject.getInt("low");
+                                int highTemp = temperatureObject.getInt("high");
+
+                                int iconResId = getWeatherIconResId(forecast);
+                                weatherItemList.add(new bkweather(date, iconResId, forecast, lowTemp, highTemp));
+                            }
+                            runOnUiThread(() -> weatherAdapter.notifyDataSetChanged());
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Error parsing weather data", e);
+                    }
+                }
+            }
+        });
+    }
+
+    private int getWeatherIconResId(String forecast) {
+        if (forecast.toLowerCase().contains("thundery")) {
+            return R.drawable.thunderstorm;
+        } else if (forecast.toLowerCase().contains("sunny")) {
+            return R.drawable.sunny;
+        } else if (forecast.toLowerCase().contains("rain") || forecast.toLowerCase().contains("cloud")) {
+            return R.drawable.weathercloud;
+        } else {
+            return R.drawable.weathercloud; // Default icon
+        }
     }
 }
