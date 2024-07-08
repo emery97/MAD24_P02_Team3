@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -16,43 +17,75 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.Set;
 
 public class dbHandler extends Application {
+    private Set<String> dictionary = new HashSet<>(); // Initialize the dictionary here
     @Override
     public void onCreate() {
         super.onCreate();
         // Initialize Firebase
         FirebaseApp.initializeApp(this);
-
         FirebaseFirestore.setLoggingEnabled(true);
+        dictionary = new HashSet<>(); // Initialize dictionary set
     }
 
-    public void getChatbotResponses(FirestoreCallback<ChatbotResponse> firestoreCallback) {
+    public void getChatbotResponses(FirestoreCallback<ChatbotResponse> callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference faqCollection = db.collection("FAQ");
-
-        faqCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        db.collection("FAQ").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                ArrayList<ChatbotResponse> responseList = new ArrayList<>();
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        ChatbotResponse response = new ChatbotResponse();
-                        if (document.contains("Question")) {
-                            response.setQuestion(document.getString("Question"));
-                        }
-                        if (document.contains("Answer")) {
-                            response.setAnswer(document.getString("Answer"));
-                        }
+                    ArrayList<ChatbotResponse> responseList = new ArrayList<>();
+                    Set<String> wordsToAdd = new HashSet<>(); // Create a set to collect words
+
+                    for (DocumentSnapshot document : task.getResult()) {
+                        ChatbotResponse response = document.toObject(ChatbotResponse.class);
                         responseList.add(response);
+                        // Add words to the set
+                        if (response != null) {
+                            String question = response.getQuestion();
+                            if (question != null) {
+                                String[] questionWords = question.split("\\s+");
+                                for (String word : questionWords) {
+                                    wordsToAdd.add(word.toLowerCase());
+                                }
+                            }
+
+                            String answer = response.getAnswer();
+                            if (answer != null) {
+                                String[] answerWords = answer.split("\\s+");
+                                for (String word : answerWords) {
+                                    wordsToAdd.add(word.toLowerCase());
+                                }
+                            }
+                        }
                     }
-                    firestoreCallback.onCallback(responseList);
-                    Log.d("dbHandler", "getChatbotResponses: Callback invoked with responseList size: " + responseList.size());
+
+                    addWordsToDictionary(wordsToAdd); // Add words to the dictionary
+
+                    callback.onCallback(responseList);
                 } else {
-                    Log.w("responseError", "Error getting documents.", task.getException());
+                    callback.onCallback(new ArrayList<>()); // Return empty list in case of failure
+                    Log.w("FAQError", "Error getting documents.", task.getException());
                 }
             }
         });
+    }
+
+    // Method to add words to dictionary
+    public Set<String> getDictionary() {
+        synchronized (this) {
+            return new HashSet<>(dictionary); // Return a copy to avoid concurrent modification issues
+        }
+    }
+
+    public void addWordsToDictionary(Set<String> newWords) {
+        synchronized (this) {
+            dictionary.addAll(newWords);
+        }
     }
 
     //get event data (coded with the help of ChatGPT)
