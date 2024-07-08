@@ -38,7 +38,7 @@
                         android:id="@+id/profilePicture"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
-                        android:srcCompat="@drawable/profileimage"
+                        app:srcCompat="@drawable/profileimage"
                         android:background="@drawable/profileimage"
                         android:padding="4dp"
                         android:layout_gravity="center"/>
@@ -47,7 +47,7 @@
                         android:id="@+id/editingIcon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:srcCompat="@drawable/edittingicon"
+                        app:srcCompat="@drawable/edittingicon"
                         android:layout_gravity="center"
                         android:layout_marginTop="8dp"/>
                 </LinearLayout>
@@ -193,6 +193,17 @@
                 android:textSize="16sp"
                 android:visibility="gone"/>
 
+            <Button
+                android:id="@+id/deleteAccountButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#D9AA52"
+                android:text="Delete Account"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -221,16 +232,6 @@
                     android:textColor="@color/white"
                     android:textSize="16sp"/>
             </LinearLayout>
-
-            <Button
-                android:id="@+id/deleteAccountButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:backgroundTint="#D9AA52"
-                android:text="Delete Account"
-                android:textColor="@color/white"
-                android:textSize="16sp"/>
         </LinearLayout>
     </ScrollView>
 

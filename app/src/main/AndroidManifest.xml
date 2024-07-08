@@ -29,6 +29,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".weather"
             android:exported="true">
             <intent-filter>
@@ -43,15 +52,7 @@
         <activity
             android:name=".maps"
             android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity android:name=".ChatActivity" />
         <activity
             android:name=".homepage"
@@ -81,10 +82,6 @@
         <activity
             android:name=".ViewFeedback"
             android:exported="true" /> <!-- CHECKING SELECT SEATS -->
-        <activity
-            android:name=".SelectSeats"
-            android:configChanges="orientation|screenSize"
-            android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
