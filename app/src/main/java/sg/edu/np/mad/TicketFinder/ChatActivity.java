@@ -5,13 +5,15 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
+
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -46,8 +48,15 @@ public class ChatActivity extends AppCompatActivity {
         dbHandler.getChatbotResponses(new FirestoreCallback<ChatbotResponse>() {
             @Override
             public void onCallback(ArrayList<ChatbotResponse> list) {
-                for (ChatbotResponse response : list) {
-                    chatbotResponsesMap.put(response.getQuestion().toLowerCase(), response.getAnswer());
+                if (list != null) {
+                    for (ChatbotResponse response : list) { // changed
+                        if (response != null && response.getQuestion() != null && response.getAnswer() != null) {
+                            chatbotResponsesMap.put(response.getQuestion().toLowerCase(), response.getAnswer());
+                        }
+                    }
+                    synchronized (dbHandler) {
+                        dbHandler.notifyAll(); // Notify that the data is ready
+                    }
                 }
             }
         });
@@ -89,6 +98,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private String getBestResponse(String messageText) {
+        String correctedMessageText = correctSpelling(messageText);
         String bestResponse = null;
         int bestMatchScore = 0;
 
@@ -96,8 +106,8 @@ public class ChatActivity extends AppCompatActivity {
             String question = entry.getKey();
             String answer = entry.getValue();
 
-            int questionMatchScore = getMatchScore(messageText, question);
-            int answerMatchScore = getMatchScore(messageText, answer);
+            int questionMatchScore = getMatchScore(correctedMessageText, question);
+            int answerMatchScore = getMatchScore(correctedMessageText, answer);
 
             if (questionMatchScore > bestMatchScore) {
                 bestMatchScore = questionMatchScore;
@@ -111,6 +121,47 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         return bestMatchScore > 0 ? bestResponse : null;
+    }
+
+    private String correctSpelling(String input) {
+        Set<String> dictionary;
+        synchronized (dbHandler) {
+            dictionary = dbHandler.getDictionary(); // Use dynamic dictionary
+            if (dictionary.isEmpty()) {
+                try {
+                    dbHandler.wait(); // Wait until dictionary is populated
+                    dictionary = dbHandler.getDictionary();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        String[] words = input.split("\\s+");
+        StringBuilder correctedInput = new StringBuilder();
+
+        for (String word : words) {
+            String correctedWord = correctWord(word);
+            correctedInput.append(correctedWord).append(" ");
+        }
+
+        return correctedInput.toString().trim();
+    }
+
+    private String correctWord(String word) {
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+        String closestWord = word;
+        int minDistance = Integer.MAX_VALUE;
+
+        for (String dictWord : dbHandler.getDictionary()) {
+            int distance = levenshtein.apply(word, dictWord);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestWord = dictWord;
+            }
+        }
+
+        return closestWord;
     }
 
     private int getMatchScore(String messageText, String text) {
