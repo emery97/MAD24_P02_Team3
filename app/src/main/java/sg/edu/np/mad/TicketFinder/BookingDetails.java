@@ -12,10 +12,11 @@ public class BookingDetails {
     private String paymentMethod;
     private String time;
     private String purchaseTimeString;
+
     private boolean expanded;
 
     // Parameterized constructor
-    public BookingDetails(String concertName,String purchaseTimeString,String time,String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
+    public BookingDetails(String concertName,String purchaseTimeString, String time,  String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod) {
         this.concertName = concertName;
         this.purchaseTimeString = purchaseTimeString;
         this.time = time;

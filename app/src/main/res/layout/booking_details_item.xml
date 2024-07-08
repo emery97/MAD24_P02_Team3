@@ -53,8 +53,7 @@
                 android:text="Seat Category"
                 android:layout_marginTop="30sp"
                 android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/seatNumber"
@@ -66,6 +65,7 @@
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
+            <!--CONCERT DATE TIME-->
             <TextView
                 android:id="@+id/eventDate"
                 android:layout_width="wrap_content"

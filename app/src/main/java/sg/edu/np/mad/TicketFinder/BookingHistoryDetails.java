@@ -74,6 +74,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
 
         fetchWeatherData();
 
+
         // Set up footer
         Footer.setUpFooter(this);
     }

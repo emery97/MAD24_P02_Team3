@@ -39,4 +39,9 @@
     <string name="total_price">Total Price:</string>
     <string name="price_value">$0</string>
     <string name="Continue">Continue</string>
+
+    <string-array name="booking_history_views">
+        <item>Booking History</item>
+        <item>Concert To Go</item>
+    </string-array>
 </resources>
