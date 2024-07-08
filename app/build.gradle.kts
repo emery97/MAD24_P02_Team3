@@ -58,7 +58,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     // For Google Auth and Calendar integrations
     implementation("com.google.android.gms:play-services-auth:20.3.0")
-
+    implementation("org.apache.commons:commons-text:1.9")
     // For easy permissions
     implementation("pub.devrel:easypermissions:3.0.0")
 }
