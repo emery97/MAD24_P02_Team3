@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -21,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -117,7 +115,7 @@ public class profilePage extends AppCompatActivity {
                 isEditMode = true;
                 AllowEditing();
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
-                // Feedback and Logout buttons are invisible
+                deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
                 feedbackbutton.setVisibility(View.INVISIBLE);
                 logoutButton.setVisibility(View.INVISIBLE);
             }
@@ -294,6 +292,7 @@ public class profilePage extends AppCompatActivity {
 
         // Display save button
         saveButton.setVisibility(View.VISIBLE);
+        deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
     }
 
     // Method to disable editing user information
@@ -306,6 +305,9 @@ public class profilePage extends AppCompatActivity {
         editUsername.setVisibility(View.GONE);
         editPassword.setVisibility(View.GONE);
         saveButton.setVisibility(View.GONE);
+        deleteAccountButton.setVisibility(View.GONE); // Hide delete button after editing
+        feedbackbutton.setVisibility(View.VISIBLE);
+        logoutButton.setVisibility(View.VISIBLE);
     }
 
     // Method to logout user

@@ -144,13 +144,14 @@
 
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -160,19 +161,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
 
 public class homepage extends AppCompatActivity {
 
@@ -182,6 +175,8 @@ public class homepage extends AppCompatActivity {
     private EventAdapter gridItemAdapter;
     private dbHandler handler = new dbHandler();
     private Spinner venueSpinner;
+    private SharedPreferences sharedPreferences;
+    private UserPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +189,9 @@ public class homepage extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        loadUserPreferences();
 
         // Initialize Spinner
         venueSpinner = findViewById(R.id.venueSpinner);
@@ -230,51 +228,36 @@ public class homepage extends AppCompatActivity {
             }
         });
 
-        // Initialize horizontal RecyclerView for "Top 3 Upcoming Events" //changed
+        // Initialize horizontal RecyclerView for "Top 3 Upcoming Events"
         horizontalRecyclerView = findViewById(R.id.horizontalRecyclerView);
         horizontalRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        horizontalItemAdapter = new EventAdapter(homepage.this, new ArrayList<>(), true); // Pass true for grid layout //changed
+        horizontalItemAdapter = new EventAdapter(homepage.this, new ArrayList<>(), true); // Pass true for grid layout
         horizontalRecyclerView.setAdapter(horizontalItemAdapter);
 
-        // Initialize grid RecyclerView for "Recommended for You" //changed
+        // Initialize grid RecyclerView for "Recommended for You"
         gridRecyclerView = findViewById(R.id.gridRecyclerView);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, getSpanCount());
         gridRecyclerView.setLayoutManager(gridLayoutManager);
-        gridItemAdapter = new EventAdapter(homepage.this, new ArrayList<>(), false); // Pass false for list layout //changed
+        gridItemAdapter = new EventAdapter(homepage.this, new ArrayList<>(), false); // Pass false for list layout
         gridRecyclerView.setAdapter(gridItemAdapter);
-
-
 
         // Set up footer
         Footer.setUpFooter(this);
-
-        // Load the featured image
-//        ImageView featuredImage = findViewById(R.id.featuredImage);
-//        loadFeaturedImage(featuredImage);
 
         // Fetch event list
         getEventList();
     }
 
-    // Method to load a random featured image from the event list
-//    private void loadFeaturedImage(ImageView imageView) {
-//        handler.getData(new FirestoreCallback<Event>() {
-//            @Override
-//            public void onCallback(ArrayList<Event> eventList) {
-//                if (!eventList.isEmpty()) {
-//
-//                    // random so that featured image changes every time it loads
-//                    Random random = new Random();
-//                    int randomIndex = random.nextInt(eventList.size());
-//
-//                    String imageUrl = eventList.get(randomIndex).getImgUrl();
-//                    Glide.with(homepage.this)
-//                            .load(imageUrl)          // Load the image from the URL
-//                            .into(imageView);        // Set the image into the provided ImageView
-//                }
-//            }
-//        });
-//    }
+    private void loadUserPreferences() {
+        String choice1 = sharedPreferences.getString("choice1", null);
+        String choice2 = sharedPreferences.getString("choice2", null);
+        String choice3 = sharedPreferences.getString("choice3", null);
+
+        preferences = new UserPreferences(choice1, choice2, choice3);
+
+        // Display a toast message indicating the retrieved preferences
+//        Toast.makeText(this, "Preferences retrieved: " + choice1 + ", " + choice2 + ", " + choice3, Toast.LENGTH_LONG).show(); //for testing
+    }
 
     // Method to fetch the event list and update the RecyclerViews
     private void getEventList() {
@@ -282,7 +265,7 @@ public class homepage extends AppCompatActivity {
             @Override
             public void onCallback(ArrayList<Event> eventList) {
                 if (eventList != null && !eventList.isEmpty()) {
-                    // Sort events by date
+                    // Sort events by date for "Upcoming Events"
                     Collections.sort(eventList, new Comparator<Event>() {
                         @Override
                         public int compare(Event event1, Event event2) {
@@ -306,15 +289,30 @@ public class homepage extends AppCompatActivity {
 
                         // Exclude the first 3 items from eventList for "Recommended for You"
                         List<Event> remainingEvents = eventList.subList(Math.min(3, eventList.size()), eventList.size());
+
+                        // Sort the remaining events by preferences and then by date for "Recommended for You"
+                        Collections.sort(remainingEvents, new Comparator<Event>() {
+                            @Override
+                            public int compare(Event event1, Event event2) {
+                                if (preferences != null) {
+                                    boolean event1Preferred = preferences.matches(event1);
+                                    boolean event2Preferred = preferences.matches(event2);
+                                    if (event1Preferred && !event2Preferred) {
+                                        return -1;
+                                    } else if (!event1Preferred && event2Preferred) {
+                                        return 1;
+                                    }
+                                }
+                                return event1.getDate().compareTo(event2.getDate());
+                            }
+                        });
+
                         gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents));
                     });
                 }
             }
         });
     }
-
-
-
 
     // Method to fetch events for the selected venue and update the RecyclerViews
     private void fetchEventsForVenue(String venue) {
@@ -346,7 +344,7 @@ public class homepage extends AppCompatActivity {
                         }
                     }
 
-                    // Sort the filtered events by date
+                    // Sort the filtered events by date for "Upcoming Events"
                     Collections.sort(upcomingEvents, new Comparator<Event>() {
                         @Override
                         public int compare(Event event1, Event event2) {
@@ -363,6 +361,24 @@ public class homepage extends AppCompatActivity {
 
                         // Exclude the first 3 items from upcomingEvents for "Recommended for You"
                         ArrayList<Event> remainingEvents = new ArrayList<>(upcomingEvents.subList(Math.min(3, upcomingEvents.size()), upcomingEvents.size()));
+
+                        // Sort the remaining events by preferences and then by date for "Recommended for You"
+                        Collections.sort(remainingEvents, new Comparator<Event>() {
+                            @Override
+                            public int compare(Event event1, Event event2) {
+                                if (preferences != null) {
+                                    boolean event1Preferred = preferences.matches(event1);
+                                    boolean event2Preferred = preferences.matches(event2);
+                                    if (event1Preferred && !event2Preferred) {
+                                        return -1;
+                                    } else if (!event1Preferred && event2Preferred) {
+                                        return 1;
+                                    }
+                                }
+                                return event1.getDate().compareTo(event2.getDate());
+                            }
+                        });
+
                         gridItemAdapter.setSearchList(remainingEvents);
                     });
                 }
@@ -370,13 +386,8 @@ public class homepage extends AppCompatActivity {
         });
     }
 
-
-
-
     // Method to get the number of columns for the grid layout based on orientation
     private int getSpanCount() {
-//        int orientation = getResources().getConfiguration().orientation;
-//        return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? 4 : 2;
         return 1;
     }
 

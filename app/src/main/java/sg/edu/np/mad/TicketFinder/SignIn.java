@@ -2,7 +2,6 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,6 +38,12 @@ public class SignIn extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private SharedPreferences sharedPreferences;
+
+    private OnLoginSuccessListener loginSuccessListener;
+
+    public void setOnLoginSuccessListener(OnLoginSuccessListener listener) {
+        this.loginSuccessListener = listener;
+    }
 
     // Creating the view
     @Override
@@ -133,7 +138,7 @@ public class SignIn extends Fragment {
                                 // Save user details to SharedPreferences
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("Document", document.getId());
-                                editor.putString("UserId", String.valueOf(document.get("userId")));
+                                editor.putString("UserId", String.valueOf(document.get("userId"))); // Ensure key is "userId"
                                 editor.putString("Name", document.getString("Name"));
                                 editor.putString("Email", document.getString("Email"));
                                 editor.putString("PhoneNum", document.getString("PhoneNum"));
@@ -143,7 +148,12 @@ public class SignIn extends Fragment {
                                 // Update password in Firestore
                                 updatePasswordInFirestore(document.getId(), newPassword);
 
-                                navigateToHomepage();
+                                // Fetch user preferences after saving basic details
+                                fetchUserPreferences(String.valueOf(document.get("userId")));
+
+                                if (loginSuccessListener != null) {
+                                    loginSuccessListener.onLoginSuccess();
+                                }
                                 break;
                             }
                         } else {
@@ -152,6 +162,32 @@ public class SignIn extends Fragment {
                             Toast.makeText(getActivity(), "Failed to retrieve user details", Toast.LENGTH_SHORT).show();
                         }
                     }
+                });
+    }
+
+    // Fetch user preferences from Firestore and save to SharedPreferences
+    private void fetchUserPreferences(String userId) {
+        db.collection("Preferences").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        UserPreferences preferences = documentSnapshot.toObject(UserPreferences.class);
+                        if (preferences != null) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("choice1", preferences.getChoice1());
+                            editor.putString("choice2", preferences.getChoice2());
+                            editor.putString("choice3", preferences.getChoice3());
+                            editor.apply();
+
+                            // Show a toast message indicating preferences are saved
+                            Toast.makeText(getActivity(), "Preferences saved: " + preferences.getChoice1() + ", " + preferences.getChoice2() + ", " + preferences.getChoice3(), Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "No preferences found for this user.", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("SignIn", "Error getting preferences.", e);
+                    Toast.makeText(getActivity(), "Failed to retrieve user preferences", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -167,20 +203,12 @@ public class SignIn extends Fragment {
                 });
     }
 
-    // Navigate to Homepage after successful sign-in
-    private void navigateToHomepage() {
-        Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getActivity(), homepage.class);
-        startActivity(intent);
-        getActivity().finish();
-    }
-
     // Display a dialog for password reset
     private void showForgotPasswordDialog(Context context) {
         Dialog forgotPasswordDialog = new Dialog(context);
         forgotPasswordDialog.setContentView(R.layout.forgot_password);
 
-        // Initalize views
+        // Initialize views
         EditText emailEditText = forgotPasswordDialog.findViewById(R.id.editTextEmail);
         Button resetButton = forgotPasswordDialog.findViewById(R.id.resetButton);
         ImageView cancelImage = forgotPasswordDialog.findViewById(R.id.cancelImage);
@@ -228,5 +256,10 @@ public class SignIn extends Fragment {
                         }
                     }
                 });
+    }
+
+    // Interface for login success listener
+    public interface OnLoginSuccessListener {
+        void onLoginSuccess();
     }
 }

@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -34,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -41,7 +45,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import android.provider.CalendarContract;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 
 public class payment extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
@@ -53,11 +71,22 @@ public class payment extends AppCompatActivity {
     private TextView totalPricetext;
     private Button cancel;
     private FirebaseFirestore db;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        // List applications that can handle calendar intents
+        listCalendarIntentHandlers();
+
+        // Google Sign-In configuration
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // Check orientation and set layout accordingly
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -106,7 +135,7 @@ public class payment extends AppCompatActivity {
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
 
         // Set total price text
-        totalPricetext.setText("Total Price: $" + totalPrice);
+        totalPricetext.setText("$" + totalPrice);
 
         // Handle click on booking details button
         bookingdetails.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +164,8 @@ public class payment extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
     }
 
     private boolean validateInput() {
@@ -178,8 +209,11 @@ public class payment extends AppCompatActivity {
         Toast.makeText(payment.this, "Payment successful", Toast.LENGTH_SHORT).show();
         // Post booking details to Firestore
         postBookingDetailsToFirestore();
+        // Show asking to connect to google calendar dialog
+        new Handler().postDelayed(this::connectToGoogleCalendar, 1000); // Wait for 1 second before displaying the alert message
+
         // Show confirmation dialog
-        new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
+        //new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
     }
 
     private void postBookingDetailsToFirestore() {
@@ -224,6 +258,35 @@ public class payment extends AppCompatActivity {
                 });
     }
 
+    // ASK IF THEY WANT TO CONNECT TO GOOGLE CALENDAR
+    private void connectToGoogleCalendar() {
+        // Building dialogue
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Would you like to save your event to your Google Calendar?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        connectToGoogleAccount();
+                        showConfirmationDialog();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        showConfirmationDialog();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Get the buttons and set their custom styles
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        // Apply the custom styles
+        positiveButton.setTextColor(Color.parseColor("#976954"));
+        negativeButton.setTextColor(Color.parseColor("#976954"));
+    }
+
     private void showConfirmationDialog() {
         // Build the confirmation dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -252,6 +315,73 @@ public class payment extends AppCompatActivity {
         // Apply the custom styles
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
+    }
+    private void connectToGoogleAccount() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            Log.d("GOOGLE_SIGN_IN", "Already signed in");
+            navigateToGoogleCalendar();
+        } else {
+            Log.d("GOOGLE_SIGN_IN", "Starting sign in intent");
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (account != null) {
+                    Log.d("GOOGLE_SIGN_IN", "Sign-in successful");
+                    navigateToGoogleCalendar();
+                }
+            } catch (ApiException e) {
+                Log.e("GOOGLE_SIGN_IN", "Sign-in failed: " + e.getMessage());
+                Toast.makeText(this, "Sign-in failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    private void navigateToGoogleCalendar() {
+        Log.d("SIGNED IN", "navigateToGoogleCalendar: ");
+
+        // Static event details for testing
+        String concertName = "Symphony of the Night";
+
+        // Log the event details
+        Log.d("EVENT DETAILS WY", "Title: " + concertName);
+
+        // Create the calendar event intent with only the title autofilled
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra("title", concertName);
+
+        // Check if there is an activity to handle the intent and start it
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.e("ERROR", "No activity found to handle calendar intent.");
+            Toast.makeText(this, "No app found to handle calendar event", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void listCalendarIntentHandlers() {
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI);
+        List<ResolveInfo> resolveInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (resolveInfoList.isEmpty()) {
+            Log.e("INTENT HANDLING", "No applications can handle calendar intent.");
+        } else {
+            for (ResolveInfo resolveInfo : resolveInfoList) {
+                Log.d("INTENT HANDLING", "Package: " + resolveInfo.activityInfo.packageName);
+            }
+        }
     }
 
     private void navigateToHomepage() {

@@ -256,4 +256,49 @@ public class dbHandler extends Application {
 
 
     }
+
+    // Get event types
+    public void getEventTypes(FirestoreCallback<String> firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference eventsCollection = db.collection("Events");
+
+        eventsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> eventTypeList = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        String genre = document.getString("Genre");
+                        if (genre != null && !eventTypeList.contains(genre)) {
+                            eventTypeList.add(genre);
+                        }
+                    }
+                    firestoreCallback.onCallback(eventTypeList);
+                } else {
+                    firestoreCallback.onCallback(new ArrayList<>()); // Return empty list in case of failure
+                    Log.w("eventTypeError", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
+    public void getUserPreferences(String userId, FirestoreCallback<UserPreferences> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Preferences").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        UserPreferences preferences = documentSnapshot.toObject(UserPreferences.class);
+                        ArrayList<UserPreferences> preferenceList = new ArrayList<>();
+                        preferenceList.add(preferences);
+                        callback.onCallback(preferenceList);
+                    } else {
+                        callback.onCallback(new ArrayList<>()); // Return empty list if no preferences found
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("preferencesError", "Error getting user preferences.", e);
+                    callback.onCallback(new ArrayList<>()); // Return empty list in case of failure
+                });
+    }
+
 }

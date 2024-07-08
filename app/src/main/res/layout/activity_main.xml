@@ -17,7 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#DCC2B7"
-            tools:context=".MainActivity">
+            tools:context=".MainActivity"
+            tools:ignore="DuplicateIds">
 
             <TextView
                 android:id="@+id/textView"
@@ -80,6 +81,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="100dp"
                         android:clickable="true"
+                        android:minHeight="48dp"
                         android:text="Login"
                         android:textColor="#4C240A"
                         android:textSize="24dp" />
@@ -95,6 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="100dp"
                         android:clickable="true"
+                        android:minHeight="48dp"
                         android:text="Register"
                         android:textColor="#4C240A"
                         android:textSize="24dp" />
@@ -118,7 +121,5 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

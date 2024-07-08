@@ -1,6 +1,5 @@
 package sg.edu.np.mad.TicketFinder;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,23 +50,9 @@ public class Register extends Fragment {
     // Instance of the listener
     private OnRegistrationSuccessListener registrationSuccessListener;
 
-    // Attaching the listener to the context
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnRegistrationSuccessListener) {
-            registrationSuccessListener = (OnRegistrationSuccessListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnRegistrationSuccessListener");
-        }
-    }
-
-    // Detaching the listener from the context
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        registrationSuccessListener = null;
+    // Method to set the listener
+    public void setOnRegistrationSuccessListener(OnRegistrationSuccessListener listener) {
+        this.registrationSuccessListener = listener;
     }
 
     // Creating the view
