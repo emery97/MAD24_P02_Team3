@@ -1,24 +1,26 @@
 package sg.edu.np.mad.TicketFinder;
 
 public class ChatbotResponse {
-    private String question;
-    private String answer;
+    private String Question;
+    private String Answer;
 
-    public ChatbotResponse() {}
+    // Default constructor is required for calls to DataSnapshot.getValue(ChatbotResponse.class)
+    public ChatbotResponse() {
+    }
 
     public String getQuestion() {
-        return question;
+        return Question;
     }
 
     public void setQuestion(String question) {
-        this.question = question;
+        Question = question;
     }
 
     public String getAnswer() {
-        return answer;
+        return Answer;
     }
 
     public void setAnswer(String answer) {
-        this.answer = answer;
+        Answer = answer;
     }
 }
