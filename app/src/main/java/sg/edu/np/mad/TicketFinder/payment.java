@@ -11,13 +11,13 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,36 +30,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import android.provider.CalendarContract;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class payment extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
@@ -87,6 +71,16 @@ public class payment extends AppCompatActivity {
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Retrieve Event object from intent
+        Intent eventIntent = getIntent();
+        Event eventObj = (Event) eventIntent.getSerializableExtra("event");
+
+        if (eventObj == null) {
+            Log.e("EVENT_NULL", "Event object is null");
+            Toast.makeText(this, "Event details are missing", Toast.LENGTH_SHORT).show();
+            return; // Early return to avoid further processing
+        }
 
         // Check orientation and set layout accordingly
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -164,8 +158,6 @@ public class payment extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
     }
 
     private boolean validateInput() {
@@ -238,7 +230,7 @@ public class payment extends AppCompatActivity {
         bookingDetails.put("TotalPrice", totalPrice);
         bookingDetails.put("Quantity", quantity);
         bookingDetails.put("PaymentMethod", paymentMethod);
-        bookingDetails.put("ConcertTitle",concertName);
+        bookingDetails.put("ConcertTitle", concertName);
         bookingDetails.put("EventTime", Time);
         bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
 
@@ -316,6 +308,7 @@ public class payment extends AppCompatActivity {
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
+
     private void connectToGoogleAccount() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
@@ -347,33 +340,57 @@ public class payment extends AppCompatActivity {
         }
     }
 
-
     private void navigateToGoogleCalendar() {
+        Intent eventIntent = getIntent();
+        Event eventObj = (Event) eventIntent.getSerializableExtra("event");
         Log.d("SIGNED IN", "navigateToGoogleCalendar: ");
 
-        // Static event details for testing
-        String concertName = "Symphony of the Night";
+        if (eventObj == null) {
+            Log.e("EVENT_NULL", "Event object is null");
+            Toast.makeText(this, "Event details are missing", Toast.LENGTH_SHORT).show();
+            return; // Early return to avoid further processing
+        }
 
-        // Log the event details
-        Log.d("EVENT DETAILS WY", "Title: " + concertName);
+        // Get booking details from intent
+        String concertName = getIntent().getStringExtra("concertName");
+        String seatCategory = getIntent().getStringExtra("seatCategory");
+        String seatNumber = getIntent().getStringExtra("seatNumber");
+        String eventTiming = getIntent().getStringExtra("eventTiming");
+        String eventVenue = eventObj.getVenue();
 
-        // Create the calendar event intent with only the title autofilled
+        // Log the event details for debugging
+        Log.d("EVENT DETAILS", "Title: " + concertName);
+        Log.d("EVENT VENUE",  eventVenue);
+
+        // Create the calendar event intent with the concert details
         Intent intent = new Intent(Intent.ACTION_INSERT);
         intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("title", concertName);
+        intent.putExtra(CalendarContract.Events.TITLE, concertName);
+        intent.putExtra(CalendarContract.Events.DESCRIPTION, "Seat: " + seatCategory + ", " + seatNumber);
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventVenue);
 
-        // Check if there is an activity to handle the intent and start it
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Log.e("ERROR", "No activity found to handle calendar intent.");
-            Toast.makeText(this, "No app found to handle calendar event", Toast.LENGTH_SHORT).show();
-        }
+        // Set the event start and end time in Singapore time
+        GregorianCalendar startDate = new GregorianCalendar(2024, 5, 14, 19, 0);
+        GregorianCalendar endDate = new GregorianCalendar(2024, 5, 14, 22, 0);
+
+        // Convert the start and end times to Singapore time zone
+        TimeZone singaporeTimeZone = TimeZone.getTimeZone("Asia/Singapore");
+        startDate.setTimeZone(singaporeTimeZone);
+        endDate.setTimeZone(singaporeTimeZone);
+
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDate.getTimeInMillis());
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTimeInMillis());
+        intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, singaporeTimeZone.getID());
+        intent.putExtra(CalendarContract.Events.ACCESS_LEVEL, CalendarContract.Events.ACCESS_PRIVATE);
+        intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+
+        startActivity(intent);
     }
 
+
     private void listCalendarIntentHandlers() {
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-                .setData(CalendarContract.Events.CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_VIEW)
+                .setData(CalendarContract.CONTENT_URI);
         List<ResolveInfo> resolveInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
         if (resolveInfoList.isEmpty()) {
             Log.e("INTENT HANDLING", "No applications can handle calendar intent.");

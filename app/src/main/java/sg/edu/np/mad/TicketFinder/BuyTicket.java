@@ -44,6 +44,10 @@ public class BuyTicket extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buy_ticket);
 
+        // Retrieve Event object from intent
+        Intent eventIntent = getIntent();
+        Event eventObj = (Event) eventIntent.getSerializableExtra("event");
+
         // Initialize views
         autoCompleteTextView = findViewById(R.id.auto_complete_txt);
         seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
@@ -161,12 +165,13 @@ public class BuyTicket extends AppCompatActivity {
                 String eventTiming = getIntent().getStringExtra("eventTiming");
                 // Create intent to start payment activity
                 Intent intent = new Intent(BuyTicket.this, payment.class);
+                intent.putExtra("event", eventObj); // Pass the Event object
                 intent.putExtra("concertName", concertName);
                 intent.putExtra("totalPrice", totalPrice);
                 intent.putExtra("seatCategory", selectedSeatCategory);
                 intent.putExtra("seatNumber", selectedSeatNumber);
                 intent.putExtra("quantity", quantity);
-                intent.putExtra("eventTiming",eventTiming);
+                intent.putExtra("eventTiming", eventTiming);
                 startActivity(intent);
             }
         });
@@ -289,3 +294,4 @@ public class BuyTicket extends AppCompatActivity {
         });
     }
 }
+
