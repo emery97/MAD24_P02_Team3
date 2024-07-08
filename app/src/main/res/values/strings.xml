@@ -42,6 +42,6 @@
 
     <string-array name="booking_history_views">
         <item>Booking History</item>
-        <item>Concert To Go</item>
+        <item>Upcoming Concerts</item>
     </string-array>
 </resources>

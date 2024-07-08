@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import static sg.edu.np.mad.TicketFinder.R.*;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,6 +34,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import java.util.Comparator;
+import java.util.TimeZone;
+
 
 public class BookingHistoryDetails extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // Shared preferences for storing user data
@@ -74,13 +84,39 @@ public class BookingHistoryDetails extends AppCompatActivity {
 
         fetchWeatherData();
 
+        // Initialize Spinner
+        Spinner viewSpinner = findViewById(R.id.viewSpinner);  // Changed View to Spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.booking_history_views, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        viewSpinner.setAdapter(adapter);
+
+        // Set Spinner listener
+        viewSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                String userId = sharedPreferences.getString("UserId", null);
+                if (userId != null) {
+                    if (selectedItem.equals("Booking History")) {
+                        fetchBookingDetailsData(userId);
+                    } else if (selectedItem.equals("Upcoming Concerts")) {
+                        fetchUpcomingConcertsData(userId);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
 
         // Set up footer
         Footer.setUpFooter(this);
     }
 
     // Method to fetch booking details data from Firestore
-    private void fetchBookingDetailsData(String userId) {
+    private List<BookingDetails> fetchBookingDetailsData(String userId) {
         db.collection("BookingDetails")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -109,7 +145,12 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                 String time = document.getString("EventTime");
 
                                 Timestamp purchaseTimeTimestamp = document.getTimestamp("PurchaseTime");
+                                Log.d("RAW PURCHASE TIME", "fetchBookingDetailsData: " + purchaseTimeTimestamp.toDate().toString());
+
                                 String purchaseTimeString = formatTimestamp(purchaseTimeTimestamp);
+                                Log.d("FORMATTED PURCHASE TIME", "fetchBookingDetailsData: " + purchaseTimeString);
+
+
 
                                 // Create BookingDetails object and add to list
                                 BookingDetails bookingDetails = new BookingDetails(eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
@@ -140,16 +181,67 @@ public class BookingHistoryDetails extends AppCompatActivity {
                         Log.d("BookingHistoryDetails", "Error getting documents: ", task.getException());
                     }
                 });
+        return bookingDetailsList;
     }
 
     private String formatTimestamp(Timestamp timestamp) {
         if (timestamp != null) {
             Date date = timestamp.toDate();
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Singapore"));  // Explicitly set the timezone
             return sdf.format(date);
         }
         return "";
     }
+
+
+    // Fetch upcoming concerts
+    private void fetchUpcomingConcertsData(String userId) {
+        List<BookingDetails> bookingDetailsList = fetchBookingDetailsData(userId);
+        List<BookingDetails> upcomingConcertsList = new ArrayList<>();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
+        Date now = new Date();
+
+        try {
+            for (BookingDetails bookingDetails : bookingDetailsList) {
+                try {
+                    Date eventDate = sdf.parse(bookingDetails.gettime());
+                    Log.d("EVENT DATE UPCOMING ", "fetchUpcomingConcertsData: "+ eventDate);
+                    if (eventDate != null && eventDate.after(now)) {
+                        upcomingConcertsList.add(bookingDetails);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Date parsing error: " + e.getMessage());
+                }
+            }
+
+            Collections.sort(upcomingConcertsList, (booking1, booking2) -> {
+                try {
+                    Date date1 = sdf.parse(booking1.gettime());
+                    Date date2 = sdf.parse(booking2.gettime());
+                    return date1.compareTo(date2); // Sort in ascending order (soonest first)
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Date sorting error: " + e.getMessage());
+                    return 0;
+                }
+            });
+
+            bookingDetailsAdapter = new BookingDetailsAdapter(upcomingConcertsList);
+            recyclerView.setAdapter(bookingDetailsAdapter);
+
+            // Logging the booking details list for debugging
+            for (BookingDetails bookingDetails : upcomingConcertsList) {
+                Log.d("Upcoming Concerts", bookingDetails.getConcertName() + " at " + bookingDetails.gettime());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error in fetchUpcomingConcertsData: " + e.getMessage());
+        }
+    }
+
 
     private void fetchWeatherData() {
         OkHttpClient client = new OkHttpClient();
