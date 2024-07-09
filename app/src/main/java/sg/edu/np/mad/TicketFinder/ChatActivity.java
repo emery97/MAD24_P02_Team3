@@ -88,7 +88,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void handleBotResponse(String messageText) {
-        String response = getBestResponse(messageText.toLowerCase());
+        String correctedMessageText = correctSpelling(messageText.toLowerCase());
+        String response = getBestResponse(correctedMessageText);
+
+        if (!correctedMessageText.equals(messageText.toLowerCase())) {
+            messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
+        }
+
         if (response != null) {
             messageList.add(new Message(response, false));
         } else {
@@ -98,7 +104,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private String getBestResponse(String messageText) {
-        String correctedMessageText = correctSpelling(messageText);
         String bestResponse = null;
         int bestMatchScore = 0;
 
@@ -106,8 +111,8 @@ public class ChatActivity extends AppCompatActivity {
             String question = entry.getKey();
             String answer = entry.getValue();
 
-            int questionMatchScore = getMatchScore(correctedMessageText, question);
-            int answerMatchScore = getMatchScore(correctedMessageText, answer);
+            int questionMatchScore = getMatchScore(messageText, question);
+            int answerMatchScore = getMatchScore(messageText, answer);
 
             if (questionMatchScore > bestMatchScore) {
                 bestMatchScore = questionMatchScore;
