@@ -276,6 +276,7 @@ public class profilePage extends AppCompatActivity {
                     editor.putString("Name", documentSnapshot.getString("Name"));
                     editor.putString("Email", documentSnapshot.getString("Email"));
                     editor.putString("Password", documentSnapshot.getString("Password"));
+                    editor.putString("ProfilePicUrl", documentSnapshot.getString("ProfilePicUrl")); // Save ProfilePicUrl
                     editor.apply();
 
                     Log.d(TAG, "User data refreshed from Firestore");
@@ -283,6 +284,7 @@ public class profilePage extends AppCompatActivity {
                     // Load profile picture if available
                     String profilePicUrl = documentSnapshot.getString("ProfilePicUrl"); // CHANGED
                     if (profilePicUrl != null && !profilePicUrl.isEmpty()) {
+                        Log.d(TAG, "Loading profile picture from URL: " + profilePicUrl);
                         // Load profile picture using a library like Glide or Picasso
                         Glide.with(this)
                                 .load(profilePicUrl)

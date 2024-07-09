@@ -1,7 +1,5 @@
 package sg.edu.np.mad.TicketFinder;
 
-import java.util.Date;
-
 public class BookingDetails {
     // attributes
     private String concertName;
