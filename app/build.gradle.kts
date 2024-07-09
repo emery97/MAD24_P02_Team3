@@ -61,4 +61,6 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.9")
     // For easy permissions
     implementation("pub.devrel:easypermissions:3.0.0")
+    implementation("androidx.biometric:biometric:1.2.0-alpha04")
+
 }
