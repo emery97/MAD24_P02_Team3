@@ -25,6 +25,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
     private HashMap<String, String> chatbotResponsesMap;
+    private static final int LEVENSHTEIN_THRESHOLD = 3; // Add a threshold for Levenshtein Distance
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -149,6 +150,7 @@ public class ChatActivity extends AppCompatActivity {
             String correctedWord = correctWord(word);
             correctedInput.append(correctedWord).append(" ");
         }
+
         return correctedInput.toString().trim();
     }
 
@@ -165,7 +167,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
-        return closestWord;
+        // Only return the corrected word if the distance is within the threshold
+        return minDistance <= LEVENSHTEIN_THRESHOLD ? closestWord : word;
     }
 
     private int getMatchScore(String messageText, String text) {
