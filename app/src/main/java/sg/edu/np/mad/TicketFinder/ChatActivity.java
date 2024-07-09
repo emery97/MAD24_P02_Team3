@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -18,10 +19,12 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView chatRecyclerView;
+    private RecyclerView suggestedPromptsRecyclerView;
     private EditText messageInput;
     private Button sendButton;
     private Button exitButton;
     private ChatAdapter chatAdapter;
+    private SuggestedPromptAdapter suggestedPromptAdapter;
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
     private HashMap<String, String> chatbotResponsesMap;
@@ -33,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         chatRecyclerView = findViewById(R.id.recyclerView);
+        suggestedPromptsRecyclerView = findViewById(R.id.suggestedPromptsRecyclerView);
         messageInput = findViewById(R.id.editTextMessage);
         sendButton = findViewById(R.id.buttonSend);
         exitButton = findViewById(R.id.exitButton);
@@ -42,6 +46,10 @@ public class ChatActivity extends AppCompatActivity {
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         chatRecyclerView.setAdapter(chatAdapter);
 
+        suggestedPromptAdapter = new SuggestedPromptAdapter(new ArrayList<>(), this::onSuggestedPromptClick);
+        suggestedPromptsRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        suggestedPromptsRecyclerView.setAdapter(suggestedPromptAdapter);
+
         dbHandler = new dbHandler();
         chatbotResponsesMap = new HashMap<>();
 
@@ -50,7 +58,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onCallback(ArrayList<ChatbotResponse> list) {
                 if (list != null) {
-                    for (ChatbotResponse response : list) { // changed
+                    for (ChatbotResponse response : list) {
                         if (response != null && response.getQuestion() != null && response.getAnswer() != null) {
                             chatbotResponsesMap.put(response.getQuestion().toLowerCase(), response.getAnswer());
                         }
@@ -98,10 +106,28 @@ public class ChatActivity extends AppCompatActivity {
 
         if (response != null) {
             messageList.add(new Message(response, false));
+            hideSuggestedPrompts();
         } else {
             messageList.add(new Message("I'm not sure how to respond to that.", false));
+            showSuggestedPrompts();
         }
         chatAdapter.notifyDataSetChanged();
+    }
+
+    private void showSuggestedPrompts() {
+        List<String> suggestions = new ArrayList<>(chatbotResponsesMap.keySet());
+        suggestedPromptAdapter.updateData(suggestions);
+        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSuggestedPrompts() {
+        suggestedPromptsRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void onSuggestedPromptClick(String prompt) {
+        messageInput.setText(prompt);
+        messageInput.setSelection(prompt.length());
+        suggestedPromptsRecyclerView.setVisibility(View.GONE);
     }
 
     private String getBestResponse(String messageText) {

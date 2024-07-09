@@ -53,7 +53,18 @@
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/messageInputLayout"/>
+        app:layout_constraintBottom_toTopOf="@id/suggestedPromptsRecyclerView"/>
+
+    <!-- RecyclerView for suggested prompts -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/suggestedPromptsRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/messageInputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <!-- Message input layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
