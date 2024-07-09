@@ -49,7 +49,6 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
         holder.expandableLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
 
         if (isExpanded) {
-            holder.eventDate.setText("Concert Date Time: " + bookingDetails.gettime());
             holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
             holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
             holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
@@ -74,7 +73,7 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
 
     // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView EventTitle,Datebought,eventDate,concertDate ,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
+        public TextView EventTitle,Datebought,eventDate,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
         LinearLayout expandableLayout;
         Button viewMoreButton, detailsbtn;
 
