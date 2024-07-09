@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class ChatActivity extends AppCompatActivity {
@@ -28,7 +27,8 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
     private HashMap<String, String> chatbotResponsesMap;
-    private static final int LEVENSHTEIN_THRESHOLD = 3; // Add a threshold for Levenshtein Distance
+    private static final int LEVENSHTEIN_THRESHOLD = 3; // Threshold for Levenshtein Distance
+    private static final int CONFIDENCE_THRESHOLD = 2; // Threshold for structured questions
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,7 +100,9 @@ public class ChatActivity extends AppCompatActivity {
         String correctedMessageText = correctSpelling(messageText.toLowerCase());
         String response = getBestResponse(correctedMessageText);
 
-        if (!correctedMessageText.equals(messageText.toLowerCase())) {
+        boolean needsCorrection = needsCorrection(messageText);
+
+        if (needsCorrection && !correctedMessageText.equals(messageText.toLowerCase())) {
             messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
         }
 
@@ -112,6 +114,12 @@ public class ChatActivity extends AppCompatActivity {
             showSuggestedPrompts();
         }
         chatAdapter.notifyDataSetChanged();
+    }
+
+    private boolean needsCorrection(String messageText) {
+        // Implement a simple heuristic to determine if the question is poorly structured
+        // You can extend this logic as needed
+        return messageText.split("\\s+").length <= CONFIDENCE_THRESHOLD;
     }
 
     private void showSuggestedPrompts() {
