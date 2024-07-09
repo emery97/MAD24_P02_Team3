@@ -149,7 +149,6 @@ public class ChatActivity extends AppCompatActivity {
             String correctedWord = correctWord(word);
             correctedInput.append(correctedWord).append(" ");
         }
-
         return correctedInput.toString().trim();
     }
 
