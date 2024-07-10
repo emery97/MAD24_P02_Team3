@@ -44,4 +44,9 @@
         <item>Booking History</item>
         <item>Upcoming Concerts</item>
     </string-array>
+
+    <string-array name="forecast_type_array">
+        <item>Days forecast</item>
+        <item>Hours forecast</item>
+    </string-array>
 </resources>

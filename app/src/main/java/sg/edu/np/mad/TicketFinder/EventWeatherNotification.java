@@ -5,9 +5,12 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.CalendarContract;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+
+import java.util.ArrayList;
 
 public class EventWeatherNotification extends BroadcastReceiver {
     private static final String CHANNEL_ID = "event_notifications";
@@ -31,11 +34,18 @@ public class EventWeatherNotification extends BroadcastReceiver {
         String totalPrice = intent.getStringExtra("total_price");
         String quantity = intent.getStringExtra("quantity");
         String paymentMethod = intent.getStringExtra("payment_method");
+        ArrayList<String> remindersList = intent.getStringArrayListExtra("reminders");
 
-        sendNotification(context, eventDate, temperature, forecast, eventTitle, dateBought, seatCategory, seatNumber, totalPrice, quantity, paymentMethod,weatherdate,weatherdetails);
+        Log.d("INTENT", ""+remindersList);
+
+        sendNotification(context, eventDate, temperature, forecast, eventTitle, dateBought, seatCategory, seatNumber, totalPrice, quantity, paymentMethod,weatherdate,weatherdetails,remindersList);
     }
 
-    private void sendNotification(Context context, String eventDate, String temperature, String forecast, String eventTitle, String dateBought, String seatCategory, String seatNumber, String totalPrice, String quantity, String paymentMethod, String weatherdate, String weatherdetails) {
+    private void sendNotification(Context context, String eventDate, String temperature, String forecast,
+                                  String eventTitle, String dateBought, String seatCategory, String seatNumber,
+                                  String totalPrice, String quantity, String paymentMethod, String weatherdate,
+                                  String weatherdetails, ArrayList<String> remindersList) {
+
         Intent resultIntent = new Intent(context, Bookingdetailsmore.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -44,7 +54,7 @@ public class EventWeatherNotification extends BroadcastReceiver {
         resultIntent.putExtra("temperature", temperature);
         resultIntent.putExtra("forecast", forecast);
         resultIntent.putExtra("weatherdate", weatherdate);
-        resultIntent.putExtra("weatherdetails",weatherdetails);
+        resultIntent.putExtra("weatherdetails", weatherdetails);
         resultIntent.putExtra("event_title", eventTitle);
         resultIntent.putExtra("date_bought", dateBought);
         resultIntent.putExtra("seat_category", seatCategory);
@@ -52,13 +62,27 @@ public class EventWeatherNotification extends BroadcastReceiver {
         resultIntent.putExtra("total_price", totalPrice);
         resultIntent.putExtra("quantity", quantity);
         resultIntent.putExtra("payment_method", paymentMethod);
+        resultIntent.putStringArrayListExtra("reminders", remindersList);
+
+        Log.d("PASS", ""+remindersList);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        // Prepare reminders text
+        StringBuilder remindersTextBuilder = new StringBuilder();
+        if (remindersList != null && !remindersList.isEmpty()) {
+            remindersTextBuilder.append("Reminders:\n");
+            for (String reminder : remindersList) {
+                remindersTextBuilder.append("- ").append(reminder).append("\n");
+            }
+        }
+        String remindersText = remindersTextBuilder.toString().trim(); // Trim to remove extra new line at the end
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.app_logo) // Replace with your notification icon
                 .setContentTitle("Weather Forecast for " + eventDate)
-                .setContentText("Temperature: " + temperature + "\n" + forecast)
+                .setContentText("Temperature: " + temperature + "\n" + forecast + "\n" + remindersText)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("Temperature: " + temperature + "\n" + forecast + "\n" + remindersText))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent) // Set the PendingIntent
                 .setAutoCancel(true); // Automatically removes the notification when tapped

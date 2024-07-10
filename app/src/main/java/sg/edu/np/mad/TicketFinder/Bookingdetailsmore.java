@@ -4,11 +4,13 @@ import static android.content.ContentValues.TAG;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -16,15 +18,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -37,8 +46,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -58,6 +69,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
     private TextView textViewForecast, textViewWeatherDate,textViewWeatherDetails;
     private TextView textViewCountdownTimer;
     private CountDownTimer countDownTimer;
+    private List<String> remindersList = new ArrayList<>();
+    private String currentReminderDetails;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +96,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
             String totalPrice = extras.getString("total_price");
             String quantity = extras.getString("quantity");
             String paymentMethod = extras.getString("payment_method");
+            ArrayList<String> remindersList = extras.getStringArrayList("reminders");
 
             // Display data in TextViews or other views in your layout
             TextView textViewEventTitle = findViewById(R.id.textViewEventTitle);
@@ -112,27 +126,46 @@ public class Bookingdetailsmore extends AppCompatActivity {
             boolean switchState = sharedPreferences.getBoolean(eventIdentifier + "_SwitchState", false);
             switchNotification.setChecked(switchState);
 
-            switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Disable switch if event date has passed
+            if (hasEventDatePassed(eventDate)) {
+                switchNotification.setEnabled(false);
+                switchNotification.setChecked(false);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(eventIdentifier + "_SwitchState", isChecked);
+                editor.putBoolean(eventIdentifier + "_SwitchState", false);
                 editor.apply();
+            } else {
+                switchNotification.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(eventIdentifier + "_SwitchState", isChecked);
+                    editor.apply();
 
-                if (isChecked) {
-                    sendNotification();
-                    showDateTimePickerDialog(eventIdentifier);
-                    Toast.makeText(this, "Notifications enabled for this event", Toast.LENGTH_SHORT).show();
-                } else {
-                    cancelScheduledNotification(eventIdentifier);
-                }
-            });
+                    if (isChecked) {
+                        sendNotification();
+                        showDateTimePickerDialog(eventIdentifier);
+                        Toast.makeText(this, "Notifications enabled for this event", Toast.LENGTH_SHORT).show();
+                    } else {
+                        cancelScheduledNotification(eventIdentifier);
+                    }
+                });
+            }
 
             // Check if event date is within 4 days of the current date
             if (isEventDateWithinNextFourDays(eventDate)) {
                 fetchWeatherData(eventDate);
             }
 
+            if (remindersList != null && !remindersList.isEmpty()) {
+                for (String reminder : remindersList) {
+                    addReminderTextViewToLayout(reminder);
+                }
+            }
+
             calculateCountdown(eventDate);
         }
+
+        Button buttonAddReminder = findViewById(R.id.buttonaddreminder);
+        buttonAddReminder.setOnClickListener(v -> showAddReminderDialog());
+
     }
 
     private void createNotificationChannel() {
@@ -411,6 +444,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
         intent.putExtra("quantity", quantity);
         intent.putExtra("payment_method", paymentMethod);
 
+        intent.putStringArrayListExtra("reminders", new ArrayList<>(remindersList));
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         // Check if the chosen time is in the past, if so, add one day
@@ -505,5 +540,185 @@ public class Bookingdetailsmore extends AppCompatActivity {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
+    }
+
+    private void showAddReminderDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.reminder_dialog);
+        dialog.setCancelable(true);
+
+        EditText editTextReminder = dialog.findViewById(R.id.editTextReminder);
+        Button buttonSaveReminder = dialog.findViewById(R.id.buttonSaveReminder);
+
+        buttonSaveReminder.setOnClickListener(v -> {
+            String reminderText = editTextReminder.getText().toString().trim();
+            if (!reminderText.isEmpty()) {
+                // Save reminder and update UI
+                saveReminder(reminderText);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void saveReminder(String reminderText) {
+        remindersList.add(reminderText);
+
+        // Create a new ConstraintLayout to hold the TextView and delete icon
+        ConstraintLayout reminderLayout = new ConstraintLayout(this);
+        reminderLayout.setId(ViewCompat.generateViewId()); // Generate a unique ID for the ConstraintLayout
+
+        // Create a new TextView for the reminder
+        TextView textViewSavedReminder = new TextView(this);
+        textViewSavedReminder.setId(ViewCompat.generateViewId()); // Generate a unique ID for the TextView
+        textViewSavedReminder.setText(reminderText);
+        textViewSavedReminder.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16); // Adjust text size as needed
+        textViewSavedReminder.setTextColor(Color.BLACK); // Adjust text color as needed
+        reminderLayout.addView(textViewSavedReminder);
+
+        // Create a delete icon (ImageView) and set its properties
+        ImageView deleteIcon = new ImageView(this);
+        deleteIcon.setId(ViewCompat.generateViewId()); // Generate a unique ID for the ImageView
+        deleteIcon.setImageResource(android.R.drawable.ic_delete);
+        reminderLayout.addView(deleteIcon);
+
+        // Set constraints for the TextView and delete icon within the ConstraintLayout
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(reminderLayout);
+
+        // Constraints for textViewSavedReminder
+        constraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.START,
+                ConstraintSet.PARENT_ID, ConstraintSet.START, 16); // Adjust start margin as needed
+        constraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8); // Adjust top margin as needed
+        constraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.BOTTOM,
+                ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8); // Adjust bottom margin as needed
+
+        // Constraints for deleteIcon
+        constraintSet.connect(deleteIcon.getId(), ConstraintSet.START,
+                textViewSavedReminder.getId(), ConstraintSet.END, 16); // Adjust start margin as needed
+        constraintSet.connect(deleteIcon.getId(), ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8); // Adjust top margin as needed
+        constraintSet.connect(deleteIcon.getId(), ConstraintSet.BOTTOM,
+                ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8); // Adjust bottom margin as needed
+
+        constraintSet.applyTo(reminderLayout);
+
+        // Add the reminderLayout to the main ConstraintLayout (layoutReminderContainer)
+        ConstraintLayout layout = findViewById(R.id.layoutReminderContainer); // Replace with your actual parent ConstraintLayout
+        layout.addView(reminderLayout);
+
+        // Set constraints for the reminderLayout within layoutReminderContainer
+        setReminderLayoutConstraints(layout);
+
+        // Set click listener for deleteIcon to remove this reminder
+        deleteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remove the reminder from the list and layout
+                remindersList.remove(reminderText);
+                layout.removeView(reminderLayout); // Remove entire reminder layout
+
+                // Reapply constraints to remaining reminders
+                setReminderLayoutConstraints(layout);
+            }
+        });
+    }
+
+    private void setReminderLayoutConstraints(ConstraintLayout layout) {
+        ConstraintSet layoutConstraintSet = new ConstraintSet();
+        layoutConstraintSet.clone(layout);
+
+        // Iterate over all children of layoutReminderContainer and set constraints
+        int previousViewId = R.id.textViewReminder; // Start below the textViewReminder
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            View child = layout.getChildAt(i);
+            if (child instanceof ConstraintLayout && child.getId() != R.id.textViewReminder) {
+                int currentViewId = child.getId();
+                layoutConstraintSet.connect(currentViewId, ConstraintSet.TOP,
+                        previousViewId, ConstraintSet.BOTTOM, 8); // Adjust top margin as needed
+                layoutConstraintSet.connect(currentViewId, ConstraintSet.START,
+                        R.id.textViewReminder, ConstraintSet.START);
+                previousViewId = currentViewId;
+            }
+        }
+
+        layoutConstraintSet.applyTo(layout);
+    }
+
+
+    private void addReminderTextViewToLayout(String reminderText) {
+        // Create a new ConstraintLayout to hold the TextView and delete icon
+        ConstraintLayout reminderLayout = new ConstraintLayout(this);
+        reminderLayout.setId(ViewCompat.generateViewId()); // Generate a unique ID for the ConstraintLayout
+
+        // Create a new TextView for the reminder
+        TextView textViewSavedReminder = new TextView(this);
+        textViewSavedReminder.setId(ViewCompat.generateViewId()); // Generate a unique ID for the TextView
+        textViewSavedReminder.setText(reminderText);
+        textViewSavedReminder.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16); // Adjust text size as needed
+        textViewSavedReminder.setTextColor(Color.BLACK); // Adjust text color as needed
+        reminderLayout.addView(textViewSavedReminder);
+
+        // Create a delete icon (ImageView) and set its properties
+        ImageView deleteIcon = new ImageView(this);
+        deleteIcon.setId(ViewCompat.generateViewId()); // Generate a unique ID for the ImageView
+        deleteIcon.setImageResource(android.R.drawable.ic_delete);
+        reminderLayout.addView(deleteIcon);
+
+        // Set constraints for the TextView and delete icon within the reminderLayout
+        ConstraintSet reminderLayoutConstraintSet = new ConstraintSet();
+        reminderLayoutConstraintSet.clone(reminderLayout);
+
+        // Constraints for textViewSavedReminder
+        reminderLayoutConstraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.START,
+                ConstraintSet.PARENT_ID, ConstraintSet.START, 16); // Adjust start margin as needed
+        reminderLayoutConstraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8); // Adjust top margin as needed
+        reminderLayoutConstraintSet.connect(textViewSavedReminder.getId(), ConstraintSet.BOTTOM,
+                ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8); // Adjust bottom margin as needed
+
+        // Constraints for deleteIcon
+        reminderLayoutConstraintSet.connect(deleteIcon.getId(), ConstraintSet.START,
+                textViewSavedReminder.getId(), ConstraintSet.END, 16); // Adjust start margin as needed
+        reminderLayoutConstraintSet.connect(deleteIcon.getId(), ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8); // Adjust top margin as needed
+        reminderLayoutConstraintSet.connect(deleteIcon.getId(), ConstraintSet.BOTTOM,
+                ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8); // Adjust bottom margin as needed
+
+        reminderLayoutConstraintSet.applyTo(reminderLayout);
+
+        // Add the reminderLayout to the main ConstraintLayout (layoutReminderContainer)
+        ConstraintLayout layout = findViewById(R.id.layoutReminderContainer); // Replace with your actual parent ConstraintLayout
+        layout.addView(reminderLayout);
+
+        // Set constraints for the reminderLayout within layoutReminderContainer
+        setReminderLayoutConstraints(layout);
+
+        // Set click listener for deleteIcon to remove this reminder
+        deleteIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remove the reminder from the list and layout
+                remindersList.remove(reminderText);
+                layout.removeView(reminderLayout); // Remove entire reminder layout
+
+                // Reapply constraints to remaining reminders
+                setReminderLayoutConstraints(layout);
+            }
+        });
+    }
+
+
+    private boolean hasEventDatePassed(String eventDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+        try {
+            Date eventDateParsed = dateFormat.parse(eventDate);
+            return eventDateParsed != null && eventDateParsed.before(new Date());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

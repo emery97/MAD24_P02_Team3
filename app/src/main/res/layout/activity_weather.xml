@@ -1,71 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/weatherlayout"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="16dp"
     android:paddingTop="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
     android:background="@android:color/white">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/weatherlayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="4-Day Weather Forecast"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"/>
+        android:orientation="vertical">
 
-    <!-- TextViews for Weather Forecasts -->
-    <TextView
-        android:id="@+id/weather1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:layout_below="@id/title"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="24dp"/>
+        <TextView
+            android:id="@+id/WeatherDetailsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:text="Weather Forecast"
+            android:gravity="center_horizontal" />
 
-    <TextView
-        android:id="@+id/weather2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:layout_below="@id/weather1"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"/>
+        <Spinner
+            android:id="@+id/spinnerForecastType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="32dp"
+            android:paddingLeft="16dp"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="8dp"
+            android:entries="@array/forecast_type_array"
+            android:background="@drawable/spinner_background" />
 
-    <TextView
-        android:id="@+id/weather3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:layout_below="@id/weather2"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"/>
+        <SearchView
+            android:id="@+id/searchViewWeather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:queryHint="Enter date (dd MMM yyyy)"
+            android:background="@drawable/search_view_background" />
 
-    <TextView
-        android:id="@+id/weather4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:layout_below="@id/weather3"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewWeather"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:paddingTop="8dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:scrollbars="vertical"
+            android:visibility="gone" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView24HourForecast"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:paddingTop="8dp"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:scrollbars="vertical" />
 
-    <Switch
-        android:id="@+id/weatherNotificationSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/weather4"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        android:text="Enable Daily Weather Notifications"
-        android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        <Switch
+            android:id="@+id/weatherNotificationSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="16dp"
+            android:text="Enable Daily Weather Notifications"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
 
-</RelativeLayout>
+    </LinearLayout>
+</ScrollView>

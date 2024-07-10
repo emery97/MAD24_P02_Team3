@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid background color -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white"/>
+            <!-- Optionally add corners or a stroke -->
+            <corners android:radius="4dp"/>
+            <stroke
+                android:width="1dp"
+                android:color="@android:color/black"/>
+        </shape>
+    </item>
+    <!-- Dropdown arrow overlay -->
+    <item android:right="8dp">
+        <bitmap
+            android:gravity="end|center_vertical"
+            android:src="@android:drawable/arrow_down_float"/>
+    </item>
+</layer-list>

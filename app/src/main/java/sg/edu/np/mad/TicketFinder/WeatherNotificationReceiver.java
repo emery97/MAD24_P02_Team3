@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -35,6 +37,7 @@ public class WeatherNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         fetchWeatherDataAndNotify(context);
+        scheduleNextAlarm(context);
     }
 
     private void fetchWeatherDataAndNotify(final Context context) {
@@ -128,5 +131,28 @@ public class WeatherNotificationReceiver extends BroadcastReceiver {
             Log.e(TAG, "Error formatting date: " + e.getMessage());
             return "";
         }
+    }
+
+    private void scheduleNextAlarm(Context context) {
+        Log.d(TAG, "Scheduling next day's weather notification");
+
+        Intent intent = new Intent(context, WeatherNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) {
+            return;
+        }
+
+        // Set the alarm to trigger at the same time the next day (e.g., 8:49 PM)
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DAY_OF_YEAR, 1); // Set for the next day
+        calendar.set(Calendar.HOUR_OF_DAY, 13); // Set to 8 PM (24-hour format)
+        calendar.set(Calendar.MINUTE, 2); // Set to 49 minutes
+        calendar.set(Calendar.SECOND, 0); // Set to 0 seconds
+
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
 }

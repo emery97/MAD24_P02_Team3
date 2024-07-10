@@ -42,6 +42,7 @@
             android:text="Temperature"
             android:textColor="@color/white"
             android:textSize="24sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageViewWeatherIcon"
@@ -53,6 +54,7 @@
             android:layout_height="100dp"
             android:layout_marginTop="12dp"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.273"
             app:layout_constraintStart_toStartOf="parent"
@@ -65,6 +67,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="12dp"
             android:text="Forecast"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -78,6 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Date"
+            android:visibility="gone"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -94,6 +98,7 @@
             android:layout_marginEnd="143dp"
             android:layout_marginBottom="10dp"
             android:text="Weather Details"
+            android:visibility="gone"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp"
@@ -114,7 +119,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/container"
-        android:background="?android:attr/selectableItemBackground">
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/textViewCountdownTimer"
@@ -217,8 +222,44 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Enable Notifications"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
-        app:layout_constraintTop_toBottomOf="@id/textViewPaymentMethod" />
+        app:layout_constraintTop_toBottomOf="@id/layoutReminderContainer" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutReminderContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/textViewEventTitle"
+        app:layout_constraintTop_toBottomOf="@id/textViewPaymentMethod" >
+
+        <TextView
+            android:id="@+id/textViewReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="10sp"
+            android:text="Reminder"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/buttonaddreminder"
+            app:layout_constraintTop_toBottomOf="@id/layoutReminderContainer"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/buttonaddreminder"
+            android:layout_width="70sp"
+            android:layout_height="50sp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/navy_blue"
+            android:text="+"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintStart_toEndOf="@id/textViewReminder"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutReminderContainer"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
