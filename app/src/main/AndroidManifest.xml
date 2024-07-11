@@ -17,14 +17,11 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-
 
     <application
         android:name=".dbHandler"
@@ -41,9 +38,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".DisplayQRActivity"
+            android:exported="false" />
+        <activity
             android:name=".Bookingdetailsmore"
             android:exported="false" />
-        <receiver android:name=".EventWeatherNotification"/>
+
+        <receiver android:name=".EventWeatherNotification" />
 
         <activity
             android:name=".MainActivity"
@@ -69,7 +70,6 @@
         <activity
             android:name=".maps"
             android:exported="false" />
-
         <activity android:name=".ChatActivity" />
         <activity
             android:name=".homepage"
@@ -103,12 +103,14 @@
             android:name=".UpcomingConcertsActivity"
             android:exported="true" />
 
-        <receiver android:name=".payment"
+        <receiver
+            android:name=".payment"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>

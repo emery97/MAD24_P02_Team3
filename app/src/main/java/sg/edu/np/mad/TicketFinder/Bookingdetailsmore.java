@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +39,12 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,6 +78,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private List<String> remindersList = new ArrayList<>();
     private String currentReminderDetails;
+    private Button generateQRButton;
+    private JSONObject eventDetails;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +94,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
         createNotificationChannel();
 
         textViewCountdownTimer = findViewById(R.id.textViewCountdownTimer);
+
+        generateQRButton = findViewById(R.id.buttonGenerateQR);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -159,6 +170,8 @@ public class Bookingdetailsmore extends AppCompatActivity {
                     addReminderTextViewToLayout(reminder);
                 }
             }
+
+            generateQRButton.setOnClickListener(v -> generateQRCodeOnClick(v));
 
             calculateCountdown(eventDate);
         }
@@ -721,4 +734,29 @@ public class Bookingdetailsmore extends AppCompatActivity {
         }
         return false;
     }
+
+
+    public void generateQRCodeOnClick(View view) {
+        // Create event details JSON object
+        JSONObject eventDetailsJson = new JSONObject();
+        Bundle extras = getIntent().getExtras();
+        try {
+            eventDetailsJson.put("event_title", extras.getString("event_title"));
+            eventDetailsJson.put("event_date", extras.getString("event_date"));
+            eventDetailsJson.put("date_bought", extras.getString("date_bought"));
+            eventDetailsJson.put("seat_category", extras.getString("seat_category"));
+            eventDetailsJson.put("seat_number", extras.getString("seat_number"));
+            eventDetailsJson.put("total_price", extras.getString("total_price"));
+            eventDetailsJson.put("quantity", extras.getString("quantity"));
+            eventDetailsJson.put("payment_method", extras.getString("payment_method"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Start new activity to display QR code
+        Intent intent = new Intent(Bookingdetailsmore.this, DisplayQRActivity.class);
+        intent.putExtra("eventDetailsJson", eventDetailsJson.toString());
+        startActivity(intent);
+    }
+
 }
