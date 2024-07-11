@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,12 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
             bookingDetails.setExpanded(!isExpanded);
             notifyItemChanged(position);
         });
+
+        // Set OnClickListener for transferTickets button
+        holder.transferTicketsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), TransferTicketsActivity.class);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -57,7 +64,7 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView concertName, purchaseTime, time, seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
-        public Button viewMoreButton;
+        public Button viewMoreButton, transferTicketsButton;
         public View expandableLayout;
 
         public ViewHolder(View view) {
@@ -72,6 +79,13 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
             paymentMethod = view.findViewById(R.id.paymentMethod);
             viewMoreButton = view.findViewById(R.id.viewMoreButton);
             expandableLayout = view.findViewById(R.id.expandableLayout);
+            transferTicketsButton = view.findViewById(R.id.transferTickets); // Make sure the ID matches
+
+            // Set OnClickListener for transferTickets button
+            transferTicketsButton.setOnClickListener(v -> {
+                Intent intent = new Intent(view.getContext(), TransferTicketsActivity.class);
+                view.getContext().startActivity(intent);
+            });
         }
     }
 }

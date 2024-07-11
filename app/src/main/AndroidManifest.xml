@@ -102,6 +102,9 @@
         <activity
             android:name=".UpcomingConcertsActivity"
             android:exported="true" />
+        <activity
+            android:name=".TransferTicketsActivity"
+            android:exported="true" />
 
         <receiver
             android:name=".payment"

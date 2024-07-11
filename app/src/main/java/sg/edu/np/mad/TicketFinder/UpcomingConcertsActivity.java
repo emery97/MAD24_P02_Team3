@@ -55,12 +55,7 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
         // Set up footer
         Footer.setUpFooter(this);
 
-        // setonclicklistener for transfer tickets
-//        Button transferTicketButton = findViewById(R.id.transferTickets);
-//        transferTicketButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(UpcomingConcertsActivity.this, TransferTicketsActivity.class);
-//            startActivity(intent);
-//        });
+
     }
 
     // Method to fetch upcoming concerts
