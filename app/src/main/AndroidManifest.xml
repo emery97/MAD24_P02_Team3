@@ -99,6 +99,9 @@
         <activity
             android:name=".ViewFeedback"
             android:exported="true" />
+        <activity
+            android:name=".UpcomingConcertsActivity"
+            android:exported="true" />
 
         <receiver android:name=".payment"
             android:enabled="true"

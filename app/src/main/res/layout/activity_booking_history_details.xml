@@ -84,6 +84,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!--UPCOMING CONCERT-->
+    <Button
+        android:id= "@+id/upcomingConcertButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        android:text="Upcoming Concerts"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="10dp"
+        android:backgroundTint="#D9AA52"/>
+
     <!-- footer -->
     <include
         android:id="@+id/footer"

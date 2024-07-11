@@ -1,9 +1,11 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -77,6 +79,13 @@ public class BookingHistoryDetails extends AppCompatActivity {
 
         // Set up footer
         Footer.setUpFooter(this);
+
+        // Set OnClickListener for Upcoming Concerts button
+        Button upcomingConcertButton = findViewById(R.id.upcomingConcertButton);
+        upcomingConcertButton.setOnClickListener(v -> {
+            Intent intent = new Intent(BookingHistoryDetails.this, UpcomingConcertsActivity.class);
+            startActivity(intent);
+        });
     }
 
     // Method to fetch booking details data from Firestore
