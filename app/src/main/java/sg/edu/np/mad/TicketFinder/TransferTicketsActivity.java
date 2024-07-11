@@ -1,6 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.view.View;
+
 
 public class TransferTicketsActivity extends AppCompatActivity {
 
@@ -72,8 +75,15 @@ public class TransferTicketsActivity extends AppCompatActivity {
 
         // Set up footer
         Footer.setUpFooter(this);
-    }
 
+    }
+    // Method to handle backButton click
+    public void onBackButtonClick(View view) {
+        // Navigate back to BookingHistoryDetails activity
+        Intent intent = new Intent(this, BookingHistoryDetails.class);
+        startActivity(intent);
+        finish(); // Finish current activity (TransferTicketsActivity)
+    }
     private void fetchFriends(String currentUserId) {
         Log.d(TAG, "Fetching friends for currentUserId: " + currentUserId);
 

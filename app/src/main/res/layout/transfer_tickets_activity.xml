@@ -19,12 +19,16 @@
         android:id="@+id/backButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:src="@drawable/back_button"
-        android:layout_marginEnd="350dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginEnd="100dp"
+        android:onClick="onBackButtonClick"
+        android:src="@drawable/back_button"
+        app:layout_constraintEnd_toStartOf="@+id/friends"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
