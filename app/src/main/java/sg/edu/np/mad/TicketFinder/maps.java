@@ -32,6 +32,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
     GoogleMap gMap;
@@ -39,6 +45,10 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
     Event eventObj;
 
     Address venueAddress;
+
+    private static final String TAG = "maps";
+    private static final String BASE_URL = "https://maps.googleapis.com/maps/api/";
+    private static final String API_KEY = "AIzaSyAtrYJH3VUAJgo-qhxicKkjihd8pPSuEII";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +125,9 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 }
                 address.setText(fullAddress.toString());
+
+                // Get place ID
+                getPlaceIdFromCoordinates(venueAddress.getLatitude(), venueAddress.getLongitude());
             }
         } else {
             Log.e("maps", "Event location is null");
@@ -141,5 +154,36 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         }
 
         return p1;
+    }
+    private void getPlaceIdFromCoordinates(double latitude, double longitude) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GeocodingService service = retrofit.create(GeocodingService.class);
+        String latlng = latitude + "," + longitude;
+
+        Call<GeocodingResponse> call = service.getReverseGeocodingData(latlng, API_KEY);
+        call.enqueue(new Callback<GeocodingResponse>() {
+            @Override
+            public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
+                if (response.isSuccessful()) {
+                    GeocodingResponse geocodingResponse = response.body();
+                    if (geocodingResponse != null && !geocodingResponse.results.isEmpty()) {
+                        GeocodingResponse.Result result = geocodingResponse.results.get(0);
+                        String placeId = result.place_id;
+                        Log.d(TAG, "Place ID: " + placeId);
+                    }
+                } else {
+                    Log.e(TAG, "Request failed with status: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GeocodingResponse> call, Throwable t) {
+                Log.e(TAG, "Request failed: " + t.getMessage());
+            }
+        });
     }
 }
