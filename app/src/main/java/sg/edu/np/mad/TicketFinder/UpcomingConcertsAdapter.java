@@ -1,30 +1,41 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcertsAdapter.ViewHolder> {
     private List<BookingDetails> upcomingConcertsList;
+    private Map<BookingDetails, Timestamp> upcomingConcertsTimestamps; // Store timestamps separately
+    private static final String TAG = "UpcomingConcertsAdapter";
 
-    public UpcomingConcertsAdapter(List<BookingDetails> upcomingConcertsList) {
+    public UpcomingConcertsAdapter(List<BookingDetails> upcomingConcertsList, Map<BookingDetails, Timestamp> upcomingConcertsTimestamps) {
         this.upcomingConcertsList = upcomingConcertsList;
+        this.upcomingConcertsTimestamps = upcomingConcertsTimestamps;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.upcoming_concert_details, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.upcoming_concert_details, parent, false);
         return new ViewHolder(view);
     }
 
@@ -32,7 +43,7 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         BookingDetails bookingDetails = upcomingConcertsList.get(position);
         holder.concertName.setText(bookingDetails.getConcertName());
-        holder.purchaseTime.setText(bookingDetails.getpurcasetime());
+        holder.purchaseTime.setText(bookingDetails.getpurcasetime()); // Display in Singapore time
         holder.time.setText(bookingDetails.gettime());
         holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
         holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
@@ -40,7 +51,6 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
         holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
         holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
 
-        // Toggle Button logic
         boolean isExpanded = bookingDetails.isExpanded();
         holder.expandableLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
 
@@ -50,10 +60,26 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
             notifyItemChanged(position);
         });
 
-        // Set OnClickListener for transferTickets button
         holder.transferTicketsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), TransferTicketsActivity.class);
-            holder.itemView.getContext().startActivity(intent);
+            String concertName = bookingDetails.getConcertName();
+            String purchaseTime = bookingDetails.getpurcasetime(); // Local time for display
+            Timestamp purchaseTimeDb = upcomingConcertsTimestamps.get(bookingDetails); // Retrieve the timestamp
+
+            if (purchaseTimeDb != null) {
+                long seconds = purchaseTimeDb.getSeconds();
+                int nanoseconds = purchaseTimeDb.getNanoseconds();
+
+                Log.d(TAG, "Passing concertName: " + concertName + ", purchaseTime: " + purchaseTime + ", purchaseTimeDb: " + purchaseTimeDb.toDate().toString());
+
+                Intent intent = new Intent(holder.itemView.getContext(), TransferTicketsActivity.class);
+                intent.putExtra("CONCERT_NAME", concertName);
+                intent.putExtra("PURCHASE_TIME", purchaseTime);
+                intent.putExtra("PURCHASE_TIME_DB_SECONDS", seconds);
+                intent.putExtra("PURCHASE_TIME_DB_NANOSECONDS", nanoseconds);
+                holder.itemView.getContext().startActivity(intent);
+            } else {
+                Log.e(TAG, "Failed to get purchaseTimeDb.");
+            }
         });
     }
 
@@ -79,13 +105,8 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
             paymentMethod = view.findViewById(R.id.paymentMethod);
             viewMoreButton = view.findViewById(R.id.viewMoreButton);
             expandableLayout = view.findViewById(R.id.expandableLayout);
-            transferTicketsButton = view.findViewById(R.id.transferTickets); // Make sure the ID matches
-
-            // Set OnClickListener for transferTickets button
-            transferTicketsButton.setOnClickListener(v -> {
-                Intent intent = new Intent(view.getContext(), TransferTicketsActivity.class);
-                view.getContext().startActivity(intent);
-            });
+            transferTicketsButton = view.findViewById(R.id.transferTickets);
         }
     }
 }
+

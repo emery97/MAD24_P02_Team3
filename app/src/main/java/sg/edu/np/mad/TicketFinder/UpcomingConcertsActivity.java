@@ -1,5 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,13 +25,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import java.util.HashMap;
+import java.util.Map;
+
+// Class definition
 public class UpcomingConcertsActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // Shared preferences for storing user data
     private FirebaseFirestore db;
     private RecyclerView recyclerView; // RecyclerView to display booking details
     private UpcomingConcertsAdapter upcomingConcertsAdapter;
     private List<BookingDetails> upcomingConcertsList = new ArrayList<>();
-
+    private Map<BookingDetails, Timestamp> upcomingConcertsTimestamps = new HashMap<>(); // Store timestamps separately
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +54,13 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
         // Get user ID from shared preferences and fetch upcoming concerts
         String userId = sharedPreferences.getString("UserId", null);
         if (userId != null) {
-            Log.d("UPCOMING CONCERTS", "onCreate: "+userId);
             fetchUpcomingConcerts(userId);
         }
 
         // Set up footer
         Footer.setUpFooter(this);
-
-
     }
 
-    // Method to fetch upcoming concerts
     private void fetchUpcomingConcerts(String userId) {
         db.collection("BookingDetails")
                 .whereEqualTo("userId", userId)
@@ -67,9 +69,8 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                            // Clear existing booking details list
                             upcomingConcertsList.clear();
-                            // Current date to compare with concert dates
+                            upcomingConcertsTimestamps.clear();
                             Date currentDate = new Date();
 
                             for (QueryDocumentSnapshot document : querySnapshot) {
@@ -77,11 +78,9 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                                 String seatCategory = document.getString("SeatCategory");
                                 String seatNumber = document.getString("SeatNumber");
 
-                                // Retrieve TotalPrice as double and convert to String
                                 Double totalPrice = document.getDouble("TotalPrice");
                                 String totalPriceString = totalPrice != null ? String.valueOf(totalPrice) : null;
 
-                                // Retrieve Quantity as long and convert to String
                                 Long quantityLong = document.getLong("Quantity");
                                 String quantityString = quantityLong != null ? String.valueOf(quantityLong) : null;
 
@@ -90,23 +89,24 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                                 String time = document.getString("EventTime");
 
                                 Timestamp purchaseTimeTimestamp = document.getTimestamp("PurchaseTime");
+                                Log.d("UPCOMING_CONCERT_ACTIVITY", "Retrieved Timestamp: " + purchaseTimeTimestamp.toDate().toString());
+
                                 String purchaseTimeString = formatTimestamp(purchaseTimeTimestamp);
 
                                 try {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
                                     Date concertDate = sdf.parse(time);
                                     if (concertDate != null && concertDate.after(currentDate)) {
-                                        // Create BookingDetails object and add to list
                                         BookingDetails bookingDetails = new BookingDetails(eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                         upcomingConcertsList.add(bookingDetails);
+                                        upcomingConcertsTimestamps.put(bookingDetails, purchaseTimeTimestamp); // Store timestamp separately
                                     }
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
                             }
 
-                            // Initialize and set adapter for RecyclerView
-                            upcomingConcertsAdapter = new UpcomingConcertsAdapter(upcomingConcertsList);
+                            upcomingConcertsAdapter = new UpcomingConcertsAdapter(upcomingConcertsList, upcomingConcertsTimestamps);
                             recyclerView.setAdapter(upcomingConcertsAdapter);
                         } else {
                             Log.d("UpcomingConcertsActivity", "No upcoming concerts found");
@@ -116,6 +116,7 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                     }
                 });
     }
+
     private String formatTimestamp(Timestamp timestamp) {
         if (timestamp != null) {
             Date date = timestamp.toDate();
@@ -125,3 +126,4 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
         return "";
     }
 }
+

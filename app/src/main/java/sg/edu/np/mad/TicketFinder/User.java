@@ -1,12 +1,13 @@
 package sg.edu.np.mad.TicketFinder;
-
 public class User {
     private String name;
     private String profileImageUrl;
+    private String userId;
 
-    public User(String name, String profileImageUrl) {
+    public User(String name, String profileImageUrl, String userId) {
         this.name = name;
         this.profileImageUrl = profileImageUrl;
+        this.userId = userId;
     }
 
     public String getName() {
@@ -17,11 +18,7 @@ public class User {
         return profileImageUrl;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public String getUserId() {
+        return userId;
     }
 }
