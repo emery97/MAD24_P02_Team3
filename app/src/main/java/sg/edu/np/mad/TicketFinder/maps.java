@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,12 +23,15 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -102,6 +106,8 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                 }
             }
         });
+
+        Footer.setUpFooter(this);
     }
 
     @Override
@@ -165,7 +171,8 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         String latlng = latitude + "," + longitude;
 
         Call<GeocodingResponse> call = service.getReverseGeocodingData(latlng, API_KEY);
-        call.enqueue(new Callback<GeocodingResponse>() {
+        Call<GeocodingResponse> call2 = service.getGeocodingData(eventObj.getVenue(), API_KEY);
+        call2.enqueue(new Callback<GeocodingResponse>() {
             @Override
             public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
                 if (response.isSuccessful()) {
@@ -174,6 +181,9 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                         GeocodingResponse.Result result = geocodingResponse.results.get(0);
                         String placeId = result.place_id;
                         Log.d(TAG, "Place ID: " + placeId);
+
+                        // Fetch place details using place ID
+                        getPlaceDetails(placeId);
                     }
                 } else {
                     Log.e(TAG, "Request failed with status: " + response.code());
@@ -185,5 +195,64 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                 Log.e(TAG, "Request failed: " + t.getMessage());
             }
         });
+    }
+
+    private void getPlaceDetails(String placeId) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        PlacesService service = retrofit.create(PlacesService.class);
+
+        Call<PlacesResponse> call = service.getPlaceDetails(placeId, API_KEY);
+        Log.d(TAG, "Request URL: " + BASE_URL + "place/details/json?place_id=" + placeId + "&key=" + API_KEY);
+        call.enqueue(new Callback<PlacesResponse>() {
+            @Override
+            public void onResponse(Call<PlacesResponse> call, Response<PlacesResponse> response) {
+                if (response.isSuccessful()) {
+                    PlacesResponse placesResponse = response.body();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String jsonResponse = gson.toJson(response.body());
+
+                    Log.d(TAG, "PlacesResponse JSON: " + jsonResponse);
+
+                    if (placesResponse != null && placesResponse.result != null) {
+                        Log.d(TAG, placesResponse.toString());
+                        if (placesResponse.result.photos != null && !placesResponse.result.photos.isEmpty()) {
+                            String photoReference = placesResponse.result.photos.get(0).photo_reference;
+                            loadPlaceImage(photoReference);
+                        }
+                        if (placesResponse.result.opening_hours != null) {
+                            StringBuilder openingHours = new StringBuilder();
+                            for (String hour : placesResponse.result.opening_hours.weekday_text) {
+                                openingHours.append(hour).append("\n");
+                            }
+                            TextView openingHoursTextView = findViewById(R.id.openingHours);
+                            openingHoursTextView.setText(openingHours.toString().trim());
+                        }
+                    } else {
+                        Log.e(TAG, "PlacesResponse or placesResponse.result is null");
+                    }
+                } else {
+                    Log.e(TAG, "Request failed with status: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlacesResponse> call, Throwable t) {
+                Log.e(TAG, "Request failed: " + t.getMessage());
+            }
+        });
+    }
+
+    private void loadPlaceImage(String photoReference) {
+        String photoUrl = BASE_URL + "place/photo?maxwidth=400&photoreference=" + photoReference + "&key=" + API_KEY;
+        Log.d(TAG, "Photo URL: " + photoUrl);
+
+        ImageView venueImageView = findViewById(R.id.venueImage);
+        Glide.with(this)
+                .load(photoUrl)
+                .into(venueImageView);
     }
 }
