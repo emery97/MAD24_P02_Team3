@@ -218,19 +218,7 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                     Log.d(TAG, "PlacesResponse JSON: " + jsonResponse);
 
                     if (placesResponse != null && placesResponse.result != null) {
-                        Log.d(TAG, placesResponse.toString());
-                        if (placesResponse.result.photos != null && !placesResponse.result.photos.isEmpty()) {
-                            String photoReference = placesResponse.result.photos.get(0).photo_reference;
-                            loadPlaceImage(photoReference);
-                        }
-                        if (placesResponse.result.opening_hours != null) {
-                            StringBuilder openingHours = new StringBuilder();
-                            for (String hour : placesResponse.result.opening_hours.weekday_text) {
-                                openingHours.append(hour).append("\n");
-                            }
-                            TextView openingHoursTextView = findViewById(R.id.openingHours);
-                            openingHoursTextView.setText(openingHours.toString().trim());
-                        }
+                        updateUIWithPlaceDetails(placesResponse.result);
                     } else {
                         Log.e(TAG, "PlacesResponse or placesResponse.result is null");
                     }
@@ -246,6 +234,59 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         });
     }
 
+    private void updateUIWithPlaceDetails(PlacesResponse.Result result) {
+
+        if (result.photos != null && !result.photos.isEmpty()) {
+            String photoReference = result.photos.get(0).photo_reference;
+            loadPlaceImage(photoReference);
+        }
+
+        if (result.opening_hours != null) {
+            StringBuilder openingHours = new StringBuilder();
+            for (String hour : result.opening_hours.weekday_text) {
+                openingHours.append(hour).append("\n");
+            }
+            TextView openingHoursTextView = findViewById(R.id.openingHours);
+            openingHoursTextView.setText(openingHours.toString().trim());
+            openingHoursTextView.setVisibility(View.VISIBLE);
+        }
+
+        if (result.international_phone_number != null) {
+            TextView phoneNumberTextView = findViewById(R.id.phoneNumberTextView);
+            phoneNumberTextView.setText(result.international_phone_number);
+            phoneNumberTextView.setVisibility(View.VISIBLE);
+        }
+
+        if (result.website != null) {
+            TextView websiteTextView = findViewById(R.id.websiteTextView);
+            websiteTextView.setText(result.website);
+            websiteTextView.setVisibility(View.VISIBLE);
+        }
+
+        if (result.wheelchair_accessible_entrance) {
+            // Show wheelchair accessible information
+        } else {
+            // Handle case where entrance is not wheelchair accessible
+        }
+
+        TextView ratingTextView = findViewById(R.id.ratingTextView);
+        ratingTextView.setText("Rating: " + result.rating);
+
+        TextView totalRatingsTextView = findViewById(R.id.totalRatingsTextView);
+        totalRatingsTextView.setText("Total Ratings: " + result.user_ratings_total);
+
+        /*
+        // Example of handling reviews
+        if (result.reviews != null && !result.reviews.isEmpty()) {
+            // Display reviews in a RecyclerView or similar UI component
+            // Example:
+            RecyclerView recyclerView = findViewById(R.id.reviewsRecyclerView);
+            recyclerView.setAdapter(new ReviewsAdapter(result.reviews));
+        }
+
+         */
+    }
+
     private void loadPlaceImage(String photoReference) {
         String photoUrl = BASE_URL + "place/photo?maxwidth=400&photoreference=" + photoReference + "&key=" + API_KEY;
         Log.d(TAG, "Photo URL: " + photoUrl);
@@ -254,5 +295,7 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         Glide.with(this)
                 .load(photoUrl)
                 .into(venueImageView);
+
+        venueImageView.setVisibility(View.VISIBLE);
     }
 }
