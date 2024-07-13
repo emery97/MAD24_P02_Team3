@@ -80,7 +80,7 @@ public class TransferTicketsActivity extends AppCompatActivity {
     // Method to handle backButton click
     public void onBackButtonClick(View view) {
         // Navigate back to BookingHistoryDetails activity
-        Intent intent = new Intent(this, BookingHistoryDetails.class);
+        Intent intent = new Intent(this, UpcomingConcertsActivity.class);
         startActivity(intent);
         finish(); // Finish current activity (TransferTicketsActivity)
     }
