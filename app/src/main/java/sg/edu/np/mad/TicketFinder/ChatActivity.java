@@ -92,7 +92,9 @@ public class ChatActivity extends AppCompatActivity {
                 if (list != null) {
                     for (ChatbotResponse response : list) {
                         if (response != null && response.getQuestion() != null && response.getAnswer() != null) {
-                            chatbotResponsesMap.put(response.getQuestion().toLowerCase(), response.getAnswer());
+                            String cleanedQuestion = cleanText(response.getQuestion());
+                            String cleanedAnswer = cleanText(response.getAnswer());
+                            chatbotResponsesMap.put(cleanedQuestion, cleanedAnswer);
                         }
                     }
                     synchronized (dbHandler) {
@@ -135,20 +137,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void handleBotResponse(String messageText) {
-        messageText = messageText.trim(); // REMOVE EXTRA SPACES
-        String correctedMessageText = correctSpelling(messageText.toLowerCase());
-        String response = getBestResponse(correctedMessageText);
-
-        boolean needsCorrection = needsCorrection(messageText);
-
-        if (needsCorrection && !correctedMessageText.equals(messageText.toLowerCase())) {
-            messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
-        }
+        String cleanedMessageText = cleanText(messageText);
+        String correctedMessageText = correctSpelling(cleanedMessageText);
+        String response = getBestResponse(cleanedMessageText);
 
         if (response != null) {
+            response = capitalizeFirstLetter(response); // Capitalize the first letter of the response
             messageList.add(new Message(response, false));
             hideSuggestedPrompts();
         } else {
+            if (!correctedMessageText.equals(cleanedMessageText)) {
+                messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
+            }
             messageList.add(new Message("I'm not sure how to respond to that.", false));
             showSuggestedPrompts();
         }
@@ -246,11 +246,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private int getMatchScore(String messageText, String text) {
         // Normalize both messageText and text by removing punctuation and converting to lower case
-        messageText = messageText.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();
-        text = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();
+        String cleanedMessageText = cleanText(messageText);
+        String cleanedText = cleanText(text);
 
-        String[] messageWords = messageText.split("\\s+");
-        String[] textWords = text.split("\\s+");
+        String[] messageWords = cleanedMessageText.split("\\s+");
+        String[] textWords = cleanedText.split("\\s+");
         int matchCount = 0;
 
         for (String messageWord : messageWords) {
@@ -262,5 +262,15 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         return matchCount;
+    }
+
+    private String cleanText(String text) {
+        return text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();  
+    }
+    private String capitalizeFirstLetter(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 }
