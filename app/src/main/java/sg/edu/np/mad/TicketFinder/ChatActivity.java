@@ -1,12 +1,17 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
@@ -14,9 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import android.Manifest;
+
 
 public class ChatActivity extends AppCompatActivity {
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private boolean permissionToRecordAccepted = false;
+    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private RecyclerView chatRecyclerView;
     private RecyclerView suggestedPromptsRecyclerView;
     private EditText messageInput;
@@ -29,6 +39,8 @@ public class ChatActivity extends AppCompatActivity {
     private HashMap<String, String> chatbotResponsesMap;
     private static final int LEVENSHTEIN_THRESHOLD = 3; // Threshold for Levenshtein Distance
     private static final int CONFIDENCE_THRESHOLD = 2; // Threshold for structured questions
+    private ImageView micIcon; // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+    private SpeechRecognizerHelper speechRecognizerHelper; // CHANGES MADE HERE FOR MIC IMPLEMENTATION
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.editTextMessage);
         sendButton = findViewById(R.id.buttonSend);
         exitButton = findViewById(R.id.exitButton);
+        micIcon = findViewById(R.id.micIcon); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
 
         messageList = new ArrayList<>();
         chatAdapter = new ChatAdapter(messageList);
@@ -52,6 +65,25 @@ public class ChatActivity extends AppCompatActivity {
 
         dbHandler = new dbHandler();
         chatbotResponsesMap = new HashMap<>();
+
+        // Initialize SpeechRecognizerHelper
+        speechRecognizerHelper = new SpeechRecognizerHelper(this, micIcon, new SpeechRecognizerHelper.OnSpeechResultListener() {
+            @Override
+            public void onSpeechResult(String text) {
+                messageInput.setText(text);
+            }
+        }); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+
+        micIcon.setOnClickListener(new View.OnClickListener() { // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    speechRecognizerHelper.startListening(); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+                } else {
+                    ActivityCompat.requestPermissions(ChatActivity.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+                }
+            }
+        });
 
         // Fetch chatbot responses from Firestore and store them in a map
         dbHandler.getChatbotResponses(new FirestoreCallback<ChatbotResponse>() {
@@ -96,7 +128,14 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() { // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+        super.onDestroy();
+        speechRecognizerHelper.destroy(); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+    }
+
     private void handleBotResponse(String messageText) {
+        messageText = messageText.trim(); // REMOVE EXTRA SPACES
         String correctedMessageText = correctSpelling(messageText.toLowerCase());
         String response = getBestResponse(correctedMessageText);
 
@@ -207,8 +246,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private int getMatchScore(String messageText, String text) {
         // Normalize both messageText and text by removing punctuation and converting to lower case
-        messageText = messageText.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase();
-        text = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase();
+        messageText = messageText.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();
+        text = text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();
 
         String[] messageWords = messageText.split("\\s+");
         String[] textWords = text.split("\\s+");
