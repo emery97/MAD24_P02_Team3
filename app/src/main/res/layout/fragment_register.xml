@@ -29,7 +29,8 @@
         android:ems="10"
         android:hint="Enter your Username"
         android:inputType="text"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:importantForAutofill="no"/>
 
     <TextView
         android:id="@+id/RegEmail"
@@ -50,7 +51,8 @@
         android:ems="10"
         android:hint="Enter your Email"
         android:inputType="textEmailAddress"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:importantForAutofill="no"/>
 
     <TextView
         android:id="@+id/RegPh"
@@ -71,7 +73,8 @@
         android:ems="10"
         android:hint="Enter your Phone Number"
         android:inputType="phone"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:importantForAutofill="no"/>
 
     <TextView
         android:id="@+id/RegPassword"
@@ -92,7 +95,8 @@
         android:ems="10"
         android:hint="New Password"
         android:inputType="textPassword"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:importantForAutofill="no"/>
 
     <TextView
         android:id="@+id/passwordReq"
