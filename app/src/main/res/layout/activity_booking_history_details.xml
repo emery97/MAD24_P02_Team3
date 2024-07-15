@@ -63,6 +63,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/scanQRCodeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:backgroundTint="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView"
+        android:onClick="scanQRCode" />
+
     <TextView
         android:id="@+id/bookinghistorytext"
         android:layout_width="wrap_content"

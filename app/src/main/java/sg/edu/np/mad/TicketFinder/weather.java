@@ -98,7 +98,6 @@ public class weather extends AppCompatActivity {
                 cancelDailyWeatherNotification();
             }
         });
-
         spinnerForecastType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -353,8 +352,8 @@ public class weather extends AppCompatActivity {
         // Set the alarm to trigger at a specific time each day (e.g., 8:49 PM)
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 13); // Set to 8 PM (24-hour format)
-        calendar.set(Calendar.MINUTE, 2); // Set to 49 minutes
+        calendar.set(Calendar.HOUR_OF_DAY, 17); // Set to 8 PM (24-hour format)
+        calendar.set(Calendar.MINUTE, 55); // Set to 49 minutes
         calendar.set(Calendar.SECOND, 0); // Set to 0 seconds
 
         // If the time is in the past for today, set it for tomorrow

@@ -71,6 +71,5 @@
             android:text="Enable Daily Weather Notifications"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
-
     </LinearLayout>
 </ScrollView>

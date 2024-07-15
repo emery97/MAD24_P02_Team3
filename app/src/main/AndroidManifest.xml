@@ -39,6 +39,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".DisplayQRDetails"
+            android:exported="false" />
+        <activity
             android:name=".DisplayQRActivity"
             android:exported="false" />
         <activity
@@ -69,6 +72,10 @@
         <receiver android:name=".WeatherNotificationReceiver" />
 
         <activity
+            android:name=".PortraitCaptureActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
             android:name=".maps"
             android:exported="false" />
         <activity android:name=".ChatActivity" />
@@ -96,7 +103,8 @@
             android:exported="true" />
         <activity
             android:name=".BookingHistoryDetails"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ViewFeedback"
             android:exported="true" />

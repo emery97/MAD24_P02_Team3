@@ -740,6 +740,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         // Create event details JSON object
         JSONObject eventDetailsJson = new JSONObject();
         Bundle extras = getIntent().getExtras();
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         try {
             eventDetailsJson.put("event_title", extras.getString("event_title"));
             eventDetailsJson.put("event_date", extras.getString("event_date"));
@@ -749,6 +750,16 @@ public class Bookingdetailsmore extends AppCompatActivity {
             eventDetailsJson.put("total_price", extras.getString("total_price"));
             eventDetailsJson.put("quantity", extras.getString("quantity"));
             eventDetailsJson.put("payment_method", extras.getString("payment_method"));
+
+            String userId = sharedPreferences.getString("UserId", "");
+            String name = sharedPreferences.getString("Name", "");
+            String email = sharedPreferences.getString("Email", "");
+            String phoneNum = sharedPreferences.getString("PhoneNum", "");
+
+            eventDetailsJson.put("user_id", userId);
+            eventDetailsJson.put("name", name);
+            eventDetailsJson.put("email", email);
+            eventDetailsJson.put("phoneNum", phoneNum);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -7,16 +7,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +53,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
     private List<bkweather> weatherItemList = new ArrayList<>();
     private final TextView[] weatherTexts = new TextView[4];
     private static final String TAG = "BookingHistoryDetails";
+    private DocumentReference qrCodeRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +92,82 @@ public class BookingHistoryDetails extends AppCompatActivity {
             Intent intent = new Intent(BookingHistoryDetails.this, UpcomingConcertsActivity.class);
             startActivity(intent);
         });
+
+        Button scanQRCodeButton = findViewById(R.id.scanQRCodeButton);
+        scanQRCodeButton.setOnClickListener(v -> startQRCodeScanner());
+    }
+
+    private void startQRCodeScanner() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
+        integrator.setPrompt("Scan a QR code");
+        integrator.setCameraId(0);
+        integrator.setBeepEnabled(false);
+        integrator.setBarcodeImageEnabled(true);
+        integrator.setOrientationLocked(true);
+        integrator.setCaptureActivity(PortraitCaptureActivity.class);
+        integrator.initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Log.d(TAG, "Cancelled scan");
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                Log.d(TAG, "Scanned");
+                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                handleQRCodeResult(result.getContents());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void handleQRCodeResult(String qrCodeData) {
+        try {
+            JSONObject qrData = new JSONObject(qrCodeData);
+            updateQRCodeStatus(qrData);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Invalid QR code data", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void updateQRCodeStatus(JSONObject qrData) {
+        try {
+            String qrCodeString = qrData.toString();
+            db.collection("QrCodes")
+                    .whereEqualTo("data", qrCodeString)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            QuerySnapshot querySnapshot = task.getResult();
+                            if (!querySnapshot.isEmpty()) {
+                                for (QueryDocumentSnapshot document : querySnapshot) {
+                                    qrCodeRef = document.getReference();
+                                    qrCodeRef.update("status", "waiting")
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d(TAG, "QR Code status updated to waiting");
+                                                Intent intent = new Intent(BookingHistoryDetails.this, DisplayQRDetails.class);
+                                                intent.putExtra("qrCodeData", qrCodeString);
+                                                startActivity(intent);
+                                            })
+                                            .addOnFailureListener(e -> Log.w(TAG, "Error updating QR Code status", e));
+                                }
+                            } else {
+                                Log.d(TAG, "QR Code not found");
+                                Toast.makeText(this, "QR Code not found", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Log.w(TAG, "Error querying QR Code", task.getException());
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Method to fetch booking details data from Firestore
