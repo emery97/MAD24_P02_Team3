@@ -99,9 +99,10 @@ public class profilePage extends AppCompatActivity {
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
         uploadProfilePicButton = findViewById(R.id.uploadProfilePicButton);
 
+        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
 
-        // Initialise database components
+        // Initialize Firebase components
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
@@ -545,7 +546,7 @@ public class profilePage extends AppCompatActivity {
         }
     }
 
-    // Method to show image options
+    // Method to show image options for uploading profile picture
     private void showImageOptions() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(profilePage.this);
@@ -647,6 +648,7 @@ public class profilePage extends AppCompatActivity {
         }
     }
 
+    // Method to authenticate user with biometric or password
     private void authenticateUser() {
         BiometricManager biometricManager = BiometricManager.from(this);
         switch (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
@@ -663,6 +665,7 @@ public class profilePage extends AppCompatActivity {
         }
     }
 
+    // Method to show password dialog for authentication
     private void showPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme);
         builder.setTitle("Enter Password");
