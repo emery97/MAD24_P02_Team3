@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -93,8 +95,10 @@ public class BookingHistoryDetails extends AppCompatActivity {
             startActivity(intent);
         });
 
-        Button scanQRCodeButton = findViewById(R.id.scanQRCodeButton);
+        ImageButton scanQRCodeButton = findViewById(R.id.scanQRCodeButton);
         scanQRCodeButton.setOnClickListener(v -> startQRCodeScanner());
+
+        checkAndRemoveExpiredQRCodes();
     }
 
     private void startQRCodeScanner() {
@@ -118,7 +122,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 Log.d(TAG, "Scanned");
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Scanned: ", Toast.LENGTH_LONG).show();
                 handleQRCodeResult(result.getContents());
             }
         } else {
@@ -293,6 +297,42 @@ public class BookingHistoryDetails extends AppCompatActivity {
         } else {
             return R.drawable.weathercloud; // Default icon
         }
+    }
+
+
+    private void checkAndRemoveExpiredQRCodes() {
+        db.collection("QrCodes")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        WriteBatch batch = db.batch();
+                        long currentTimeMillis = System.currentTimeMillis();
+
+                        for (QueryDocumentSnapshot document : querySnapshot) {
+                            String dataString = document.getString("data");
+                            if (dataString != null) {
+                                try {
+                                    JSONObject dataJson = new JSONObject(dataString);
+                                    long expiryTimeMillis = dataJson.getLong("expiryTimeMillis");
+
+                                    if (expiryTimeMillis <= currentTimeMillis) {
+                                        batch.delete(document.getReference());
+                                    }
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "Error parsing JSON data", e);
+                                }
+                            }
+                        }
+
+                        // Commit the batch write
+                        batch.commit()
+                                .addOnSuccessListener(aVoid -> Log.d(TAG, "Expired QR codes removed successfully"))
+                                .addOnFailureListener(e -> Log.w(TAG, "Error removing expired QR codes", e));
+                    } else {
+                        Log.w(TAG, "Error querying QR codes", task.getException());
+                    }
+                });
     }
 }
 

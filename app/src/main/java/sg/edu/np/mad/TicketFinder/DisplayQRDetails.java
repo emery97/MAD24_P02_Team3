@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,10 +14,24 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class DisplayQRDetails extends AppCompatActivity {
+
+    private FirebaseFirestore db;
+    private String eventTitle;
+    private String eventDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +46,7 @@ public class DisplayQRDetails extends AppCompatActivity {
 
         Button viewMoreButton = findViewById(R.id.viewMoreButton);
         LinearLayout additionalDetailsLayout = findViewById(R.id.additionalDetailsLayout);
+        db = FirebaseFirestore.getInstance();
 
         viewMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,13 +68,66 @@ public class DisplayQRDetails extends AppCompatActivity {
         try {
             // Parse the JSON string
             JSONObject qrData = new JSONObject(qrCodeData);
-            String eventTitle = qrData.getString("event_title");
+            eventTitle = qrData.getString("event_title");
+            eventDate = qrData.getString("event_date");
+
+            // Check if event is valid
+            checkEventValidity(eventTitle);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Invalid QR code data", Toast.LENGTH_LONG).show();
+            finish(); // Close activity if QR data is invalid
+        }
+    }
+
+    private void checkEventValidity(String eventTitle) {
+        // Reference to the events collection
+        Query query = db.collection("Events")
+                .whereEqualTo("Name", eventTitle);
+
+        // Execute the query asynchronously
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                boolean isValidEvent = false;
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String firestoreName = document.getString("Name");
+
+                    // Compare the retrieved Firestore event name with the provided event title
+                    if (firestoreName != null && firestoreName.equals(eventTitle)) {
+                        isValidEvent = true;
+                        break;
+                    }
+                }
+                if (isValidEvent) {
+                    Toast.makeText(DisplayQRDetails.this, "Valid event", Toast.LENGTH_SHORT).show();
+                    // Continue displaying event details
+                    displayEventDetails();
+                } else {
+                    Toast.makeText(DisplayQRDetails.this, "Not a valid event", Toast.LENGTH_SHORT).show();
+                    // Navigate back to BookingHistoryDetails or any other appropriate action
+                    navigateBack();
+                }
+            } else {
+                // Handle errors
+                Toast.makeText(DisplayQRDetails.this, "Error checking event validity", Toast.LENGTH_SHORT).show();
+                navigateBack(); // Navigate back on error
+            }
+        });
+    }
+
+
+    private void displayEventDetails() {
+        // Continue displaying event details here
+        try {
+            JSONObject qrData = new JSONObject(getIntent().getStringExtra("qrCodeData"));
+            eventTitle = qrData.getString("event_title");
             String seatCategory = qrData.getString("seat_category");
             String seatNumber = qrData.getString("seat_number");
             String totalPrice = qrData.getString("total_price");
             String quantity = qrData.getString("quantity");
             String paymentMethod = qrData.getString("payment_method");
-            String time = qrData.getString("event_date");
+            eventDate = qrData.getString("event_date");
             String purchaseTime = qrData.getString("date_bought");
             String userid = qrData.getString("user_id");
             String name = qrData.getString("name");
@@ -66,7 +135,6 @@ public class DisplayQRDetails extends AppCompatActivity {
             String phone = qrData.getString("phoneNum");
             String expiry = qrData.getString("expiryTimeMillis");
 
-            // Find the TextView elements by their ID
             TextView eventTitleTextView = findViewById(R.id.eventTitleTextView);
             TextView seatCategoryTextView = findViewById(R.id.seatCategoryTextView);
             TextView seatNumberTextView = findViewById(R.id.seatNumberTextView);
@@ -81,15 +149,13 @@ public class DisplayQRDetails extends AppCompatActivity {
             TextView PhoneTextView = findViewById(R.id.PhoneTextView);
             TextView expiryTextView = findViewById(R.id.expiryTextView);
 
-
-            // Set the text for each TextView
             eventTitleTextView.setText(eventTitle);
             seatCategoryTextView.setText(seatCategory);
             seatNumberTextView.setText(seatNumber);
             totalPriceTextView.setText(totalPrice);
             quantityTextView.setText(quantity);
             paymentMethodTextView.setText(paymentMethod);
-            timeTextView.setText(time);
+            timeTextView.setText(eventDate);
             purchaseTimeTextView.setText(purchaseTime);
             nameTextView.setText(name);
             useridTextView.setText(userid);
@@ -101,5 +167,12 @@ public class DisplayQRDetails extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "Invalid QR code data", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void navigateBack() {
+        // Navigate back to BookingHistoryDetails or any other appropriate action
+        Intent intent = new Intent(DisplayQRDetails.this, BookingHistoryDetails.class);
+        startActivity(intent);
+        finish(); // Finish current activity to prevent going back to it
     }
 }
