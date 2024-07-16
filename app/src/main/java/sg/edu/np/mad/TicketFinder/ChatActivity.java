@@ -14,13 +14,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import android.Manifest;
-
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -39,8 +41,9 @@ public class ChatActivity extends AppCompatActivity {
     private HashMap<String, String> chatbotResponsesMap;
     private static final int LEVENSHTEIN_THRESHOLD = 3; // Threshold for Levenshtein Distance
     private static final int CONFIDENCE_THRESHOLD = 2; // Threshold for structured questions
-    private ImageView micIcon; // CHANGES MADE HERE FOR MIC IMPLEMENTATION
-    private SpeechRecognizerHelper speechRecognizerHelper; // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+    private ImageView micIcon; // For mic implementation
+    private SpeechRecognizerHelper speechRecognizerHelper; // For mic implementation
+    private ArrayList<Event> eventList = new ArrayList<>(); // For event data
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,10 +55,10 @@ public class ChatActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.editTextMessage);
         sendButton = findViewById(R.id.buttonSend);
         exitButton = findViewById(R.id.exitButton);
-        micIcon = findViewById(R.id.micIcon); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+        micIcon = findViewById(R.id.micIcon); // For mic implementation
 
         messageList = new ArrayList<>();
-        chatAdapter = new ChatAdapter(messageList);
+        chatAdapter = new ChatAdapter(messageList, this);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         chatRecyclerView.setAdapter(chatAdapter);
 
@@ -67,40 +70,36 @@ public class ChatActivity extends AppCompatActivity {
         chatbotResponsesMap = new HashMap<>();
 
         // Initialize SpeechRecognizerHelper
-        speechRecognizerHelper = new SpeechRecognizerHelper(this, micIcon, new SpeechRecognizerHelper.OnSpeechResultListener() {
-            @Override
-            public void onSpeechResult(String text) {
-                messageInput.setText(text);
-            }
-        }); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+        speechRecognizerHelper = new SpeechRecognizerHelper(this, micIcon, text -> messageInput.setText(text)); // For mic implementation
 
-        micIcon.setOnClickListener(new View.OnClickListener() { // CHANGES MADE HERE FOR MIC IMPLEMENTATION
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    speechRecognizerHelper.startListening(); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
-                } else {
-                    ActivityCompat.requestPermissions(ChatActivity.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
-                }
+        micIcon.setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(ChatActivity.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                speechRecognizerHelper.startListening(); // For mic implementation
+            } else {
+                ActivityCompat.requestPermissions(ChatActivity.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION); // For mic implementation
             }
         });
 
         // Fetch chatbot responses from Firestore and store them in a map
-        dbHandler.getChatbotResponses(new FirestoreCallback<ChatbotResponse>() {
-            @Override
-            public void onCallback(ArrayList<ChatbotResponse> list) {
-                if (list != null) {
-                    for (ChatbotResponse response : list) {
-                        if (response != null && response.getQuestion() != null && response.getAnswer() != null) {
-                            String cleanedQuestion = cleanText(response.getQuestion());
-                            String cleanedAnswer = cleanText(response.getAnswer());
-                            chatbotResponsesMap.put(cleanedQuestion, cleanedAnswer);
-                        }
-                    }
-                    synchronized (dbHandler) {
-                        dbHandler.notifyAll(); // Notify that the data is ready
+        dbHandler.getChatbotResponses(list -> {
+            if (list != null) {
+                for (ChatbotResponse response : list) {
+                    if (response != null && response.getQuestion() != null && response.getAnswer() != null) {
+                        String cleanedQuestion = cleanText(response.getQuestion());
+                        String cleanedAnswer = cleanText(response.getAnswer());
+                        chatbotResponsesMap.put(cleanedQuestion, cleanedAnswer);
                     }
                 }
+                synchronized (dbHandler) {
+                    dbHandler.notifyAll(); // Notify that the data is ready
+                }
+            }
+        });
+
+        // Fetch event data from Firestore
+        dbHandler.getData(list -> {
+            if (list != null) {
+                eventList = list;
             }
         });
 
@@ -108,32 +107,24 @@ public class ChatActivity extends AppCompatActivity {
         messageList.add(new Message("Hello! How can I assist you today?", false));
         chatAdapter.notifyDataSetChanged();
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String messageText = messageInput.getText().toString();
-                if (!TextUtils.isEmpty(messageText)) {
-                    messageList.add(new Message(messageText, true));
-                    messageInput.setText("");
-                    chatAdapter.notifyDataSetChanged();
+        sendButton.setOnClickListener(v -> {
+            String messageText = messageInput.getText().toString();
+            if (!TextUtils.isEmpty(messageText)) {
+                messageList.add(new Message(messageText, true));
+                messageInput.setText("");
+                chatAdapter.notifyDataSetChanged();
 
-                    handleBotResponse(messageText);
-                }
+                handleBotResponse(messageText);
             }
         });
 
-        exitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Close the activity
-            }
-        });
+        exitButton.setOnClickListener(v -> finish()); // Close the activity
     }
 
     @Override
-    protected void onDestroy() { // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+    protected void onDestroy() {
         super.onDestroy();
-        speechRecognizerHelper.destroy(); // CHANGES MADE HERE FOR MIC IMPLEMENTATION
+        speechRecognizerHelper.destroy(); // For mic implementation
     }
 
     private void handleBotResponse(String messageText) {
@@ -141,7 +132,16 @@ public class ChatActivity extends AppCompatActivity {
         String correctedMessageText = correctSpelling(cleanedMessageText);
         String response = getBestResponse(cleanedMessageText);
 
-        if (response != null) {
+        // Check for artist matches
+        ArrayList<Event> matchedEvents = findEventsByArtist(cleanedMessageText);
+
+        if (!matchedEvents.isEmpty()) {
+            String artistName = matchedEvents.get(0).getArtist();
+            messageList.add(new Message("Here are the event details with the artist " + artistName + ". Click on the event card to find out more.", false));
+            chatAdapter.notifyDataSetChanged(); // Notify adapter to refresh
+
+            showMatchingEvents(matchedEvents);
+        } else if (response != null) {
             response = capitalizeFirstLetter(response); // Capitalize the first letter of the response
             messageList.add(new Message(response, false));
             hideSuggestedPrompts();
@@ -165,10 +165,7 @@ public class ChatActivity extends AppCompatActivity {
         chatAdapter.notifyDataSetChanged();
     }
 
-
     private boolean needsCorrection(String messageText) {
-        // Implement a simple heuristic to determine if the question is poorly structured
-        // You can extend this logic as needed
         return messageText.split("\\s+").length <= CONFIDENCE_THRESHOLD;
     }
 
@@ -180,6 +177,13 @@ public class ChatActivity extends AppCompatActivity {
 
     private void hideSuggestedPrompts() {
         suggestedPromptsRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void showMatchingEvents(ArrayList<Event> events) {
+        for (Event event : events) {
+            messageList.add(new Message(event)); // Add event as a message
+        }
+        chatAdapter.notifyDataSetChanged(); // Notify adapter to refresh
     }
 
     private void onSuggestedPromptClick(String prompt) {
@@ -214,12 +218,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private String correctSpelling(String input) {
+        CountDownLatch latch = new CountDownLatch(1);
         Set<String> dictionary;
+
         synchronized (dbHandler) {
             dictionary = dbHandler.getDictionary(); // Use dynamic dictionary
             if (dictionary.isEmpty()) {
                 try {
-                    dbHandler.wait(); // Wait until dictionary is populated
+                    latch.await(); // Wait until dictionary is populated
                     dictionary = dbHandler.getDictionary();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -251,12 +257,10 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
-        // Only return the corrected word if the distance is within the threshold
         return minDistance <= LEVENSHTEIN_THRESHOLD ? closestWord : word;
     }
 
     private int getMatchScore(String messageText, String text) {
-        // Normalize both messageText and text by removing punctuation and converting to lower case
         String cleanedMessageText = cleanText(messageText);
         String cleanedText = cleanText(text);
 
@@ -276,12 +280,27 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private String cleanText(String text) {
-        return text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();  
+        return text.replaceAll("[^a-zA-Z0-9 ]", "").toLowerCase().trim();
     }
+
     private String capitalizeFirstLetter(String text) {
         if (text == null || text.isEmpty()) {
             return text;
         }
         return text.substring(0, 1).toUpperCase() + text.substring(1);
+    }
+
+    private ArrayList<Event> findEventsByArtist(String artistName) {
+        ArrayList<Event> matchedEvents = new ArrayList<>();
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+        for (Event event : eventList) {
+            if (event.getArtist() != null) {
+                int distance = levenshtein.apply(artistName.toLowerCase(), event.getArtist().toLowerCase());
+                if (distance <= LEVENSHTEIN_THRESHOLD || event.getArtist().toLowerCase().contains(artistName.toLowerCase())) {
+                    matchedEvents.add(event);
+                }
+            }
+        }
+        return matchedEvents;
     }
 }
