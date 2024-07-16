@@ -148,12 +148,23 @@ public class ChatActivity extends AppCompatActivity {
         } else {
             if (!correctedMessageText.equals(cleanedMessageText)) {
                 messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
+                String correctedResponse = getBestResponse(correctedMessageText);
+                if (correctedResponse != null) {
+                    correctedResponse = capitalizeFirstLetter(correctedResponse);
+                    messageList.add(new Message(correctedResponse, false));
+                    hideSuggestedPrompts();
+                } else {
+                    messageList.add(new Message("I'm not sure how to respond to that.", false));
+                    showSuggestedPrompts();
+                }
+            } else {
+                messageList.add(new Message("I'm not sure how to respond to that.", false));
+                showSuggestedPrompts();
             }
-            messageList.add(new Message("I'm not sure how to respond to that.", false));
-            showSuggestedPrompts();
         }
         chatAdapter.notifyDataSetChanged();
     }
+
 
     private boolean needsCorrection(String messageText) {
         // Implement a simple heuristic to determine if the question is poorly structured
