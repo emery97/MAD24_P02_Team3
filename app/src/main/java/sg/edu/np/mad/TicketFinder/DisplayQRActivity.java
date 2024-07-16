@@ -2,14 +2,15 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -87,6 +88,8 @@ public class DisplayQRActivity extends AppCompatActivity {
         try {
             qrCodeData.put("data", jsonObject.toString());
             qrCodeData.put("status", "on-hold");
+            qrCodeData.put("usage", "Not Used");
+            qrCodeData.put("verify", "Not Verified");
 
             db.collection("QrCodes")
                     .add(qrCodeData)
@@ -113,8 +116,12 @@ public class DisplayQRActivity extends AppCompatActivity {
 
                     if (documentSnapshot != null && documentSnapshot.exists()) {
                         String status = documentSnapshot.getString("status");
-                        if ("waiting".equals(status)) {
-                            showAlert("Waiting for approval");
+                        String verifyStatus = documentSnapshot.getString("verify");
+
+                        // Check if the verify status is already "Verified"
+                        if ("waiting".equals(status) && !"Verified".equals(verifyStatus)) {
+                            // Prompt for email before showing the alert
+                            promptForEmailAndValidate(documentSnapshot);
                         }
                     } else {
                         Log.d(TAG, "Current data: null");
@@ -122,12 +129,60 @@ public class DisplayQRActivity extends AppCompatActivity {
                 });
     }
 
-    private void showAlert(String message) {
-        new AlertDialog.Builder(this)
-                .setTitle("Status")
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+
+    private void promptForEmailAndValidate(DocumentSnapshot documentSnapshot) {
+        // Create an EditText input field
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                .setTitle("Enter Email")
+                .setMessage("Please enter your email to proceed:")
+                .setView(input)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    String enteredEmail = input.getText().toString().trim();
+                    try {
+                        // Retrieve the email from the QR code JSON data
+                        String qrCodeEmail = new JSONObject(documentSnapshot.getString("data")).getString("email");
+
+                        // Compare the entered email with the email in the QR code JSON
+                        if (enteredEmail.equals(qrCodeEmail)) {
+                            // Update the "verify" field to "Verified" in Firestore
+                            documentSnapshot.getReference().update("verify", "Verified")
+                                    .addOnSuccessListener(aVoid -> {
+                                        showAlert("Email verified. Waiting for approval.");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "Error updating document", e);
+                                        Toast.makeText(this, "Failed to update verification status.", Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            Toast.makeText(this, "Email does not match. Please try again.", Toast.LENGTH_SHORT).show();
+                            promptForEmailAndValidate(documentSnapshot);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, "Error retrieving email from QR code data.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.cancel())
                 .show();
+    }
+
+    private void showAlert(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Status")
+                .setMessage(message);
+
+        // Create custom AlertDialog without any buttons
+        AlertDialog alertDialog = builder.create();
+
+        // Disable outside touch and back button to dismiss
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
+
+        // Show the dialog
+        alertDialog.show();
     }
 
     @Override

@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,7 +15,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -22,16 +26,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import javax.annotation.Nullable;
 
 public class DisplayQRDetails extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String eventTitle;
     private String eventDate;
+    private Button approvedbtn, rejectbtn;
+    private String qrCodeData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +48,24 @@ public class DisplayQRDetails extends AppCompatActivity {
         });
 
         Button viewMoreButton = findViewById(R.id.viewMoreButton);
+        approvedbtn = findViewById(R.id.Approvebtn);
+        rejectbtn = findViewById(R.id.Rejectbtn);
         LinearLayout additionalDetailsLayout = findViewById(R.id.additionalDetailsLayout);
         db = FirebaseFirestore.getInstance();
+
+        approvedbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateQrCodeStatus("approved");
+            }
+        });
+
+        rejectbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateQrCodeStatus("rejected");
+            }
+        });
 
         viewMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +80,7 @@ public class DisplayQRDetails extends AppCompatActivity {
             }
         });
 
-        String qrCodeData = getIntent().getStringExtra("qrCodeData");
+        qrCodeData = getIntent().getStringExtra("qrCodeData");
         TextView qrcode = findViewById(R.id.qrdata);
         qrcode.setText(qrCodeData);
 
@@ -73,6 +92,9 @@ public class DisplayQRDetails extends AppCompatActivity {
 
             // Check if event is valid
             checkEventValidity(eventTitle);
+
+            // Check verification status
+            checkVerificationStatus(qrCodeData);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -115,7 +137,6 @@ public class DisplayQRDetails extends AppCompatActivity {
             }
         });
     }
-
 
     private void displayEventDetails() {
         // Continue displaying event details here
@@ -174,5 +195,80 @@ public class DisplayQRDetails extends AppCompatActivity {
         Intent intent = new Intent(DisplayQRDetails.this, BookingHistoryDetails.class);
         startActivity(intent);
         finish(); // Finish current activity to prevent going back to it
+    }
+
+    private void checkVerificationStatus(String qrCodeData) {
+        db.collection("QrCodes")
+                .whereEqualTo("data", qrCodeData)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("DisplayQRDetails", "Listen failed.", e);
+                            return;
+                        }
+
+                        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                String verifyStatus = document.getString("verify");
+
+                                if ("Verified".equals(verifyStatus)) {
+                                    approvedbtn.setEnabled(true);
+                                    rejectbtn.setEnabled(true);
+                                } else {
+                                    approvedbtn.setEnabled(false);
+                                    rejectbtn.setEnabled(false);
+                                    Toast.makeText(DisplayQRDetails.this,
+                                            "Email not verified.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        } else {
+                            approvedbtn.setEnabled(false);
+                            rejectbtn.setEnabled(false);
+                            Toast.makeText(DisplayQRDetails.this,
+                                    "QR Code not found",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void updateQrCodeStatus(String status) {
+        db.collection("QrCodes")
+                .whereEqualTo("data", qrCodeData)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (!querySnapshot.isEmpty()) {
+                            for (QueryDocumentSnapshot document : querySnapshot) {
+                                // Get the reference to the document
+                                DocumentReference qrCodeRef = document.getReference();
+
+                                // Update the "status" field to the specified status ("approved")
+                                qrCodeRef.update("status", status, "usage", "Used")
+                                        .addOnSuccessListener(aVoid -> {
+                                            navigateBack();
+
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Handle the failure scenario, e.g., show an error message
+                                            Toast.makeText(DisplayQRDetails.this,
+                                                    "Failed to update QR Code status",
+                                                    Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        } else {
+                            Toast.makeText(DisplayQRDetails.this,
+                                    "QR Code not found",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(DisplayQRDetails.this,
+                                "Error querying QR Code",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
