@@ -23,6 +23,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +37,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -134,7 +137,7 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                 address.setText(fullAddress.toString());
 
                 // Get place ID
-                getPlaceIdFromCoordinates(venueAddress.getLatitude(), venueAddress.getLongitude());
+                getPlaceId();
             }
         } else {
             Log.e("maps", "Event location is null");
@@ -162,16 +165,14 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
         return p1;
     }
-    private void getPlaceIdFromCoordinates(double latitude, double longitude) {
+    private void getPlaceId() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         GeocodingService service = retrofit.create(GeocodingService.class);
-        String latlng = latitude + "," + longitude;
 
-        Call<GeocodingResponse> call = service.getReverseGeocodingData(latlng, API_KEY);
         Call<GeocodingResponse> call2 = service.getGeocodingData(eventObj.getVenue(), API_KEY);
         call2.enqueue(new Callback<GeocodingResponse>() {
             @Override
@@ -277,21 +278,18 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         }
 
         TextView ratingTextView = findViewById(R.id.ratingTextView);
-        ratingTextView.setText(String.valueOf(result.rating));
+        ratingTextView.setText(result.rating + "/5");
 
         TextView totalRatingsTextView = findViewById(R.id.totalRatingsTextView);
         totalRatingsTextView.setText(String.valueOf(result.user_ratings_total));
 
-        /*
-        // Example of handling reviews
         if (result.reviews != null && !result.reviews.isEmpty()) {
-            // Display reviews in a RecyclerView or similar UI component
-            // Example:
-            RecyclerView recyclerView = findViewById(R.id.reviewsRecyclerView);
-            recyclerView.setAdapter(new ReviewsAdapter(result.reviews));
+            CardView reviewsHolder = findViewById(R.id.reviewsHolder);
+            RecyclerView recyclerView = findViewById(R.id.reviewRecyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(new VenueReviewAdapter(result.reviews));
+            reviewsHolder.setVisibility(View.VISIBLE);
         }
-
-         */
     }
 
     private void loadPlaceImage(String photoReference) {
