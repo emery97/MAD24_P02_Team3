@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -237,43 +238,49 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
     private void updateUIWithPlaceDetails(PlacesResponse.Result result) {
 
         if (result.photos != null && !result.photos.isEmpty()) {
+            CardView venueImageHolder = findViewById(R.id.venueImageHolder);
             String photoReference = result.photos.get(0).photo_reference;
             loadPlaceImage(photoReference);
+            venueImageHolder.setVisibility(View.VISIBLE);
         }
 
         if (result.opening_hours != null) {
+            CardView openingHoursHolder = findViewById(R.id.openingHoursHolder);
             StringBuilder openingHours = new StringBuilder();
             for (String hour : result.opening_hours.weekday_text) {
                 openingHours.append(hour).append("\n");
             }
             TextView openingHoursTextView = findViewById(R.id.openingHours);
             openingHoursTextView.setText(openingHours.toString().trim());
-            openingHoursTextView.setVisibility(View.VISIBLE);
+            openingHoursHolder.setVisibility(View.VISIBLE);
         }
 
         if (result.international_phone_number != null) {
+            CardView phoneNumberHolder = findViewById(R.id.phoneNumberHolder);
             TextView phoneNumberTextView = findViewById(R.id.phoneNumberTextView);
             phoneNumberTextView.setText(result.international_phone_number);
-            phoneNumberTextView.setVisibility(View.VISIBLE);
+            phoneNumberHolder.setVisibility(View.VISIBLE);
         }
 
         if (result.website != null) {
+            CardView websiteHolder = findViewById(R.id.websiteHolder);
             TextView websiteTextView = findViewById(R.id.websiteTextView);
             websiteTextView.setText(result.website);
-            websiteTextView.setVisibility(View.VISIBLE);
+            websiteHolder.setVisibility(View.VISIBLE);
         }
 
+        TextView wheelchairTextView = findViewById(R.id.wheelchairTextView);
         if (result.wheelchair_accessible_entrance) {
-            // Show wheelchair accessible information
+            wheelchairTextView.setText("Yes");
         } else {
-            // Handle case where entrance is not wheelchair accessible
+            wheelchairTextView.setText("No");
         }
 
         TextView ratingTextView = findViewById(R.id.ratingTextView);
-        ratingTextView.setText("Rating: " + result.rating);
+        ratingTextView.setText(String.valueOf(result.rating));
 
         TextView totalRatingsTextView = findViewById(R.id.totalRatingsTextView);
-        totalRatingsTextView.setText("Total Ratings: " + result.user_ratings_total);
+        totalRatingsTextView.setText(String.valueOf(result.user_ratings_total));
 
         /*
         // Example of handling reviews
@@ -295,7 +302,5 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
         Glide.with(this)
                 .load(photoUrl)
                 .into(venueImageView);
-
-        venueImageView.setVisibility(View.VISIBLE);
     }
 }
