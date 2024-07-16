@@ -323,6 +323,4 @@ public class ChatActivity extends AppCompatActivity {
         }
         return matchedEvents;
     }
-
-
 }
