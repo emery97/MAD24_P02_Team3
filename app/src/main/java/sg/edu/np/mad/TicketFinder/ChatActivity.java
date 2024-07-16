@@ -3,6 +3,7 @@ package sg.edu.np.mad.TicketFinder;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +40,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
     private HashMap<String, String> chatbotResponsesMap;
-    private static final int LEVENSHTEIN_THRESHOLD = 3; // Threshold for Levenshtein Distance
+    private static final int LEVENSHTEIN_THRESHOLD = 5; // Threshold for Levenshtein Distance
     private static final int CONFIDENCE_THRESHOLD = 2; // Threshold for structured questions
     private ImageView micIcon; // For mic implementation
     private SpeechRecognizerHelper speechRecognizerHelper; // For mic implementation
@@ -130,23 +131,30 @@ public class ChatActivity extends AppCompatActivity {
     private void handleBotResponse(String messageText) {
         String cleanedMessageText = cleanText(messageText);
         String correctedMessageText = correctSpelling(cleanedMessageText);
-        String response = getBestResponse(cleanedMessageText);
 
-        // Check for artist matches
+        // First, check for artist matches
         ArrayList<Event> matchedEvents = findEventsByArtist(cleanedMessageText);
-
         if (!matchedEvents.isEmpty()) {
             String artistName = matchedEvents.get(0).getArtist();
+            Log.d("ChatActivity", "Artist detected: " + artistName);
             messageList.add(new Message("Here are the event details with the artist " + artistName + ". Click on the event card to find out more.", false));
             chatAdapter.notifyDataSetChanged(); // Notify adapter to refresh
-
             showMatchingEvents(matchedEvents);
-        } else if (response != null) {
+            return; // Exit the method after displaying events
+        } else {
+            Log.d("ChatActivity", "No artist detected.");
+        }
+
+        // If no artist matches, proceed with usual chatbot responses
+        String response = getBestResponse(cleanedMessageText);
+        if (response != null) {
+            Log.d("ChatActivity", "Database response found.");
             response = capitalizeFirstLetter(response); // Capitalize the first letter of the response
             messageList.add(new Message(response, false));
             hideSuggestedPrompts();
         } else {
             if (!correctedMessageText.equals(cleanedMessageText)) {
+                Log.d("ChatActivity", "Corrected message text: " + correctedMessageText);
                 messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
                 String correctedResponse = getBestResponse(correctedMessageText);
                 if (correctedResponse != null) {
@@ -164,6 +172,8 @@ public class ChatActivity extends AppCompatActivity {
         }
         chatAdapter.notifyDataSetChanged();
     }
+
+
 
     private boolean needsCorrection(String messageText) {
         return messageText.split("\\s+").length <= CONFIDENCE_THRESHOLD;
@@ -290,17 +300,29 @@ public class ChatActivity extends AppCompatActivity {
         return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
-    private ArrayList<Event> findEventsByArtist(String artistName) {
+    private ArrayList<Event> findEventsByArtist(String inputText) {
         ArrayList<Event> matchedEvents = new ArrayList<>();
         LevenshteinDistance levenshtein = new LevenshteinDistance();
+        String cleanedInputText = cleanText(inputText);
+
+        Log.d("ChatActivity", "Cleaned input text for artist search: " + cleanedInputText);
+
         for (Event event : eventList) {
             if (event.getArtist() != null) {
-                int distance = levenshtein.apply(artistName.toLowerCase(), event.getArtist().toLowerCase());
-                if (distance <= LEVENSHTEIN_THRESHOLD || event.getArtist().toLowerCase().contains(artistName.toLowerCase())) {
+                String cleanedArtistName = cleanText(event.getArtist());
+                int distance = levenshtein.apply(cleanedInputText, cleanedArtistName);
+
+                Log.d("ChatActivity", "Comparing with artist: " + cleanedArtistName + ", Distance: " + distance);
+
+                // Adjusted condition for better matching
+                if (distance <= LEVENSHTEIN_THRESHOLD || cleanedArtistName.contains(cleanedInputText) || cleanedInputText.contains(cleanedArtistName)) {
+                    Log.d("ChatActivity", "Artist match found: " + event.getArtist());
                     matchedEvents.add(event);
                 }
             }
         }
         return matchedEvents;
     }
+
+
 }
