@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import android.Manifest;
@@ -40,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messageList;
     private dbHandler dbHandler;
     private HashMap<String, String> chatbotResponsesMap;
-    private static final int LEVENSHTEIN_THRESHOLD = 5; // Threshold for Levenshtein Distance
+    private static final int LEVENSHTEIN_THRESHOLD = 3; // Adjusted threshold for better matching
     private static final int CONFIDENCE_THRESHOLD = 2; // Threshold for structured questions
     private ImageView micIcon; // For mic implementation
     private SpeechRecognizerHelper speechRecognizerHelper; // For mic implementation
@@ -133,7 +132,7 @@ public class ChatActivity extends AppCompatActivity {
         String correctedMessageText = correctSpelling(cleanedMessageText);
 
         // First, check for artist matches
-        ArrayList<Event> matchedEvents = findEventsByArtist(cleanedMessageText);
+        ArrayList<Event> matchedEvents = findEventsByArtist(correctedMessageText);
         if (!matchedEvents.isEmpty()) {
             String artistName = matchedEvents.get(0).getArtist();
             Log.d("ChatActivity", "Artist detected: " + artistName);
@@ -146,37 +145,88 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         // If no artist matches, proceed with usual chatbot responses
-        String response = getBestResponse(cleanedMessageText);
-        if (response != null) {
-            Log.d("ChatActivity", "Database response found.");
-            response = capitalizeFirstLetter(response); // Capitalize the first letter of the response
-            messageList.add(new Message(response, false));
-            hideSuggestedPrompts();
+        if (isGibberish(correctedMessageText)) {
+            Log.d("ChatActivity", "Message is gibberish, showing suggested prompts.");
+            messageList.add(new Message("I'm not sure how to respond to that. Here are some suggestions:", false));
+            showSuggestedPrompts();
         } else {
-            if (!correctedMessageText.equals(cleanedMessageText)) {
-                Log.d("ChatActivity", "Corrected message text: " + correctedMessageText);
-                messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
-                String correctedResponse = getBestResponse(correctedMessageText);
-                if (correctedResponse != null) {
-                    correctedResponse = capitalizeFirstLetter(correctedResponse);
-                    messageList.add(new Message(correctedResponse, false));
-                    hideSuggestedPrompts();
+            String response = getBestResponse(correctedMessageText);
+            if (response != null) {
+                Log.d("ChatActivity", "Database response found.");
+                response = capitalizeFirstLetter(response); // Capitalize the first letter of the response
+                messageList.add(new Message(response, false));
+                hideSuggestedPrompts();
+            } else {
+                if (!correctedMessageText.equals(cleanedMessageText)) {
+                    Log.d("ChatActivity", "Corrected message text: " + correctedMessageText);
+                    messageList.add(new Message("Did you mean: " + correctedMessageText + "?", false));
+                    String correctedResponse = getBestResponse(correctedMessageText);
+                    if (correctedResponse != null) {
+                        correctedResponse = capitalizeFirstLetter(correctedResponse);
+                        messageList.add(new Message(correctedResponse, false));
+                        hideSuggestedPrompts();
+                    } else {
+                        messageList.add(new Message("I'm not sure how to respond to that.", false));
+                        showSuggestedPrompts();
+                    }
                 } else {
                     messageList.add(new Message("I'm not sure how to respond to that.", false));
                     showSuggestedPrompts();
                 }
-            } else {
-                messageList.add(new Message("I'm not sure how to respond to that.", false));
-                showSuggestedPrompts();
             }
         }
         chatAdapter.notifyDataSetChanged();
     }
 
+    private String correctSpelling(String input) {
+        Set<String> dictionary = dbHandler.getDictionary(); // Ensure the dictionary is loaded
+        String[] words = input.split("\\s+");
+        StringBuilder correctedInput = new StringBuilder();
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
 
+        for (String word : words) {
+            String correctedWord = word;
+            int minDistance = Integer.MAX_VALUE;
 
-    private boolean needsCorrection(String messageText) {
-        return messageText.split("\\s+").length <= CONFIDENCE_THRESHOLD;
+            for (String dictWord : dictionary) {
+                int distance = levenshtein.apply(word, dictWord);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    correctedWord = dictWord;
+                }
+            }
+
+            // Only replace the word if the minimum distance is within the threshold
+            if (minDistance <= LEVENSHTEIN_THRESHOLD) {
+                correctedInput.append(correctedWord).append(" ");
+            } else {
+                correctedInput.append(word).append(" ");
+            }
+        }
+
+        return correctedInput.toString().trim();
+    }
+
+    private boolean isGibberish(String messageText) {
+        Set<String> dictionary = dbHandler.getDictionary();
+        String[] words = messageText.split("\\s+");
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+        int gibberishCount = 0;
+
+        for (String word : words) {
+            int minDistance = Integer.MAX_VALUE;
+            for (String dictWord : dictionary) {
+                int distance = levenshtein.apply(word, dictWord);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
+            if (minDistance > LEVENSHTEIN_THRESHOLD) {
+                gibberishCount++;
+            }
+        }
+
+        return gibberishCount >= (words.length * 0.75); // If 75% or more words are considered gibberish
     }
 
     private void showSuggestedPrompts() {
@@ -204,89 +254,28 @@ public class ChatActivity extends AppCompatActivity {
 
     private String getBestResponse(String messageText) {
         String bestResponse = null;
-        int bestMatchScore = 0;
+        double bestMatchScore = Double.MAX_VALUE; // Lower score means better match
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
 
         for (HashMap.Entry<String, String> entry : chatbotResponsesMap.entrySet()) {
             String question = entry.getKey();
             String answer = entry.getValue();
 
-            int questionMatchScore = getMatchScore(messageText, question);
-            int answerMatchScore = getMatchScore(messageText, answer);
+            double questionMatchScore = levenshtein.apply(messageText, question) / (double) Math.max(messageText.length(), question.length());
+            double answerMatchScore = levenshtein.apply(messageText, answer) / (double) Math.max(messageText.length(), answer.length());
 
-            if (questionMatchScore > bestMatchScore) {
+            if (questionMatchScore < bestMatchScore) {
                 bestMatchScore = questionMatchScore;
                 bestResponse = answer;
             }
 
-            if (answerMatchScore > bestMatchScore) {
+            if (answerMatchScore < bestMatchScore) {
                 bestMatchScore = answerMatchScore;
                 bestResponse = answer;
             }
         }
 
-        return bestMatchScore > 0 ? bestResponse : null;
-    }
-
-    private String correctSpelling(String input) {
-        CountDownLatch latch = new CountDownLatch(1);
-        Set<String> dictionary;
-
-        synchronized (dbHandler) {
-            dictionary = dbHandler.getDictionary(); // Use dynamic dictionary
-            if (dictionary.isEmpty()) {
-                try {
-                    latch.await(); // Wait until dictionary is populated
-                    dictionary = dbHandler.getDictionary();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        String[] words = input.split("\\s+");
-        StringBuilder correctedInput = new StringBuilder();
-
-        for (String word : words) {
-            String correctedWord = correctWord(word);
-            correctedInput.append(correctedWord).append(" ");
-        }
-
-        return correctedInput.toString().trim();
-    }
-
-    private String correctWord(String word) {
-        LevenshteinDistance levenshtein = new LevenshteinDistance();
-        String closestWord = word;
-        int minDistance = Integer.MAX_VALUE;
-
-        for (String dictWord : dbHandler.getDictionary()) {
-            int distance = levenshtein.apply(word, dictWord);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestWord = dictWord;
-            }
-        }
-
-        return minDistance <= LEVENSHTEIN_THRESHOLD ? closestWord : word;
-    }
-
-    private int getMatchScore(String messageText, String text) {
-        String cleanedMessageText = cleanText(messageText);
-        String cleanedText = cleanText(text);
-
-        String[] messageWords = cleanedMessageText.split("\\s+");
-        String[] textWords = cleanedText.split("\\s+");
-        int matchCount = 0;
-
-        for (String messageWord : messageWords) {
-            for (String textWord : textWords) {
-                if (messageWord.equalsIgnoreCase(textWord)) {
-                    matchCount++;
-                }
-            }
-        }
-
-        return matchCount;
+        return bestMatchScore < LEVENSHTEIN_THRESHOLD ? bestResponse : null;
     }
 
     private String cleanText(String text) {
@@ -315,7 +304,7 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d("ChatActivity", "Comparing with artist: " + cleanedArtistName + ", Distance: " + distance);
 
                 // Adjusted condition for better matching
-                if (distance <= LEVENSHTEIN_THRESHOLD || cleanedArtistName.contains(cleanedInputText) || cleanedInputText.contains(cleanedArtistName)) {
+                if (cleanedArtistName.contains(cleanedInputText) || cleanedInputText.contains(cleanedArtistName)) {
                     Log.d("ChatActivity", "Artist match found: " + event.getArtist());
                     matchedEvents.add(event);
                 }
