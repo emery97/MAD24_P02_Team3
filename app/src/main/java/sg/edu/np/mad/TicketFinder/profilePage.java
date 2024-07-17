@@ -186,7 +186,7 @@ public class profilePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Show confirmation dialog
-                new AlertDialog.Builder(profilePage.this)
+                new AlertDialog.Builder(profilePage.this, R.style.CustomAlertDialogTheme)
                         .setTitle("Delete Account")
                         .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
