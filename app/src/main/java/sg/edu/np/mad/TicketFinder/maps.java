@@ -240,8 +240,9 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
         if (result.photos != null && !result.photos.isEmpty()) {
             CardView venueImageHolder = findViewById(R.id.venueImageHolder);
-            String photoReference = result.photos.get(0).photo_reference;
-            loadPlaceImage(photoReference);
+            RecyclerView venueImageRecyclerView = findViewById(R.id.venueImageRecyclerView);
+            venueImageRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            venueImageRecyclerView.setAdapter(new VenueImageAdapter(this, result.photos));
             venueImageHolder.setVisibility(View.VISIBLE);
         }
 
@@ -290,15 +291,5 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
             recyclerView.setAdapter(new VenueReviewAdapter(result.reviews));
             reviewsHolder.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void loadPlaceImage(String photoReference) {
-        String photoUrl = BASE_URL + "place/photo?maxwidth=400&photoreference=" + photoReference + "&key=" + API_KEY;
-        Log.d(TAG, "Photo URL: " + photoUrl);
-
-        ImageView venueImageView = findViewById(R.id.venueImage);
-        Glide.with(this)
-                .load(photoUrl)
-                .into(venueImageView);
     }
 }

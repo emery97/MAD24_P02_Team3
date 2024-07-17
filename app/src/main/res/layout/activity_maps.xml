@@ -121,16 +121,16 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Venue Image"
+                            android:text="Venue Images"
                             android:textSize="28sp"
                             android:textStyle="bold" />
 
-                        <ImageView
-                            android:id="@+id/venueImage"
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/venueImageRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
                             android:layout_marginTop="8dp"
-                            android:scaleType="centerCrop" />
+                            android:orientation="horizontal" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
