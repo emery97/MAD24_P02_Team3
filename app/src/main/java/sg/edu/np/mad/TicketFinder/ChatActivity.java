@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import android.Manifest;
@@ -226,7 +227,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
-        return gibberishCount >= (words.length * 0.75); // If 75% or more words are considered gibberish
+        return gibberishCount == words.length; // If all words are considered gibberish
     }
 
     private void showSuggestedPrompts() {
@@ -304,7 +305,7 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d("ChatActivity", "Comparing with artist: " + cleanedArtistName + ", Distance: " + distance);
 
                 // Adjusted condition for better matching
-                if (cleanedArtistName.contains(cleanedInputText) || cleanedInputText.contains(cleanedArtistName)) {
+                if (distance <= LEVENSHTEIN_THRESHOLD || cleanedArtistName.contains(cleanedInputText) || cleanedInputText.contains(cleanedArtistName)) {
                     Log.d("ChatActivity", "Artist match found: " + event.getArtist());
                     matchedEvents.add(event);
                 }
