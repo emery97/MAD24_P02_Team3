@@ -284,19 +284,27 @@ public class SignIn extends Fragment {
 
     // Prompt the user if they want to retrieve saved credentials
     private void promptRetrieveCredentials() {
-        new AlertDialog.Builder(getActivity())
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialogTheme)
                 .setTitle("Retrieve Saved Credentials")
                 .setMessage("Do you want to retrieve your saved email and password?")
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton(android.R.string.yes, (dialogInterface, which) -> {
                     promptBiometricForRetrieve();
                 })
-                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                .setNegativeButton(android.R.string.no, (dialogInterface, which) -> {
                     // User chose not to retrieve saved credentials
                     emailField.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
                     passwordField.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
                 })
-                .show();
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+        });
+
+        dialog.show();
     }
+
 
     // Prompt for biometric authentication before retrieving credentials
     private void promptBiometricForRetrieve() {
@@ -346,18 +354,25 @@ public class SignIn extends Fragment {
 
     // Prompt the user to save the password for autofill with biometric
     private void promptSavePasswordAutofill(String email, String password) {
-        new AlertDialog.Builder(getActivity())
+        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialogTheme)
                 .setTitle("Save Email and Password")
                 .setMessage("Do you want to save your email and password for autofill?")
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                .setPositiveButton(android.R.string.yes, (dialogInterface, which) -> {
                     promptBiometricForSave(email, password);
                 })
-                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                .setNegativeButton(android.R.string.no, (dialogInterface, which) -> {
                     if (loginSuccessListener != null) {
                         loginSuccessListener.onLoginSuccess();
                     }
                 })
-                .show();
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+        });
+
+        dialog.show();
     }
 
     // Prompt for biometric authentication before saving credentials
