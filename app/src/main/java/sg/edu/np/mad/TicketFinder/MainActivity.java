@@ -139,12 +139,20 @@ public class MainActivity extends AppCompatActivity implements Register.OnRegist
         Spinner genreSpinner3 = findViewById(R.id.genreSpinner3);
         Button saveButton = findViewById(R.id.saveButton);
 
-        // Fetch event types from Firestore
+        // Fetch event data and extract genres
         dbHandler handler = new dbHandler();
-        handler.getEventTypes(new FirestoreCallback<String>() {
+        handler.getData(new FirestoreCallback<Event>() {
             @Override
-            public void onCallback(ArrayList<String> eventTypeList) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, eventTypeList);
+            public void onCallback(ArrayList<Event> eventList) {
+                ArrayList<String> genres = new ArrayList<>();
+                for (Event event : eventList) {
+                    String genre = event.getGenre();
+                    if (genre != null && !genres.contains(genre)) {
+                        genres.add(genre);
+                    }
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, genres);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
                 genreSpinner1.setAdapter(adapter);
@@ -161,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements Register.OnRegist
             savePreferences(userId, choice1, choice2, choice3);
         });
     }
+
 
     private void savePreferences(String userId, String choice1, String choice2, String choice3) {
         Map<String, Object> preferences = new HashMap<>();
