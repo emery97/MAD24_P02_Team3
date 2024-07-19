@@ -255,7 +255,6 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -269,7 +268,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -305,11 +303,14 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private final Map<String, String> keywordToDocIdMap = new HashMap<>();
     private final Map<String, String> chatbotResponsesMap = new HashMap<>();
     private final List<String> questionsList = new ArrayList<>();
+    private ArrayList<Event> eventsList = new ArrayList<>(); // Store events
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private boolean permissionToRecordAccepted = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
     private ImageView micIcon;
     private SpeechRecognizerHelper speechRecognizerHelper;
+    private EventAdapter eventAdapter;
+
 
 
     @Override
@@ -324,6 +325,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
         messageList = new ArrayList<>();
         chatAdapter = new ChatAdapter(this, messageList);
         suggestedPromptAdapter = new SuggestedPromptAdapter(new ArrayList<>(), this::onSuggestedPromptClick);
+        eventAdapter = new EventAdapter(this, new ArrayList<>(), false); // ******** changes made here
 
         firestoreDb = FirebaseFirestore.getInstance();
         firebaseSmartReply = FirebaseNaturalLanguage.getInstance().getSmartReply();
@@ -357,7 +359,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
         });
 
         fetchQuestionsFromFirestore();
-
+        fetchEventsFromFirestore();
         showGreetingMsg();
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -421,8 +423,23 @@ public class TicketFinderChatbot extends AppCompatActivity {
         });
     }
 
+
+    private void fetchEventsFromFirestore() {
+        dbHandler db = new dbHandler();
+        db.getData(new FirestoreCallback<Event>() {
+            @Override
+            public void onCallback(ArrayList<Event> list) {
+                eventsList = list; // Populate eventsList with the fetched data
+                for (Event event : eventsList) {
+                    Log.d("fetchEventsFromFirestore", "Artist: " + event.getArtist());
+                }
+                Log.d("fetchEvents", "Events fetched successfully: " + eventsList.size());
+            }
+        });
+    }
+
     private void showGreetingMsg() {
-        String welcomeMessage = "Hi my name is Joe Yi! Feel free to ask me any questions related to events!'.";
+        String welcomeMessage = "Hi my name is Joe Yi! Feel free to ask me any questions related to events!";
         messageList.add(new Message(welcomeMessage, false));
         chatAdapter.notifyDataSetChanged();
         chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
@@ -442,6 +459,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
             return;
         }
 
+        // Check for event titles or artist names
+        if (checkForArtistMatch(message)) {
+            hideSuggestedPrompts();
+            return;
+        }
+
         String closestKeyword = findClosestKeyword(message);
         Log.d("handleUserMessage", "Closest keyword: " + closestKeyword);
         if (closestKeyword != null) {
@@ -453,6 +476,34 @@ public class TicketFinderChatbot extends AppCompatActivity {
         }
     }
 
+    private boolean checkForArtistMatch(String message) {
+        String[] userWords = message.split(" ");
+        for (Event event : eventsList) {
+            String artist = event.getArtist().toLowerCase();
+
+            // Check for full artist name match
+            for (String userWord : userWords) {
+                if (getLevenshteinDistance(userWord.toLowerCase(), artist) <= 1) {
+                    messageList.add(new Message(event));
+                    chatAdapter.notifyDataSetChanged();
+                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    return true;
+                }
+            }
+
+            // Check for partial artist name match (two words from user match with artist name)
+            for (int i = 0; i < userWords.length - 1; i++) {
+                String combinedUserWords = userWords[i].toLowerCase() + " " + userWords[i + 1].toLowerCase();
+                if (getLevenshteinDistance(combinedUserWords, artist) <= 2) {
+                    messageList.add(new Message(event));
+                    chatAdapter.notifyDataSetChanged();
+                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private void generateSmartReply(String message) {
         List<FirebaseTextMessage> conversation = new ArrayList<>();
@@ -499,6 +550,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     }
                 });
     }
+
 
 //    private void generateSmartReply(String message) {
 //        List<FirebaseTextMessage> conversation = new ArrayList<>();

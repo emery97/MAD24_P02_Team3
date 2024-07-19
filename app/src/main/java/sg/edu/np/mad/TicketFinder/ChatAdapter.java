@@ -15,6 +15,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_USER = 0;
     private static final int VIEW_TYPE_BOT = 1;
+    private static final int VIEW_TYPE_EVENT = 2;
 
     private final Context context;
     private final ArrayList<Message> messageList;
@@ -31,9 +32,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (viewType == VIEW_TYPE_USER) {
             view = LayoutInflater.from(context).inflate(R.layout.user_message, parent, false);
             return new UserViewHolder(view);
-        } else {
+        } else if (viewType == VIEW_TYPE_BOT) {
             view = LayoutInflater.from(context).inflate(R.layout.bot_message, parent, false);
             return new BotViewHolder(view);
+        } else {
+            view = LayoutInflater.from(context).inflate(R.layout.item_event, parent, false);
+            return new EventAdapter.EventViewHolder(view); // ******** changes made here
         }
     }
 
@@ -42,14 +46,23 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Message message = messageList.get(position);
         if (holder.getItemViewType() == VIEW_TYPE_USER) {
             ((UserViewHolder) holder).bind(message);
-        } else {
+        } else if (holder.getItemViewType() == VIEW_TYPE_BOT) {
             ((BotViewHolder) holder).bind(message);
+        } else {
+            ((EventAdapter.EventViewHolder) holder).bind(message.getEvent());
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        return messageList.get(position).isUser() ? VIEW_TYPE_USER : VIEW_TYPE_BOT;
+        Message message = messageList.get(position);
+        if (message.isUser()) {
+            return VIEW_TYPE_USER;
+        } else if (message.getEvent() != null) {
+            return VIEW_TYPE_EVENT;
+        } else {
+            return VIEW_TYPE_BOT;
+        }
     }
 
     @Override

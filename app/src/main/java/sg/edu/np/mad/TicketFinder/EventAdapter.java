@@ -180,6 +180,18 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             eventArtist = itemView.findViewById(R.id.eventArtist);
             eventDate = itemView.findViewById(R.id.eventDate);
         }
+        public void bind(Event event) {
+            eventTitle.setText(event.getTitle());
+            eventArtist.setText(event.getArtist());
+            eventDate.setText(event.getDate().format(DateTimeFormatter.ofPattern("dd LLLL yyyy")));
+            Glide.with(eventImage.getContext()).load(event.getImgUrl()).into(eventImage);
+
+            eventCard.setOnClickListener(v -> {
+                Intent intent = new Intent(eventCard.getContext(), EventDetails.class);
+                intent.putExtra("event", event);
+                eventCard.getContext().startActivity(intent);
+            });
+        }
     }
 
     // Default constructor to maintain compatibility with existing code
@@ -205,32 +217,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     // putting data in each item_event / item_event_grid xml
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
-        // get event
         Event event = eventList.get(position);
-
-        // format date
-        LocalDate eventObjDate = event.getDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd LLLL yyyy");
-        String formattedDate = eventObjDate.format(formatter);
-
-        // set values
-        holder.eventTitle.setText(event.getTitle());
-        holder.eventArtist.setText(event.getArtist());
-        holder.eventDate.setText(formattedDate);
-        // set image with Glide
-        Glide.with(context)
-                .load(event.getImgUrl())
-                .into(holder.eventImage);
-
-        // when clicking on event, sends to the event's respective eventDetails page
-        holder.eventCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, EventDetails.class);
-                intent.putExtra("event", event); // sending event data
-                context.startActivity(intent);
-            }
-        });
+        holder.bind(event); // bind method here
     }
 
     @Override
