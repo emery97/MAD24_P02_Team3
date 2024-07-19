@@ -352,7 +352,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         });
     }
-
     private void fetchQuestionsFromFirestore() {
         AsyncTask.execute(new Runnable() {
             @Override
