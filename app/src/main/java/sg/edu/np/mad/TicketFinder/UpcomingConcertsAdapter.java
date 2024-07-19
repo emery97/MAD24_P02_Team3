@@ -47,6 +47,7 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
         holder.time.setText(bookingDetails.gettime());
         holder.seatCategory.setText("Seat Category: " + bookingDetails.getSeatCategory());
         holder.seatNumber.setText("Seat Number: " + bookingDetails.getSeatNumber());
+        holder.time.setText("Concert Date: " + bookingDetails.gettime());
         holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
         holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
         holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());

@@ -144,12 +144,15 @@
 
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
@@ -246,6 +249,14 @@ public class homepage extends AppCompatActivity {
 
         // Fetch event list
         getEventList();
+
+        // Set OnClickListener for Find Friends button
+        Button findFriendsButton = findViewById(R.id.findFriends);
+        findFriendsButton.setOnClickListener(v -> {
+            Log.d("FRIENDDS BUTTON", "onCreate: ");
+            Intent intent = new Intent(homepage.this, FriendsActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadUserPreferences() {
