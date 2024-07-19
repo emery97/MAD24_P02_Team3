@@ -23,7 +23,7 @@ public class SuggestedPromptAdapter extends RecyclerView.Adapter<SuggestedPrompt
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_suggested_prompt, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.suggestion_prompt, parent, false);
         return new ViewHolder(view);
     }
 
