@@ -397,14 +397,14 @@ public class TicketFinderChatbot extends AppCompatActivity {
         Log.d("handleUserMessage", "Received message: " + message);
 
         // Check for common greetings first
-//        if (isGreeting(message)) {
-//            String greetingResponse = getGreetingResponse();
-//            messageList.add(new Message(greetingResponse, false));
-//            chatAdapter.notifyDataSetChanged();
-//            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//            hideSuggestedPrompts();
-//            return;
-//        }
+        if (isGreeting(message)) {
+            String greetingResponse = getGreetingResponse();
+            messageList.add(new Message(greetingResponse, false));
+            chatAdapter.notifyDataSetChanged();
+            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+            hideSuggestedPrompts();
+            return;
+        }
 
         String closestKeyword = findClosestKeyword(message);
         Log.d("handleUserMessage", "Closest keyword: " + closestKeyword);
@@ -418,52 +418,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
     }
 
 
-//    private void generateSmartReply(String message) {
-//        List<FirebaseTextMessage> conversation = new ArrayList<>();
-//        for (Message msg : messageList) {
-//            if (msg.isUser()) {
-//                conversation.add(FirebaseTextMessage.createForLocalUser(msg.getMessage(), System.currentTimeMillis()));
-//            } else {
-//                conversation.add(FirebaseTextMessage.createForRemoteUser(msg.getMessage(), System.currentTimeMillis(), "bot"));
-//            }
-//        }
-//
-//        firebaseSmartReply.suggestReplies(conversation)
-//                .addOnCompleteListener(new OnCompleteListener<SmartReplySuggestionResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<SmartReplySuggestionResult> task) {
-//                        if (task.isSuccessful()) {
-//                            SmartReplySuggestionResult result = task.getResult();
-//                            if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
-//                                messageList.add(new Message("I don't understand the question.", false));
-//                                showSuggestedPrompts();
-//                            } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
-//                                List<SmartReplySuggestion> suggestions = result.getSuggestions();
-//                                if (!suggestions.isEmpty()) {
-//                                    String reply = suggestions.get(0).getText();
-//                                    if (isGenericReply(reply)) {
-//                                        messageList.add(new Message("I don't understand the question.", false));
-//                                        showSuggestedPrompts();
-//                                    } else {
-//                                        messageList.add(new Message(reply, false));
-//                                        hideSuggestedPrompts();
-//                                    }
-//                                    Log.d("SmartReply", "Reply: " + reply);
-//                                } else {
-//                                    messageList.add(new Message("I don't understand the question.", false));
-//                                    Log.d("SmartReply", "No suggestions available.");
-//                                    showSuggestedPrompts();
-//                                }
-//                            }
-//                            chatAdapter.notifyDataSetChanged();
-//                            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//                        } else {
-//                            Log.e("SmartReply", "Smart Reply task failed", task.getException());
-//                        }
-//                    }
-//                });
-//    }
-
     private void generateSmartReply(String message) {
         List<FirebaseTextMessage> conversation = new ArrayList<>();
         for (Message msg : messageList) {
@@ -474,28 +428,19 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         }
 
-        // Log the conversation for debugging
-        Log.d("SmartReply", "Conversation for Smart Reply:");
-        for (FirebaseTextMessage msg : conversation) {
-            Log.d("SmartReply", "Message: " + msg.toString());
-        }
-
         firebaseSmartReply.suggestReplies(conversation)
                 .addOnCompleteListener(new OnCompleteListener<SmartReplySuggestionResult>() {
                     @Override
                     public void onComplete(@NonNull Task<SmartReplySuggestionResult> task) {
                         if (task.isSuccessful()) {
                             SmartReplySuggestionResult result = task.getResult();
-                            Log.d("SmartReply", "Smart Reply result status: " + result.getStatus());
                             if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
                                 messageList.add(new Message("I don't understand the question.", false));
                                 showSuggestedPrompts();
                             } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
                                 List<SmartReplySuggestion> suggestions = result.getSuggestions();
-                                Log.d("SmartReply", "Number of suggestions: " + suggestions.size());
                                 if (!suggestions.isEmpty()) {
                                     String reply = suggestions.get(0).getText();
-                                    Log.d("SmartReply", "Suggested reply: " + reply);
                                     if (isGenericOrEmojiReply(reply)) {
                                         messageList.add(new Message("I don't understand the question.", false));
                                         showSuggestedPrompts();
@@ -503,6 +448,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
                                         messageList.add(new Message(reply, false));
                                         hideSuggestedPrompts();
                                     }
+                                    Log.d("SmartReply", "Reply: " + reply);
                                 } else {
                                     messageList.add(new Message("I don't understand the question.", false));
                                     Log.d("SmartReply", "No suggestions available.");
@@ -518,26 +464,80 @@ public class TicketFinderChatbot extends AppCompatActivity {
                 });
     }
 
+//    private void generateSmartReply(String message) {
+//        List<FirebaseTextMessage> conversation = new ArrayList<>();
+//        for (Message msg : messageList) {
+//            if (msg.isUser()) {
+//                conversation.add(FirebaseTextMessage.createForLocalUser(msg.getMessage(), System.currentTimeMillis()));
+//            } else {
+//                conversation.add(FirebaseTextMessage.createForRemoteUser(msg.getMessage(), System.currentTimeMillis(), "bot"));
+//            }
+//        }
+//
+//        // Log the conversation for debugging
+//        Log.d("SmartReply", "Conversation for Smart Reply:");
+//        for (FirebaseTextMessage msg : conversation) {
+//            Log.d("SmartReply", "Message: " + msg.toString());
+//        }
+//
+//        firebaseSmartReply.suggestReplies(conversation)
+//                .addOnCompleteListener(new OnCompleteListener<SmartReplySuggestionResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<SmartReplySuggestionResult> task) {
+//                        if (task.isSuccessful()) {
+//                            SmartReplySuggestionResult result = task.getResult();
+//                            Log.d("SmartReply", "Smart Reply result status: " + result.getStatus());
+//                            if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
+//                                messageList.add(new Message("I don't understand the question.", false));
+//                                showSuggestedPrompts();
+//                            } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
+//                                List<SmartReplySuggestion> suggestions = result.getSuggestions();
+//                                Log.d("SmartReply", "Number of suggestions: " + suggestions.size());
+//                                if (!suggestions.isEmpty()) {
+//                                    String reply = suggestions.get(0).getText();
+//                                    Log.d("SmartReply", "Suggested reply: " + reply);
+//                                    if (isGenericOrEmojiReply(reply)) {
+//                                        messageList.add(new Message("I don't understand the question.", false));
+//                                        showSuggestedPrompts();
+//                                    } else {
+//                                        messageList.add(new Message(reply, false));
+//                                        hideSuggestedPrompts();
+//                                    }
+//                                } else {
+//                                    messageList.add(new Message("I don't understand the question.", false));
+//                                    Log.d("SmartReply", "No suggestions available.");
+//                                    showSuggestedPrompts();
+//                                }
+//                            }
+//                            chatAdapter.notifyDataSetChanged();
+//                            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+//                        } else {
+//                            Log.e("SmartReply", "Smart Reply task failed", task.getException());
+//                        }
+//                    }
+//                });
+//    }
+
     private boolean isGenericOrEmojiReply(String reply) {
         // List of generic replies to filter out
         List<String> genericReplies = Arrays.asList("Okay", "I don't know", "Sorry", "Alright", "Oh, okay", "😟", "😊", "😢");
         return genericReplies.contains(reply) || reply.matches("[\\p{So}\\p{Cn}]+"); // Matches emojis and other symbols
     }
 
-//    private boolean isGreeting(String message) {
-//        List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
-//        for (String greeting : greetings) {
-//            if (message.toLowerCase().contains(greeting)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private String getGreetingResponse() {
-//        List<String> responses = Arrays.asList("Hello! How can I assist you today?", "Hi there! What can I do for you?", "Hey! Need any help?");
-//        return responses.get(new Random().nextInt(responses.size()));
-//    }
+    private boolean isGreeting(String message) {
+        List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
+        for (String greeting : greetings) {
+            if (message.toLowerCase().contains(greeting)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getGreetingResponse() {
+        List<String> responses = Arrays.asList("Hello! How can I assist you today?", "Hi there! What can I do for you?", "Hey! Need any help?");
+        return responses.get(new Random().nextInt(responses.size()));
+    }
 
     private void fetchFaqAnswer(final String documentId) {
         AsyncTask.execute(new Runnable() {
@@ -549,10 +549,11 @@ public class TicketFinderChatbot extends AppCompatActivity {
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful() && task.getResult().exists()) {
                                     String answer = task.getResult().getString("Answer");
+                                    Log.d("fetchFaqAnswer", "Answer fetched for document ID: " + documentId + ", Answer: " + answer); // *********************
                                     messageList.add(new Message(answer, false));
                                     hideSuggestedPrompts();
                                 } else {
-                                    messageList.add(new Message("Failed to fetch the answer.", false));
+                                    Log.d("fetchFaqAnswer", "Failed to fetch answer for document ID: " + documentId); // *********************
                                     showSuggestedPrompts();
                                 }
                                 chatAdapter.notifyDataSetChanged();
