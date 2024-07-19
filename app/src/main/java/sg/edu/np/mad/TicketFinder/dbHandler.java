@@ -30,63 +30,6 @@ public class dbHandler extends Application {
         FirebaseFirestore.setLoggingEnabled(true);
         dictionary = new HashSet<>(); // Initialize dictionary set
     }
-
-    public void getChatbotResponses(FirestoreCallback<ChatbotResponse> callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("FAQ").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    ArrayList<ChatbotResponse> responseList = new ArrayList<>();
-                    Set<String> wordsToAdd = new HashSet<>(); // Create a set to collect words
-
-                    for (DocumentSnapshot document : task.getResult()) {
-                        ChatbotResponse response = document.toObject(ChatbotResponse.class);
-                        responseList.add(response);
-                        // Add words to the set
-                        if (response != null) {
-                            String question = response.getQuestion();
-                            if (question != null) {
-                                String[] questionWords = question.split("\\s+");
-                                for (String word : questionWords) {
-                                    wordsToAdd.add(word.toLowerCase());
-                                }
-                            }
-
-                            String answer = response.getAnswer();
-                            if (answer != null) {
-                                String[] answerWords = answer.split("\\s+");
-                                for (String word : answerWords) {
-                                    wordsToAdd.add(word.toLowerCase());
-                                }
-                            }
-                        }
-                    }
-
-                    addWordsToDictionary(wordsToAdd); // Add words to the dictionary
-
-                    callback.onCallback(responseList);
-                } else {
-                    callback.onCallback(new ArrayList<>()); // Return empty list in case of failure
-                    Log.w("FAQError", "Error getting documents.", task.getException());
-                }
-            }
-        });
-    }
-
-    // Method to add words to dictionary
-    public Set<String> getDictionary() {
-        synchronized (this) {
-            return new HashSet<>(dictionary); // Return a copy to avoid concurrent modification issues
-        }
-    }
-
-    public void addWordsToDictionary(Set<String> newWords) {
-        synchronized (this) {
-            dictionary.addAll(newWords);
-        }
-    }
-
     //get event data (coded with the help of ChatGPT)
     public void getData(FirestoreCallback firestoreCallback) {
         // connect to firestore
