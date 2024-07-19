@@ -75,4 +75,5 @@ dependencies {
     implementation ("com.google.firebase:firebase-ml-natural-language-smart-reply-model:20.0.7")
     implementation ("com.airbnb.android:lottie:5.0.3")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation("org.apache.commons:commons-text:1.9")
 }

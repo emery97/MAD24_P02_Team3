@@ -142,7 +142,7 @@ public class EventDetails extends AppCompatActivity {
         findViewById(R.id.chatbotButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EventDetails.this, chatbot.class);
+                Intent intent = new Intent(EventDetails.this, TicketFinderChatbot.class);
                 startActivity(intent);
             }
         });

@@ -6,9 +6,12 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -17,7 +20,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class dbHandler extends Application {
@@ -223,15 +228,30 @@ public class dbHandler extends Application {
             }
 
         });
-
-
-
-
-
-
-
     }
 
 
+    public void addFaq(String question, String answer, String keywords) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference faqCollection = db.collection("FAQ");
 
+        Map<String, Object> faq = new HashMap<>();
+        faq.put("Question", question);
+        faq.put("Answer", answer);
+        faq.put("Keywords", keywords.split(" "));
+
+        faqCollection.add(faq)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("dbHandler", "FAQ added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("dbHandler", "Error adding FAQ", e);
+                    }
+                });
+    }
 }
