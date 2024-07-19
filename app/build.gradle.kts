@@ -44,30 +44,29 @@ dependencies {
     implementation("com.stripe:stripe-java:25.0.0")
     implementation("com.stripe:stripe-android:20.44.0")
     implementation("com.android.volley:volley:1.2.1")
-    implementation(platform("com.google.firebase:firebase-bom:33.0.0")) // Firebase BOM
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-firestore:25.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+    implementation("com.google.firebase:firebase-storage:21.0.0")
     implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
 
-    // Maps
+    //maps
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.libraries.places:places:2.5.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
-
-    // Google Auth and Calendar integrations
+    // For Google Auth and Calendar integrations
     implementation("com.google.android.gms:play-services-auth:20.3.0")
     implementation("org.apache.commons:commons-text:1.9")
-
-    // Easy permissions
+    // For easy permissions
     implementation("pub.devrel:easypermissions:3.0.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha04")
     implementation("com.google.zxing:core:3.5.2")
