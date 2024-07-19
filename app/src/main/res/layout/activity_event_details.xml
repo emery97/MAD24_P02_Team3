@@ -23,7 +23,6 @@
         app:title="Event Details"
         app:titleTextColor="@android:color/white" />
 
-
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -39,25 +38,23 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Cards for event details -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <ImageView
                         android:id="@+id/eventImg"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:scaleType="centerCrop" />
-
                     <TextView
                         android:id="@+id/eventTitle"
                         android:layout_width="wrap_content"
@@ -67,7 +64,6 @@
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventCaption"
                         android:layout_width="wrap_content"
@@ -77,7 +73,6 @@
                         android:textColor="#000000"
                         android:textSize="16sp"
                         android:textStyle="italic" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -87,13 +82,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:id="@+id/eventArtist"
                         android:layout_width="wrap_content"
@@ -102,7 +95,6 @@
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventGenre"
                         android:layout_width="wrap_content"
@@ -111,7 +103,6 @@
                         android:text="Genre"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -121,13 +112,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:id="@+id/eventTiming"
                         android:layout_width="wrap_content"
@@ -136,7 +125,6 @@
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventVenue"
                         android:layout_width="wrap_content"
@@ -145,7 +133,6 @@
                         android:text="Venue"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
-
                     <Button
                         android:id="@+id/showVenueMap"
                         android:layout_width="wrap_content"
@@ -153,7 +140,6 @@
                         android:backgroundTint="#D9AA52"
                         android:text="Show Venue Details"
                         android:textColor="#FFFFFF" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -163,13 +149,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -177,7 +161,6 @@
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventDescription"
                         android:layout_width="wrap_content"
@@ -186,7 +169,6 @@
                         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam accumsan dui eu sollicitudin fermentum."
                         android:textColor="@color/black"
                         android:textSize="16sp" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -196,13 +178,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -210,7 +190,6 @@
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventTicketPrice"
                         android:layout_width="wrap_content"
@@ -219,7 +198,6 @@
                         android:text="$99.99"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -229,13 +207,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -243,7 +219,6 @@
                         android:textColor="@color/black"
                         android:textSize="20sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/eventGeneralSales"
                         android:layout_width="wrap_content"
@@ -252,7 +227,6 @@
                         android:text="Start Date: 5 July 2024"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -261,13 +235,11 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
-
                     <Button
                         android:id="@+id/showMapButton"
                         android:layout_width="match_parent"
@@ -276,7 +248,6 @@
                         android:backgroundTint="#D9AA52"
                         android:text="View Seat Map"
                         android:textColor="@color/white" />
-
                     <Button
                         android:id="@+id/buyTicketsButton"
                         android:layout_width="match_parent"
@@ -285,24 +256,22 @@
                         android:backgroundTint="#1B2B40"
                         android:text="Buy Tickets"
                         android:textColor="@color/white" />
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
     </ScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/chatbotButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_faq_icon"
-        android:scaleType="centerInside"
-        android:padding="0dp"
-        app:backgroundTint="#CDCDCD"
-        app:maxImageSize="48dp"
-        app:layout_constraintBottom_toTopOf="@id/footer"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="16dp"
+        app:lottie_rawRes="@raw/bot_icon"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <include
