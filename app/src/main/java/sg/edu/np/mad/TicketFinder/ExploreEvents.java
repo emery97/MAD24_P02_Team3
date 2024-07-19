@@ -2,8 +2,8 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -82,6 +82,13 @@ public class ExploreEvents extends AppCompatActivity {
         setupSearchBar(); // Setup search bar
         setupFilterButton(); // Setup filter button
         Footer.setUpFooter(this); // Set up footer
+
+        // Set OnClickListener for Find Friends button
+        Button upcomingConcertButton = findViewById(R.id.findFriends);
+        upcomingConcertButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, FriendsActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

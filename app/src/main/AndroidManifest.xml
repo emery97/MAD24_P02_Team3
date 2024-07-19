@@ -114,6 +114,9 @@
         <activity
             android:name=".TransferTicketsActivity"
             android:exported="true" />
+        <activity
+            android:name=".FriendsActivity"
+            android:exported="true" />
 
         <receiver
             android:name=".payment"
@@ -126,6 +129,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+<!--        <service-->
+<!--            android:name=".MyFirebaseMessagingService"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <meta-data
             android:name="preloaded_fonts"

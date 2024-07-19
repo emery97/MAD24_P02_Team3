@@ -668,11 +668,12 @@ public class profilePage extends AppCompatActivity {
     // Method to show password dialog for authentication
     private void showPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme);
-        builder.setTitle("Enter Password");
+        builder.setTitle("Enter Account Password");
 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_enter_password, null);
+        final EditText input = dialogView.findViewById(R.id.passwordInput);
+
+        builder.setView(dialogView);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override

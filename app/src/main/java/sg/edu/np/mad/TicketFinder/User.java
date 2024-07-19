@@ -9,16 +9,27 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.userId = userId;
     }
+    // empty constructor
+    public User(){}
 
     public String getName() {
         return name;
+    }
+    public void setName(String name){
+        this.name = name;
     }
 
     public String getProfileImageUrl() {
         return profileImageUrl;
     }
+    public void setProfileImageUrl(String ProfileImageUrl){
+        this.profileImageUrl = profileImageUrl;
+    }
 
     public String getUserId() {
         return userId;
+    }
+    public void setUserId(String userId){
+        this.userId = userId;
     }
 }
