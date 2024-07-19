@@ -251,6 +251,7 @@
 
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -261,6 +262,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -286,8 +289,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class TicketFinderChatbot extends AppCompatActivity {
+import android.Manifest;
 
+public class TicketFinderChatbot extends AppCompatActivity {
     RecyclerView chatRecyclerView;
     RecyclerView suggestedPromptsRecyclerView;
     EditText messageInput;
@@ -301,6 +305,11 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private final Map<String, String> keywordToDocIdMap = new HashMap<>();
     private final Map<String, String> chatbotResponsesMap = new HashMap<>();
     private final List<String> questionsList = new ArrayList<>();
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private boolean permissionToRecordAccepted = false;
+    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
+    private ImageView micIcon;
+    private SpeechRecognizerHelper speechRecognizerHelper;
 
 
     @Override
@@ -311,6 +320,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
         suggestedPromptsRecyclerView = findViewById(R.id.suggested_prompts_recycler);
         messageInput = findViewById(R.id.message_input_field);
         sendButton = findViewById(R.id.send_button);
+        micIcon = findViewById(R.id.mic_button);
         messageList = new ArrayList<>();
         chatAdapter = new ChatAdapter(this, messageList);
         suggestedPromptAdapter = new SuggestedPromptAdapter(new ArrayList<>(), this::onSuggestedPromptClick);
@@ -325,6 +335,26 @@ public class TicketFinderChatbot extends AppCompatActivity {
         LinearLayoutManager promptLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         suggestedPromptsRecyclerView.setAdapter(suggestedPromptAdapter);
         suggestedPromptsRecyclerView.setLayoutManager(promptLayoutManager);
+
+        // Initialize SpeechRecognizerHelper
+        speechRecognizerHelper = new SpeechRecognizerHelper(this, micIcon, new SpeechRecognizerHelper.OnSpeechResultListener() {
+            @Override
+            public void onSpeechResult(String text) {
+                messageInput.setText(text);
+            }
+        });
+
+        // MIC IMPLEMENTATION
+        micIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(TicketFinderChatbot.this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    speechRecognizerHelper.startListening();
+                } else {
+                    ActivityCompat.requestPermissions(TicketFinderChatbot.this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+                }
+            }
+        });
 
         fetchQuestionsFromFirestore();
 
@@ -351,6 +381,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        speechRecognizerHelper.destroy();
     }
 
     private void fetchQuestionsFromFirestore() {

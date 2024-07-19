@@ -126,6 +126,14 @@
                     android:imeOptions="actionSend"/>
 
                 <ImageView
+                    android:id="@+id/mic_button"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/mic_icon"
+                    android:contentDescription="Voice Input"
+                    android:padding="8dp" />
+
+                <ImageView
                     android:id="@+id/send_button"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
