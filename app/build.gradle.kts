@@ -70,4 +70,9 @@ dependencies {
     implementation("androidx.biometric:biometric:1.2.0-alpha04")
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    // chat bot
+    implementation ("com.google.firebase:firebase-ml-natural-language:22.0.0")
+    implementation ("com.google.firebase:firebase-ml-natural-language-smart-reply-model:20.0.7")
+    implementation ("com.airbnb.android:lottie:5.0.3")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
 }
