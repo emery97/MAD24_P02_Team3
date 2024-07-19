@@ -47,7 +47,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:25.0.0")
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-storage:21.0.0")
-    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-messaging") {
+        exclude(group = "com.google.firebase", module = "firebase-iid") // conflicted with chatbot
+    }
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.firebase:firebase-analytics")
@@ -71,4 +73,14 @@ dependencies {
     implementation("androidx.biometric:biometric:1.2.0-alpha04")
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    // chat bot
+    implementation("com.google.firebase:firebase-ml-natural-language:22.0.0") {
+        exclude(group = "com.google.firebase", module = "firebase-iid")
+    }
+    implementation("com.google.firebase:firebase-ml-natural-language-smart-reply-model:20.0.7") {
+        exclude(group = "com.google.firebase", module = "firebase-iid")
+    }
+    implementation ("com.airbnb.android:lottie:5.0.3")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation("org.apache.commons:commons-text:1.9")
 }

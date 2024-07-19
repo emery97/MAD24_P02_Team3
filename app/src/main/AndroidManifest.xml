@@ -78,7 +78,7 @@
         <activity
             android:name=".maps"
             android:exported="false" />
-        <activity android:name=".ChatActivity" />
+        <activity android:name=".TicketFinderChatbot" />
         <activity
             android:name=".homepage"
             android:exported="true" />
