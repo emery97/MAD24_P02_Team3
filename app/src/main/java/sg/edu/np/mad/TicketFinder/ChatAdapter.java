@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             view = LayoutInflater.from(context).inflate(R.layout.bot_message, parent, false);
             return new BotViewHolder(view);
         } else {
-            view = LayoutInflater.from(context).inflate(R.layout.item_event, parent, false);
-            return new EventAdapter.EventViewHolder(view); // ******** changes made here
+            view = LayoutInflater.from(context).inflate(R.layout.item_chat_event, parent, false);
+            return new EventViewHolder(view); // Use the correct layout for events
         }
     }
 
@@ -49,7 +50,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (holder.getItemViewType() == VIEW_TYPE_BOT) {
             ((BotViewHolder) holder).bind(message);
         } else {
-            ((EventAdapter.EventViewHolder) holder).bind(message.getEvent());
+            ((EventViewHolder) holder).bind(message.getEvent());
         }
     }
 
@@ -93,6 +94,25 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void bind(Message message) {
             botMessage.setText(message.getMessage());
+        }
+    }
+
+    static class EventViewHolder extends RecyclerView.ViewHolder {
+        private final RecyclerView eventRecyclerView;
+        private final EventAdapter eventAdapter; // Adapter for the inner RecyclerView
+
+        public EventViewHolder(View itemView) {
+            super(itemView);
+            eventRecyclerView = itemView.findViewById(R.id.eventRecyclerView);
+            eventAdapter = new EventAdapter(itemView.getContext(), new ArrayList<>(), false);
+            eventRecyclerView.setAdapter(eventAdapter);
+            eventRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
+        }
+
+        public void bind(Event event) {
+            ArrayList<Event> eventList = new ArrayList<>();
+            eventList.add(event);
+            eventAdapter.setSearchList(eventList); // Update the adapter with the single event
         }
     }
 }

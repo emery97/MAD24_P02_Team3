@@ -246,6 +246,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
             for (int i = 0; i < userWords.length - 1; i++) {
                 String combinedUserWords = userWords[i].toLowerCase() + " " + userWords[i + 1].toLowerCase();
                 if (getLevenshteinDistance(combinedUserWords, artist) <= 2) {
+                    sendEventIntroMessage(artist);
                     messageList.add(new Message(event));
                     chatAdapter.notifyDataSetChanged();
                     chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
@@ -256,6 +257,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
         return false;
     }
 
+    private void sendEventIntroMessage(String artist) {
+        String introMessage = "Here are some details about the event featuring ${artist}. You can click on the event details page to find out more!";
+        messageList.add(new Message(introMessage, false));
+        chatAdapter.notifyDataSetChanged();
+        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+    }
     private void generateSmartReply(String message) {
         List<FirebaseTextMessage> conversation = new ArrayList<>();
         for (Message msg : messageList) {
