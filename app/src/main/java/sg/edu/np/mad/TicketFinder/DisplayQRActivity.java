@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.InputType;
@@ -32,6 +33,7 @@ public class DisplayQRActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String qrCodeDocumentId;
     private ListenerRegistration qrCodeListener;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +124,13 @@ public class DisplayQRActivity extends AppCompatActivity {
                         if ("waiting".equals(status) && !"Verified".equals(verifyStatus)) {
                             // Prompt for email before showing the alert
                             promptForEmailAndValidate(documentSnapshot);
+                        } else if ("approved".equals(status)) {
+                            dismissAlert();
+                            showApprovalSuccessAlert();
+                        } else if ("rejected".equals(status)){
+                            Intent intent = new Intent(DisplayQRActivity.this, BookingHistoryDetails.class);
+                            startActivity(intent);
+                            finish();
                         }
                     } else {
                         Log.d(TAG, "Current data: null");
@@ -175,7 +184,7 @@ public class DisplayQRActivity extends AppCompatActivity {
                 .setMessage(message);
 
         // Create custom AlertDialog without any buttons
-        AlertDialog alertDialog = builder.create();
+        alertDialog = builder.create();
 
         // Disable outside touch and back button to dismiss
         alertDialog.setCanceledOnTouchOutside(false);
@@ -183,6 +192,26 @@ public class DisplayQRActivity extends AppCompatActivity {
 
         // Show the dialog
         alertDialog.show();
+    }
+
+
+    private void dismissAlert() {
+        // Dismiss any existing alert dialog if shown
+        if (alertDialog != null && alertDialog.isShowing()) {
+            alertDialog.dismiss();
+        }
+    }
+
+    private void showApprovalSuccessAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("QR Code Approved")
+                .setMessage("The QR Code has been approved.")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    Intent intent = new Intent(DisplayQRActivity.this, BookingHistoryDetails.class);
+                    startActivity(intent);
+                    finish();
+                })
+                .show();
     }
 
     @Override

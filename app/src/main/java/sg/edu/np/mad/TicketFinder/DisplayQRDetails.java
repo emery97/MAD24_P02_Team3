@@ -94,7 +94,7 @@ public class DisplayQRDetails extends AppCompatActivity {
             checkEventValidity(eventTitle);
 
             // Check verification status
-            checkVerificationStatus(qrCodeData);
+//            checkVerificationStatus(qrCodeData);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -122,9 +122,8 @@ public class DisplayQRDetails extends AppCompatActivity {
                     }
                 }
                 if (isValidEvent) {
-                    Toast.makeText(DisplayQRDetails.this, "Valid event", Toast.LENGTH_SHORT).show();
-                    // Continue displaying event details
                     displayEventDetails();
+                    checkQrCodeUsageStatus(qrCodeData);
                 } else {
                     Toast.makeText(DisplayQRDetails.this, "Not a valid event", Toast.LENGTH_SHORT).show();
                     // Navigate back to BookingHistoryDetails or any other appropriate action
@@ -137,6 +136,53 @@ public class DisplayQRDetails extends AppCompatActivity {
             }
         });
     }
+
+    private void checkQrCodeUsageStatus(String qrCodeData) {
+        db.collection("QrCodes")
+                .whereEqualTo("data", qrCodeData)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("DisplayQRDetails", "Listen failed.", e);
+                            return;
+                        }
+
+                        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                String usageStatus = document.getString("usage");
+                                String currentStatus = document.getString("status");
+
+                                // Check usage status and ensure the current status is neither "approved" nor "rejected"
+                                if ("Used".equals(usageStatus) && !"approved".equals(currentStatus) && !"rejected".equals(currentStatus)) {
+                                    // Update the status to "rejected"
+                                    DocumentReference qrCodeRef = document.getReference();
+                                    qrCodeRef.update("status", "rejected")
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(DisplayQRDetails.this,
+                                                        "QR Code has already been used. Status set to rejected.",
+                                                        Toast.LENGTH_SHORT).show();
+                                                navigateBack();
+                                            })
+                                            .addOnFailureListener(updateError -> {
+                                                Toast.makeText(DisplayQRDetails.this,
+                                                        "Failed to update QR Code status",
+                                                        Toast.LENGTH_SHORT).show();
+                                                navigateBack();
+                                            });
+                                } else {
+                                    checkVerificationStatus(qrCodeData);
+                                }
+                            }
+                        } else {
+                            Toast.makeText(DisplayQRDetails.this,
+                                    "QR Code not found",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
 
     private void displayEventDetails() {
         // Continue displaying event details here
