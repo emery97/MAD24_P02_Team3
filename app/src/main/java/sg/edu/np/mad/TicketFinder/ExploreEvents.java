@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -49,8 +50,8 @@ public class ExploreEvents extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("EXPLORE EVENTS", "explore events: ");
         super.onCreate(savedInstanceState);
-        Log.d("ExploreEvents", "onCreate called");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_explore_events);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -81,14 +82,10 @@ public class ExploreEvents extends AppCompatActivity {
         setupSearchToggle(); // Setup search toggle button for artist/title
         setupSearchBar(); // Setup search bar
         setupFilterButton(); // Setup filter button
+
+
         Footer.setUpFooter(this); // Set up footer
 
-        // Set OnClickListener for Find Friends button
-        Button upcomingConcertButton = findViewById(R.id.findFriends);
-        upcomingConcertButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, FriendsActivity.class);
-            startActivity(intent);
-        });
     }
 
     @Override

@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.util.Log;
 import android.widget.ImageButton;
 import android.app.Activity;
 import android.content.Intent;
@@ -25,6 +26,7 @@ public class Footer {
             @Override
             public void onClick(View v) {
                 // Set click listener for the search icon
+                Log.d("footer", "onClick: COMES HERE");
                 Intent intent = new Intent(activity, ExploreEvents.class);
                 activity.startActivity(intent); // Start the ExploreEvents activity
             }
