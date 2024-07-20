@@ -1,254 +1,3 @@
-//package sg.edu.np.mad.TicketFinder;
-//
-//import android.os.AsyncTask;
-//import android.os.Bundle;
-//import android.util.Log;
-//import android.view.MotionEvent;
-//import android.view.View;
-//import android.widget.EditText;
-//import android.widget.ImageView;
-//
-//import androidx.annotation.NonNull;
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.recyclerview.widget.LinearLayoutManager;
-//import androidx.recyclerview.widget.RecyclerView;
-//
-//import com.google.android.gms.tasks.OnCompleteListener;
-//import com.google.android.gms.tasks.Task;
-//import com.google.firebase.firestore.CollectionReference;
-//import com.google.firebase.firestore.DocumentSnapshot;
-//import com.google.firebase.firestore.FirebaseFirestore;
-//import com.google.firebase.firestore.QueryDocumentSnapshot;
-//import com.google.firebase.firestore.QuerySnapshot;
-//import com.google.firebase.ml.naturallanguage.FirebaseNaturalLanguage;
-//import com.google.firebase.ml.naturallanguage.smartreply.FirebaseSmartReply;
-//import com.google.firebase.ml.naturallanguage.smartreply.FirebaseTextMessage;
-//import com.google.firebase.ml.naturallanguage.smartreply.SmartReplySuggestion;
-//import com.google.firebase.ml.naturallanguage.smartreply.SmartReplySuggestionResult;
-//
-//import org.apache.commons.text.similarity.LevenshteinDistance;
-//
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//
-//public class TicketFinderChatbot extends AppCompatActivity {
-//
-//    RecyclerView chatRecyclerView;
-//    EditText messageInput;
-//    ArrayList<Message> messageList;
-//    ChatAdapter chatAdapter;
-//    FirebaseFirestore firestoreDb;
-//    FirebaseSmartReply firebaseSmartReply;
-//
-//    private final Map<String, String> keywordToDocIdMap = new HashMap<>();
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_ticket_finder_chat);
-//        chatRecyclerView = findViewById(R.id.chat_recycler_view);
-//        messageInput = findViewById(R.id.message_input);
-//        messageList = new ArrayList<>();
-//        chatAdapter = new ChatAdapter(this, messageList);
-//        firestoreDb = FirebaseFirestore.getInstance();
-//        firebaseSmartReply = FirebaseNaturalLanguage.getInstance().getSmartReply();
-//
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        chatRecyclerView.setAdapter(chatAdapter);
-//        chatRecyclerView.setLayoutManager(linearLayoutManager);
-//
-//        fetchKeywordsFromFirestore();
-//
-//        sendWelcomeMessage();
-//
-//        messageInput.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (messageInput.getRight() - messageInput.getCompoundDrawables()[2].getBounds().width())) {
-//                        String userMessage = messageInput.getText().toString().trim();
-//                        if (!userMessage.isEmpty()) {
-//                            messageList.add(new Message(userMessage, true));
-//                            chatAdapter.notifyDataSetChanged();
-//                            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//                            handleUserMessage(userMessage);
-//                            messageInput.setText("");
-//                        }
-//                        return true;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
-//
-//        ImageView closeChatButton = findViewById(R.id.close_chat_button);
-//        closeChatButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
-//    }
-//
-//    private void fetchKeywordsFromFirestore() {
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                firestoreDb.collection("FAQ").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                String docId = document.getId();
-//                                String keywordString = document.getString("Keywords");
-//                                if (keywordString != null) {
-//                                    String[] keywords = keywordString.split(" ");
-//                                    for (String keyword : keywords) {
-//                                        keywordToDocIdMap.put(keyword.toLowerCase(), docId);
-//                                    }
-//                                }
-//                            }
-//                            Log.d("fetchKeywords", "Keywords fetched successfully: " + keywordToDocIdMap.keySet());
-//                        } else {
-//                            Log.w("fetchKeywords", "Error getting documents.", task.getException());
-//                        }
-//                    }
-//                });
-//            }
-//        });
-//    }
-//
-//    private void sendWelcomeMessage() {
-//        String welcomeMessage = "Welcome! How can I assist you today? You can ask me questions like 'how to pay' or 'what are the payment methods'.";
-//        messageList.add(new Message(welcomeMessage, false));
-//        chatAdapter.notifyDataSetChanged();
-//        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//    }
-//
-//    private void handleUserMessage(String message) {
-//        Log.d("handleUserMessage", "Received message: " + message);
-//        String closestKeyword = findClosestKeyword(message);
-//        Log.d("handleUserMessage", "Closest keyword: " + closestKeyword);
-//        if (closestKeyword != null) {
-//            String documentId = keywordToDocIdMap.get(closestKeyword);
-//            Log.d("handleUserMessage", "Fetching answer for document ID: " + documentId);
-//            fetchFaqAnswer(documentId);
-//        } else {
-//            generateSmartReply(message);
-//        }
-//    }
-//
-//    private void generateSmartReply(String message) {
-//        List<FirebaseTextMessage> conversation = new ArrayList<>();
-//        for (Message msg : messageList) {
-//            if (msg.isUser()) {
-//                conversation.add(FirebaseTextMessage.createForLocalUser(msg.getMessage(), System.currentTimeMillis()));
-//            } else {
-//                conversation.add(FirebaseTextMessage.createForRemoteUser(msg.getMessage(), System.currentTimeMillis(), "bot"));
-//            }
-//        }
-//
-//        firebaseSmartReply.suggestReplies(conversation)
-//                .addOnCompleteListener(new OnCompleteListener<SmartReplySuggestionResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<SmartReplySuggestionResult> task) {
-//                        if (task.isSuccessful()) {
-//                            SmartReplySuggestionResult result = task.getResult();
-//                            if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
-//                                messageList.add(new Message("I don't understand the question.", false));
-//                            } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
-//                                List<SmartReplySuggestion> suggestions = result.getSuggestions();
-//                                if (!suggestions.isEmpty()) {
-//                                    String reply = suggestions.get(0).getText();
-//                                    if (isGenericReply(reply)) {
-//                                        messageList.add(new Message("I don't understand the question.", false));
-//                                    } else {
-//                                        messageList.add(new Message(reply, false));
-//                                    }
-//                                    Log.d("SmartReply", "Reply: " + reply);
-//                                } else {
-//                                    messageList.add(new Message("I don't understand the question.", false));
-//                                    Log.d("SmartReply", "No suggestions available.");
-//                                }
-//                            }
-//                            chatAdapter.notifyDataSetChanged();
-//                            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//                        } else {
-//                            Log.e("SmartReply", "Smart Reply task failed", task.getException());
-//                        }
-//                    }
-//                });
-//    }
-//
-//    private boolean isGenericReply(String reply) {
-//        // List of generic replies to filter out
-//        List<String> genericReplies = Arrays.asList("Okay", "I don't know", "Sorry", "Alright");
-//        return genericReplies.contains(reply);
-//    }
-//
-//    private void fetchFaqAnswer(final String documentId) {
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                firestoreDb.collection("FAQ").document(documentId).get()
-//                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                                if (task.isSuccessful() && task.getResult().exists()) {
-//                                    String answer = task.getResult().getString("Answer");
-//                                    messageList.add(new Message(answer, false));
-//                                } else {
-//                                    messageList.add(new Message("Failed to fetch the answer.", false));
-//                                }
-//                                chatAdapter.notifyDataSetChanged();
-//                                chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//                            }
-//                        });
-//            }
-//        });
-//    }
-//
-//    private int getLevenshteinDistance(String s1, String s2) {
-//        LevenshteinDistance levenshteinDistance = new LevenshteinDistance();
-//        return levenshteinDistance.apply(s1, s2);
-//    }
-//
-//    private String findClosestKeyword(String message) {
-//        String[] words = message.split(" ");
-//        Map<String, Integer> keywordDistanceMap = new HashMap<>();
-//
-//        for (String word : words) {
-//            for (String keyword : keywordToDocIdMap.keySet()) {
-//                int distance = getLevenshteinDistance(word.toLowerCase(), keyword.toLowerCase());
-//                if (!keywordDistanceMap.containsKey(keyword) || distance < keywordDistanceMap.get(keyword)) {
-//                    keywordDistanceMap.put(keyword, distance);
-//                }
-//            }
-//        }
-//
-//        String closestKeyword = null;
-//        int minDistance = Integer.MAX_VALUE;
-//
-//        for (Map.Entry<String, Integer> entry : keywordDistanceMap.entrySet()) {
-//            if (entry.getValue() < minDistance) {
-//                minDistance = entry.getValue();
-//                closestKeyword = entry.getKey();
-//            }
-//        }
-//
-//        Log.d("findClosestKeyword", "Min Distance: " + minDistance);
-//        if (minDistance <= 1) { // Threshold for considering a match
-//            return closestKeyword;
-//        } else {
-//            return null;
-//        }
-//    }
-//}
-
-
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.pm.PackageManager;
@@ -286,7 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 import android.Manifest;
 
 public class TicketFinderChatbot extends AppCompatActivity {
@@ -449,8 +199,9 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private void handleUserMessage(String message) {
         Log.d("handleUserMessage", "Received message: " + message);
 
+        String cleanedMessage = cleanMessage(message);
         // Check for common greetings first
-        if (isGreeting(message)) {
+        if (isGreeting(cleanedMessage)) {
             String greetingResponse = getGreetingResponse();
             messageList.add(new Message(greetingResponse, false));
             chatAdapter.notifyDataSetChanged();
@@ -460,19 +211,19 @@ public class TicketFinderChatbot extends AppCompatActivity {
         }
 
         // Check for event titles or artist names
-        if (checkForArtistMatch(message)) {
+        if (checkForArtistMatch(cleanedMessage)) {
             hideSuggestedPrompts();
             return;
         }
 
-        String closestKeyword = findClosestKeyword(message);
+        String closestKeyword = findClosestKeyword(cleanedMessage);
         Log.d("handleUserMessage", "Closest keyword: " + closestKeyword);
         if (closestKeyword != null) {
             String documentId = keywordToDocIdMap.get(closestKeyword);
             Log.d("handleUserMessage", "Fetching answer for document ID: " + documentId);
             fetchFaqAnswer(documentId);
         } else {
-            generateSmartReply(message);
+            generateSmartReply(cleanedMessage);
         }
     }
 
@@ -702,4 +453,25 @@ public class TicketFinderChatbot extends AppCompatActivity {
             return null;
         }
     }
+    private String cleanMessage(String message) {
+        // Normalize the message to remove accents and other diacritical marks
+        String normalizedMessage = Normalizer.normalize(message, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String cleanedMessage = pattern.matcher(normalizedMessage).replaceAll("");
+
+        // Convert the message to lowercase
+        cleanedMessage = cleanedMessage.toLowerCase();
+
+        // Remove common suffixes such as 's'
+        cleanedMessage = cleanedMessage.replaceAll("\\bs\\b", "");
+
+        // Remove punctuation and special characters
+        cleanedMessage = cleanedMessage.replaceAll("[^a-zA-Z0-9\\s]", "");
+
+        // Trim any extra spaces
+        cleanedMessage = cleanedMessage.trim();
+
+        return cleanedMessage;
+    }
+
 }
