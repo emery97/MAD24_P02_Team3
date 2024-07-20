@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -26,6 +24,7 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private List<User> userList;
+    private String currentUserId; // Ensure this is declared at the class level
     private static final String TAG = "friendsActivity";
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -37,12 +36,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         setContentView(R.layout.find_friends);
 
         searchView = findViewById(R.id.searchFriends);
-        if (searchView == null) {
-            Log.e(TAG, "SearchView is null");
-        } else {
-            Log.d(TAG, "SearchView initialized successfully");
-        }
-
         recyclerView = findViewById(R.id.exploreView);
 
         // Initialize userList with data (e.g., fetched from Firestore)
@@ -50,8 +43,11 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
 
         // Get shared preferences for user data
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        String currentUserId = sharedPreferences.getString("UserId", null);
-        adapter = new UserAdapter(this, userList, currentUserId);
+        currentUserId = sharedPreferences.getString("UserId", null); // Initialize currentUserId here
+
+        Log.d(TAG, "Current User ID: " + currentUserId);
+
+        adapter = new UserAdapter(this, userList, currentUserId); // Pass currentUserId to the adapter
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,12 +64,13 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         Footer.setUpFooter(this);
     }
 
-    // define a callback interface
+    // Define a callback interface
     public interface FetchUsersCallback {
         void onFetchCompleted(List<User> userList);
     }
 
     private void fetchUsers(FetchUsersCallback callback) {
+        Log.d(TAG, "fetchUsers: " + currentUserId);
         db.collection("Account")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -87,19 +84,23 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                             if (profilePicURL != null) {
                                 user.setProfileImageUrl(profilePicURL);
                             } else {
-                                user.setProfileImageUrl(""); // set empty url
+                                user.setProfileImageUrl(""); // Set empty URL
                             }
-                            userList.add(user);
+                            if (!document.getLong("userId").toString().equals(currentUserId)) {
+                                userList.add(user); // Only add users that are not the current user
+                            }
                         }
                         adapter.notifyDataSetChanged();
-                        // notify callback
+                        // Notify callback
                         callback.onFetchCompleted(userList);
+                        Log.d(TAG, "fetchUsers: " + userList.size());
                     } else {
                         Log.e("FriendsActivity", "Error fetching users", task.getException());
                     }
                 });
     }
-    private void showUsers(){
+
+    private void showUsers() {
         adapter.show(userList);
     }
 
@@ -132,7 +133,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
 
     @Override
     public void onFriendAdded(User user) {
-        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db.collection("Account").document(currentUserId)
                 .update("friends", FieldValue.arrayUnion(user.getUserId()))
                 .addOnSuccessListener(aVoid -> {
