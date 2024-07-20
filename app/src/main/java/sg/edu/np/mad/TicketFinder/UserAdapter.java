@@ -114,8 +114,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 .setTitle("Add Friend")
                 .setMessage("Do you want to add " + friend.getName() + " as your friend?")
                 .setPositiveButton("Yes", (dialogInterface, which) -> {
-                    addFriendToCurrentUser(friend.getUserId());
-                    Toast.makeText(context, friend.getName() + " is your friend now !!", Toast.LENGTH_SHORT).show();
+                    if(checkIfCanAddAsFriend(friend) == true){
+                        addFriendToCurrentUser(friend.getUserId());
+                        Toast.makeText(context, friend.getName() + " is your friend now !!", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .setNegativeButton("No", (dialogInterface, which) -> dialogInterface.dismiss())
                 .create();
@@ -126,6 +128,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
+    }
+    private boolean checkIfCanAddAsFriend( User friend){
+        Log.d(TAG, "checkIfCanAddAsFriend: " +friend.getUserId() +" "+ currentUserId );
+        if(friend.getUserId().equals(currentUserId)){
+            Log.d(TAG, "checkIfCanAddAsFriend: LOLLLLS");
+            Toast.makeText(context, "You cannot add yourself as a friend, sorry if that bites :( ", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
 
