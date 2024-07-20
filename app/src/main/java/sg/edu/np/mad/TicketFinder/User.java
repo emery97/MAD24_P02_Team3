@@ -22,7 +22,8 @@ public class User {
     public String getProfileImageUrl() {
         return profileImageUrl;
     }
-    public void setProfileImageUrl(String ProfileImageUrl){
+
+    public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
 

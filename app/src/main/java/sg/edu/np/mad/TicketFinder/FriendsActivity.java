@@ -55,7 +55,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
             @Override
             public void onFetchCompleted(List<User> userList) {
                 showUsers();
-                Log.d(TAG, "onCreate: userList size after fetch: " + userList.size());
                 setupSearchListener(); // Set up search listener after fetching users
             }
         });
@@ -87,7 +86,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                             userList.add(user);
                         }
                         adapter.notifyDataSetChanged();
-                        Log.d(TAG, "fetchUsers: " + userList.size());
                         // notify callback
                         callback.onFetchCompleted(userList);
                     } else {
@@ -106,7 +104,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "onQueryTextSubmit: " + query);
                 if (query == null || query.trim().isEmpty()) {
-                    Log.d(TAG, "onQueryTextSubmit: IT'S EMPTY");
                     adapter.show(userList);
                 } else {
                     adapter.filter(query); // Filter adapter based on user input
@@ -118,7 +115,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
             public boolean onQueryTextChange(String newText) {
                 Log.d(TAG, "onQueryTextChange: " + newText);
                 if (newText == null || newText.trim().isEmpty()) {
-                    Log.d(TAG, "onQueryTextChange: IT'S EMPTY");
                     adapter.show(userList);
                 } else {
                     adapter.filter(newText); // Filter adapter based on user input
