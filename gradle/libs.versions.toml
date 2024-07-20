@@ -14,6 +14,7 @@ glide = "5.0.0-rc01"
 firebaseAuth = "23.0.0"
 firebaseAppcheckPlayintegrity = "18.0.0"
 firebaseStorage = "21.0.0"
+carUiLib = "2.6.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +30,7 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-appcheck-playintegrity = { group = "com.google.firebase", name = "firebase-appcheck-playintegrity", version.ref = "firebaseAppcheckPlayintegrity" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
+car-ui-lib = { group = "com.android.car.ui", name = "car-ui-lib", version.ref = "carUiLib" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

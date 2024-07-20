@@ -58,6 +58,8 @@
                     android:layout_weight="1"
                     android:background="@drawable/search_view_background"
                     android:iconifiedByDefault="false"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     app:queryBackground="@android:color/transparent"
                     app:queryHint="Search events ...">
 

@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +24,7 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private List<User> userList;
+    private static final String TAG = "friendsActivity";
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -33,6 +35,12 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         setContentView(R.layout.find_friends);
 
         searchView = findViewById(R.id.searchFriends);
+        if (searchView == null) {
+            Log.e(TAG, "SearchView is null");
+        } else {
+            Log.d(TAG, "SearchView initialized successfully");
+        }
+
         recyclerView = findViewById(R.id.exploreView);
 
         // Initialize userList with data (e.g., fetched from Firestore)
@@ -42,17 +50,25 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        setupSearchListener();
-        fetchUsers(); // Fetch users from Firestore
-
-        // Set the activity as listener for friend addition
-        adapter.setOnFriendAddListener(this);
-
+        // Fetch users from Firestore
+        fetchUsers(new FetchUsersCallback() {
+            @Override
+            public void onFetchCompleted(List<User> userList) {
+                showUsers();
+                Log.d(TAG, "onCreate: userList size after fetch: " + userList.size());
+                setupSearchListener(); // Set up search listener after fetching users
+            }
+        });
         // Set up footer
         Footer.setUpFooter(this);
     }
 
-    private void fetchUsers() {
+    // define a callback interface
+    public interface FetchUsersCallback {
+        void onFetchCompleted(List<User> userList);
+    }
+
+    private void fetchUsers(FetchUsersCallback callback) {
         db.collection("Account")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -71,28 +87,46 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                             userList.add(user);
                         }
                         adapter.notifyDataSetChanged();
+                        Log.d(TAG, "fetchUsers: " + userList.size());
+                        // notify callback
+                        callback.onFetchCompleted(userList);
                     } else {
                         Log.e("FriendsActivity", "Error fetching users", task.getException());
                     }
                 });
     }
+    private void showUsers(){
+        adapter.show(userList);
+    }
 
     private void setupSearchListener() {
+        Log.d(TAG, "setupSearchListener: " + userList.size());
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query); // Filter adapter based on user input
+                Log.d(TAG, "onQueryTextSubmit: " + query);
+                if (query == null || query.trim().isEmpty()) {
+                    Log.d(TAG, "onQueryTextSubmit: IT'S EMPTY");
+                    adapter.show(userList);
+                } else {
+                    adapter.filter(query); // Filter adapter based on user input
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText); // Filter adapter based on user input
+                Log.d(TAG, "onQueryTextChange: " + newText);
+                if (newText == null || newText.trim().isEmpty()) {
+                    Log.d(TAG, "onQueryTextChange: IT'S EMPTY");
+                    adapter.show(userList);
+                } else {
+                    adapter.filter(newText); // Filter adapter based on user input
+                }
                 return false;
             }
         });
     }
-
 
     @Override
     public void onFriendAdded(User user) {

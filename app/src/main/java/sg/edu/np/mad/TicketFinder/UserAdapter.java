@@ -21,9 +21,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private LayoutInflater mInflater;
     private OnFriendAddListener friendAddListener; // Listener for friend addition
 
-    // Interface for friend addition callback
-    public interface OnFriendAddListener {
-        void onFriendAdded(User user);
+    // Constructor to initialize data
+    public UserAdapter(Context context, List<User> userList) {
+        this.mInflater = LayoutInflater.from(context);
+        this.userList = userList;
+        this.filteredList = new ArrayList<>(userList); // Initially, filteredList contains all users
     }
 
     // Setter for friendAddListener
@@ -31,11 +33,27 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         this.friendAddListener = listener;
     }
 
-    // Constructor to initialize data
-    public UserAdapter(Context context, List<User> userList) {
-        this.mInflater = LayoutInflater.from(context);
-        this.userList = userList;
-        this.filteredList = new ArrayList<>(userList); // Initially, filteredList contains all users
+    // Method to show all users
+    public void show(List<User> userList) {
+        this.filteredList = new ArrayList<>(userList);
+        notifyDataSetChanged();
+    }
+
+
+    // Method to update the filtered list based on the query
+    public void filter(String query) {
+        filteredList.clear(); // Clear the previous filtered list
+        if (query.trim().isEmpty()) {
+            filteredList.addAll(userList); // If query is empty, show all users
+        } else {
+            query = query.toLowerCase();
+            for (User user : userList) {
+                if (user.getName().toLowerCase().contains(query)) {
+                    filteredList.add(user); // Add user to filtered list if name matches query
+                }
+            }
+        }
+        notifyDataSetChanged(); // Notify adapter of data change
     }
 
     // Inflate the row layout when needed
@@ -85,20 +103,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             });
         }
     }
-
-    // Method to update the filtered list based on the query
-    public void filter(String query) {
-        filteredList.clear(); // Clear the previous filtered list
-        if (query.trim().isEmpty()) {
-            filteredList.addAll(userList); // If query is empty, show all users
-        } else {
-            query = query.toLowerCase();
-            for (User user : userList) {
-                if (user.getName().toLowerCase().contains(query)) {
-                    filteredList.add(user); // Add user to filtered list if name matches query
-                }
-            }
-        }
-        notifyDataSetChanged(); // Notify adapter of data change
+    public interface OnFriendAddListener {
+        void onFriendAdded(User user);
     }
 }
