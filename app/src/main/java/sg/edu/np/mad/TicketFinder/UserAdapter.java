@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -33,13 +34,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private FirebaseFirestore db;
     private OnFriendAddListener friendAddListener; // Listener for friend addition
     private static String TAG = "userAdapter";
+    private String currentUserId;
 
     // Constructor to initialize data
-    public UserAdapter(Context context, List<User> userList) {
+    public UserAdapter(Context context, List<User> userList, String currentUserId) {
         this.context = context;
         this.mInflater = LayoutInflater.from(context);
         this.userList = userList;
         this.filteredList = new ArrayList<>(userList); // Initially, filteredList contains all users
+        this.currentUserId = currentUserId;
         db = FirebaseFirestore.getInstance();
     }
     // Inflate the row layout when needed
@@ -94,7 +97,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             for (User user : userList) {
                 if (user.getName().toLowerCase().contains(query)) {
                     filteredList.add(user); // Add user to filtered list if name matches query
-                    Log.d(TAG, "filter: "+filteredList);
                 }
             }
         }
@@ -110,9 +112,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private void showTransferDialog(Context context, User friend) {
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Add Friend")
-                .setMessage("Do you want to add " + friend.getName() + "as your friend?")
+                .setMessage("Do you want to add " + friend.getName() + " as your friend?")
                 .setPositiveButton("Yes", (dialogInterface, which) -> {
-                    Toast.makeText(context, friend.getName() + "is your friend now !!", Toast.LENGTH_SHORT).show();
+                    addFriendToCurrentUser(friend.getUserId());
+                    Toast.makeText(context, friend.getName() + " is your friend now !!", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("No", (dialogInterface, which) -> dialogInterface.dismiss())
                 .create();
@@ -124,6 +127,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
+
 
     // Stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -142,4 +146,24 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public interface OnFriendAddListener {
         void onFriendAdded(User user);
     }
+    public void addFriendToCurrentUser(String friendUserId) {
+        Log.d(TAG, "addFriendToCurrentUser: Adding friend " + friendUserId + " to user " + currentUserId);
+        db.collection("Account")
+                .whereEqualTo("userId", Integer.parseInt(currentUserId))
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            db.collection("Account").document(document.getId())
+                                    .update("friends", FieldValue.arrayUnion(friendUserId))
+                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "addFriendToCurrentUser: DocumentSnapshot successfully updated!"))
+                                    .addOnFailureListener(e -> Log.w(TAG, "addFriendToCurrentUser: Error updating document", e));
+                        }
+                    } else {
+                        Log.w(TAG, "addFriendToCurrentUser: No matching documents found or task not successful");
+                    }
+                })
+                .addOnFailureListener(e -> Log.w(TAG, "addFriendToCurrentUser: Error getting documents", e));
+    }
+
 }

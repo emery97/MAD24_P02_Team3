@@ -1,5 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -46,7 +48,11 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         // Initialize userList with data (e.g., fetched from Firestore)
         userList = new ArrayList<>(); // Populate userList with your data
 
-        adapter = new UserAdapter(this, userList);
+        // Get shared preferences for user data
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentUserId = sharedPreferences.getString("UserId", null);
+        adapter = new UserAdapter(this, userList, currentUserId);
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
