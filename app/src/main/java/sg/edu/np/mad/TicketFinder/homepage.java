@@ -183,6 +183,7 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
     private SharedPreferences sharedPreferences;
     private UserPreferences preferences;
     private SpeechRecognitionNav speechRecognitionHelper;
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,7 +263,6 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
         });
 
         // Initialize and set up speech recognition
-        speechRecognitionHelper = new SpeechRecognitionNav(this, this);
         ImageButton speakerButton = findViewById(R.id.speakerButton);
         speakerButton.setOnClickListener(v -> speechRecognitionHelper.startListening());
     }
@@ -273,17 +273,16 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
         String choice3 = sharedPreferences.getString("choice3", null);
 
         preferences = new UserPreferences(choice1, choice2, choice3);
-
-        // Display a toast message indicating the retrieved preferences
-//        Toast.makeText(this, "Preferences retrieved: " + choice1 + ", " + choice2 + ", " + choice3, Toast.LENGTH_LONG).show(); //for testing
     }
 
     // Method to fetch the event list and update the RecyclerViews
     private void getEventList() {
         handler.getData(new FirestoreCallback<Event>() {
             @Override
-            public void onCallback(ArrayList<Event> eventList) {
-                if (eventList != null && !eventList.isEmpty()) {
+            public void onCallback(ArrayList<Event> fetchedEventList) {
+                if (fetchedEventList != null && !fetchedEventList.isEmpty()) {
+                    eventList = fetchedEventList; // Save the event list for speech recognition
+
                     // Sort events by date for "Upcoming Events"
                     Collections.sort(eventList, new Comparator<Event>() {
                         @Override
@@ -328,6 +327,9 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
 
                         gridItemAdapter.setSearchList(new ArrayList<>(remainingEvents));
                     });
+
+                    // Initialize the speech recognition helper with the event list
+                    speechRecognitionHelper = new SpeechRecognitionNav(homepage.this, homepage.this, eventList);
                 }
             }
         });
@@ -337,8 +339,10 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
     private void fetchEventsForVenue(String venue) {
         handler.getData(new FirestoreCallback<Event>() {
             @Override
-            public void onCallback(ArrayList<Event> eventList) {
-                if (eventList != null && !eventList.isEmpty()) {
+            public void onCallback(ArrayList<Event> fetchedEventList) {
+                if (fetchedEventList != null && !fetchedEventList.isEmpty()) {
+                    eventList = fetchedEventList; // Save the event list for speech recognition
+
                     ArrayList<Event> filteredEvents;
                     if (venue.equals("Singapore")) {
                         // Show all events if "Singapore" is selected
@@ -400,6 +404,9 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
 
                         gridItemAdapter.setSearchList(remainingEvents);
                     });
+
+                    // Initialize the speech recognition helper with the event list
+                    speechRecognitionHelper = new SpeechRecognitionNav(homepage.this, homepage.this, eventList);
                 }
             }
         });
@@ -422,7 +429,7 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
         }
     }
 
-    // SpeechRecognition.SpeechRecognitionListener implementation
+    // SpeechRecognitionNav.SpeechRecognitionListener implementation
     @Override
     public void onReadyForSpeech() {
         Toast.makeText(this, "Listening...", Toast.LENGTH_SHORT).show();
@@ -455,24 +462,26 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
 
     @Override
     public void onResults(String result) {
-        String navigationCommand = SpeechRecognitionNav.getNavigationCommand(result);
+        String navigationCommand = speechRecognitionHelper.getNavigationCommand(result);
         if (navigationCommand != null) {
-            switch (navigationCommand) {
-                case "homepage":
-                    startActivity(new Intent(this, homepage.class));
-                    break;
-                case "exploreEvents":
-                    startActivity(new Intent(this, ExploreEvents.class));
-                    break;
-                case "bookingHistory":
-                    startActivity(new Intent(this, BookingHistoryDetails.class));
-                    break;
-                case "profilePage":
-                    startActivity(new Intent(this, profilePage.class));
-                    break;
-                default:
-                    Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
-                    break;
+            if (navigationCommand.equals("homepage")) {
+                startActivity(new Intent(this, homepage.class));
+            } else if (navigationCommand.equals("exploreEvents")) {
+                startActivity(new Intent(this, ExploreEvents.class));
+            } else if (navigationCommand.equals("bookingHistory")) {
+                startActivity(new Intent(this, BookingHistoryDetails.class));
+            } else if (navigationCommand.equals("profilePage")) {
+                startActivity(new Intent(this, profilePage.class));
+            } else {
+                for (Event event : eventList) {
+                    if (navigationCommand.equals(event.getTitle())) {
+                        Intent intent = new Intent(this, EventDetails.class);
+                        intent.putExtra("event", event);
+                        startActivity(intent);
+                        return;
+                    }
+                }
+                Toast.makeText(this, "Event not recognized", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
