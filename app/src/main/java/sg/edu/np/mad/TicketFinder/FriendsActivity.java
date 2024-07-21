@@ -24,6 +24,8 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private List<User> userList;
+    private List<User>friendList;
+    private List<String>friendUserId;
     private String currentUserId; // Ensure this is declared at the class level
     private static final String TAG = "friendsActivity";
 
@@ -38,36 +40,45 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         searchView = findViewById(R.id.searchFriends);
         recyclerView = findViewById(R.id.exploreView);
 
-        // Initialize userList with data (e.g., fetched from Firestore)
-        userList = new ArrayList<>(); // Populate userList with your data
+        userList = new ArrayList<>();
+        friendList = new ArrayList<>();
+        friendUserId = new ArrayList<>();
 
-        // Get shared preferences for user data
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        currentUserId = sharedPreferences.getString("UserId", null); // Initialize currentUserId here
+        currentUserId = sharedPreferences.getString("UserId", null);
 
         Log.d(TAG, "Current User ID: " + currentUserId);
 
-        adapter = new UserAdapter(this, userList, currentUserId); // Pass currentUserId to the adapter
-
+        adapter = new UserAdapter(this, userList, currentUserId);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Fetch users from Firestore
-        fetchUsers(new FetchUsersCallback() {
+        fetchCurrentUserFriends(new FetchUsersCallback() {
             @Override
-            public void onFetchCompleted(List<User> userList) {
-                showUsers();
-                setupSearchListener(); // Set up search listener after fetching users
+            public void onFetchCompleted(List<User> userList, List<User> friendList, List<String> friendUserId) {
+                fetchUsers(new FetchUsersCallback() {
+                    @Override
+                    public void onFetchCompleted(List<User> userList, List<User> friendList, List<String> friendUserId) {
+                        for(User user: userList){
+                            Log.d(TAG, "onFetchCompleted: "+ user.getName());
+                        }
+                        showUsers();
+                        setupSearchListener();
+                    }
+                });
             }
         });
-        // Set up footer
+
         Footer.setUpFooter(this);
     }
 
     // Define a callback interface
     public interface FetchUsersCallback {
-        void onFetchCompleted(List<User> userList);
+        void onFetchCompleted(List<User> userList, List<User> friendList, List<String> friendUserId);
     }
+
+
+
 
     private void fetchUsers(FetchUsersCallback callback) {
         Log.d(TAG, "fetchUsers: " + currentUserId);
@@ -76,11 +87,13 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         userList.clear();
+
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             User user = new User();
                             user.setName(document.getString("Name"));
                             user.setUserId(document.getLong("userId").toString());
                             String profilePicURL = document.getString("ProfilePicUrl");
+
                             if (profilePicURL != null) {
                                 user.setProfileImageUrl(profilePicURL);
                             } else {
@@ -91,14 +104,79 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                             }
                         }
                         adapter.notifyDataSetChanged();
+
+                        // removing friend from user list
+                        userList.removeIf(user -> friendUserId.contains(user.getUserId()));
+
                         // Notify callback
-                        callback.onFetchCompleted(userList);
-                        Log.d(TAG, "fetchUsers: " + userList.size());
+                        callback.onFetchCompleted(userList, friendList, friendUserId);
+
+//                        Log.d(TAG, "fetchUsers USER LIST: " + userList.size());
+//                        Log.d(TAG, "fetchUsers friend list " + friendList.size());
+//                        Log.d(TAG, "fetchUsers:  FRIEND USER ID LIST  " + friendUserId.size());
+
                     } else {
                         Log.e("FriendsActivity", "Error fetching users", task.getException());
                     }
                 });
     }
+    private void fetchCurrentUserFriends(FetchUsersCallback callback) {
+        Log.d(TAG, "fetchCurrentUserFriends: " + currentUserId);
+        db.collection("Account")
+                .whereEqualTo("userId", Long.parseLong(currentUserId))
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        friendList.clear(); // Clear friendList before populating
+                        friendUserId.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Get friends list
+                            List<String> friends = (List<String>) document.get("friends");
+                            if (friends != null) {
+                                for (String friendId : friends) {
+                                    fetchFriendDetails(friendId, callback); // Pass the callback
+                                    friendUserId.add(friendId); // add friend's user id to friendUserId list
+                                }
+                            } else {
+                                Log.d(TAG, "No friends found for current user: " + currentUserId);
+                                // Call the callback even if no friends are found
+                                callback.onFetchCompleted(userList, friendList, friendUserId);
+                            }
+                        }
+                    } else {
+                        Log.e("FriendsActivity", "Error fetching current user friends", task.getException());
+                    }
+                    Log.d(TAG, "fetchCurrentUserFriends: friend user id " + friendUserId.size());
+                });
+    }
+
+    private void fetchFriendDetails(String friendId, FetchUsersCallback callback) {
+        db.collection("Account")
+                .whereEqualTo("userId", Long.parseLong(friendId))
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            User friend = new User();
+                            friend.setName(document.getString("Name"));
+                            friend.setUserId(document.getLong("userId").toString());
+                            String profilePicURL = document.getString("ProfilePicUrl");
+                            if (profilePicURL != null) {
+                                friend.setProfileImageUrl(profilePicURL);
+                            } else {
+                                friend.setProfileImageUrl(""); // Set empty URL
+                            }
+                            friendList.add(friend); // Add friend to friendList
+                        }
+//                        Log.d(TAG, "Friend list size: " + friendList.size());
+                        // Notify callback after fetching all friends
+                        callback.onFetchCompleted(userList, friendList, friendUserId);
+                    } else {
+                        Log.e("FriendsActivity", "Error fetching friend details", task.getException());
+                    }
+                });
+    }
+
 
     private void showUsers() {
         adapter.show(userList);

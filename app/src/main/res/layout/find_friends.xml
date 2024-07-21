@@ -64,6 +64,14 @@
                     app:queryHint="Search events ...">
 
                 </SearchView>
+                <ImageButton
+                    android:id="@+id/friendsNavigation"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/friends_navigation" />
 
             </LinearLayout>
 
