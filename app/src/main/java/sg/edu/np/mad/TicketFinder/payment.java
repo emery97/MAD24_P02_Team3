@@ -15,6 +15,7 @@ import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.autofill.AutofillManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +27,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationManagerCompat;
+import androidx.biometric.BiometricPrompt;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -42,7 +43,6 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -50,15 +50,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-
-// notification
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.os.Build;
-import androidx.core.app.NotificationCompat;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class payment extends AppCompatActivity {
     private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
@@ -73,6 +66,8 @@ public class payment extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
+
+    private boolean autofillUsed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +169,79 @@ public class payment extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        promptRetrieveCredentials();
+    }
+
+    private void promptRetrieveCredentials() {
+        android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
+                .setTitle("Retrieve Saved Credentials")
+                .setMessage("Do you want to retrieve your saved card details?")
+                .setPositiveButton(android.R.string.yes, (dialogInterface, which) -> {
+                    promptBiometricForRetrieve();
+                })
+                .setNegativeButton(android.R.string.no, (dialogInterface, which) -> {
+                    // User chose not to retrieve saved credentials
+                    editCardNumber.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+                    editExpiry.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+                    editCVV.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+                })
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+            dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
+        });
+
+        dialog.show();
+    }
+
+    // Prompt for biometric authentication before retrieving credentials
+    private void promptBiometricForRetrieve() {
+        Executor executor = Executors.newSingleThreadExecutor();
+        BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                // Use payment.this.runOnUiThread() to access runOnUiThread
+                payment.this.runOnUiThread(() -> {
+                    autofillCredentials();
+                });
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                // Handle error or cancel
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                // Handle failure
+            }
+        });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for my app")
+                .setSubtitle("Log in using your biometric credential to retrieve saved credentials")
+                .setDeviceCredentialAllowed(true) // Allow using device credentials (PIN, pattern, password)
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    // Autofill credentials after biometric authentication succeeds
+    private void autofillCredentials() {
+        AutofillManager autofillManager = this.getSystemService(AutofillManager.class);
+        if (autofillManager != null) {
+            editCardNumber.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
+            editExpiry.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
+            editCVV.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
+            autofillManager.requestAutofill(editCardNumber);
+            autofillManager.requestAutofill(editExpiry);
+            autofillManager.requestAutofill(editCVV);
+            autofillUsed = true; // Set autofill used to true
+        }
     }
 
     private boolean validateInput() {

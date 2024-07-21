@@ -153,7 +153,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -170,7 +172,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class homepage extends AppCompatActivity {
+public class homepage extends AppCompatActivity implements SpeechRecognition.SpeechRecognitionListener {
 
     private RecyclerView horizontalRecyclerView;
     private EventAdapter horizontalItemAdapter;
@@ -180,6 +182,7 @@ public class homepage extends AppCompatActivity {
     private Spinner venueSpinner;
     private SharedPreferences sharedPreferences;
     private UserPreferences preferences;
+    private SpeechRecognition speechRecognitionHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +260,11 @@ public class homepage extends AppCompatActivity {
             Intent intent = new Intent(homepage.this, FriendsActivity.class);
             startActivity(intent);
         });
+
+        // Initialize and set up speech recognition
+        speechRecognitionHelper = new SpeechRecognition(this, this);
+        ImageButton speakerButton = findViewById(R.id.speakerButton);
+        speakerButton.setOnClickListener(v -> speechRecognitionHelper.startListening());
     }
 
     private void loadUserPreferences() {
@@ -412,5 +420,72 @@ public class homepage extends AppCompatActivity {
             // Update the span count of the grid layout manager based on the new config
             layoutManager.setSpanCount(getSpanCount());
         }
+    }
+
+    // SpeechRecognition.SpeechRecognitionListener implementation
+    @Override
+    public void onReadyForSpeech() {
+        Toast.makeText(this, "Listening...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+        // Handle beginning of speech
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        // Handle RMS change
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        // Handle buffer received
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Toast.makeText(this, "Processing...", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onError(int error) {
+        Toast.makeText(this, "Error: " + error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResults(String result) {
+        String navigationCommand = SpeechRecognition.getNavigationCommand(result);
+        if (navigationCommand != null) {
+            switch (navigationCommand) {
+                case "homepage":
+                    startActivity(new Intent(this, homepage.class));
+                    break;
+                case "exploreEvents":
+                    startActivity(new Intent(this, ExploreEvents.class));
+                    break;
+                case "bookingHistory":
+                    startActivity(new Intent(this, BookingHistoryDetails.class));
+                    break;
+                case "profilePage":
+                    startActivity(new Intent(this, profilePage.class));
+                    break;
+                default:
+                    Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        } else {
+            Toast.makeText(this, "Command not recognized", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onPartialResults(String partialResult) {
+        // Handle partial results
+    }
+
+    @Override
+    public void onEvent(int eventType, Bundle params) {
+        // Handle event
     }
 }

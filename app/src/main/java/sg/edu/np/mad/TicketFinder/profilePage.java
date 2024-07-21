@@ -373,6 +373,7 @@ public class profilePage extends AppCompatActivity {
         // Regular fields not shown
         username.setVisibility(View.GONE);
         password.setVisibility(View.GONE);
+        editingIcon.setVisibility(View.GONE);
 
         // Replaced by editing fields
         editUsername.setVisibility(View.VISIBLE);
@@ -392,6 +393,8 @@ public class profilePage extends AppCompatActivity {
         // Regular fields shown
         username.setVisibility(View.VISIBLE);
         password.setVisibility(View.VISIBLE);
+        editingIcon.setVisibility(View.VISIBLE);
+
 
         // Editing fields and save button not shown
         editUsername.setVisibility(View.GONE);
