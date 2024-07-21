@@ -27,6 +27,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    packaging {
+        resources {
+            excludes.add("META-INF/INDEX.LIST")
+            excludes.add("META-INF/DEPENDENCIES")
+        }
+    }
 }
 
 dependencies {
@@ -49,7 +55,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
     implementation("com.google.firebase:firebase-storage:21.0.0")
     implementation("com.google.firebase:firebase-messaging") {
-        exclude(group = "com.google.firebase", module = "firebase-iid") // conflicted with chatbot
+        exclude(group = "com.google.firebase", module = "firebase-iid")
     }
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.google.android.material:material:1.12.0")
@@ -57,7 +63,7 @@ dependencies {
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
 
-    //maps
+    // Maps
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.libraries.places:places:2.5.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
@@ -66,24 +72,47 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.8.8")
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
     // For Google Auth and Calendar integrations
     implementation("com.google.android.gms:play-services-auth:20.3.0")
     implementation("org.apache.commons:commons-text:1.9")
+
     // For easy permissions
     implementation("pub.devrel:easypermissions:3.0.0")
     implementation("androidx.biometric:biometric:1.2.0-alpha04")
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-    // chat bot
+
+    // Chat bot
     implementation("com.google.firebase:firebase-ml-natural-language:22.0.0") {
         exclude(group = "com.google.firebase", module = "firebase-iid")
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
+        exclude(group = "com.google.api.grpc", module = "proto-google-common-protos")
+        exclude(group = "com.google.type", module = "PostalAddressProto")
+        exclude(group = "com.google.type", module = "Quaternion")
+        exclude(group = "com.google.type", module = "TimeOfDay")
+        exclude(group = "com.google.type", module = "TimeZone")
     }
     implementation("com.google.firebase:firebase-ml-natural-language-smart-reply-model:20.0.7") {
         exclude(group = "com.google.firebase", module = "firebase-iid")
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
+        exclude(group = "com.google.api.grpc", module = "proto-google-common-protos")
+        exclude(group = "com.google.type", module = "PostalAddressProto")
+        exclude(group = "com.google.type", module = "Quaternion")
+        exclude(group = "com.google.type", module = "TimeOfDay")
+        exclude(group = "com.google.type", module = "TimeZone")
     }
-    implementation ("com.airbnb.android:lottie:5.0.3")
-    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.airbnb.android:lottie:5.0.3")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("org.apache.commons:commons-text:1.9")
+    implementation("com.google.cloud:google-cloud-translate:1.95.1") {
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
+        exclude(group = "com.google.api.grpc", module = "proto-google-common-protos")
+        exclude(group = "com.google.type", module = "PostalAddressProto")
+        exclude(group = "com.google.type", module = "Quaternion")
+        exclude(group = "com.google.type", module = "TimeOfDay")
+        exclude(group = "com.google.type", module = "TimeZone")
+    }
 
     // for unfriend activity
     implementation ("com.google.code.gson:gson:2.8.6")
