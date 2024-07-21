@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.autofill.AutofillManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ public class SignIn extends Fragment {
     private EditText passwordField;
     private Button submitButton;
     private TextView forgotpassword;
+    private ImageButton autoFillIcon;
+    private TextView autoFilltext;
 
     // Firebase and SharedPreferences
     private FirebaseFirestore db;
@@ -62,6 +65,8 @@ public class SignIn extends Fragment {
         passwordField = view.findViewById(R.id.Password);
         submitButton = view.findViewById(R.id.Submit);
         forgotpassword = view.findViewById(R.id.forgotPassword);
+        autoFillIcon = view.findViewById(R.id.autoFillIcon);
+        autoFilltext = view.findViewById(R.id.autoFilltext);
 
         // Disable autofill initially
         emailField.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
@@ -94,8 +99,15 @@ public class SignIn extends Fragment {
             }
         });
 
-        // Prompt the user if they want to use autofill
-        promptRetrieveCredentials();
+        // OnClickListener for the "AutoFill" icon
+        View.OnClickListener autoFillListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptBiometricForRetrieve();
+            }
+        };
+        autoFillIcon.setOnClickListener(autoFillListener);
+        autoFilltext.setOnClickListener(autoFillListener);
 
         return view;
     }
@@ -280,29 +292,6 @@ public class SignIn extends Fragment {
     // Interface for login success listener
     public interface OnLoginSuccessListener {
         void onLoginSuccess();
-    }
-
-    // Prompt the user if they want to retrieve saved credentials
-    private void promptRetrieveCredentials() {
-        AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.CustomAlertDialogTheme)
-                .setTitle("Retrieve Saved Credentials")
-                .setMessage("Do you want to retrieve your saved email and password?")
-                .setPositiveButton(android.R.string.yes, (dialogInterface, which) -> {
-                    promptBiometricForRetrieve();
-                })
-                .setNegativeButton(android.R.string.no, (dialogInterface, which) -> {
-                    // User chose not to retrieve saved credentials
-                    emailField.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
-                    passwordField.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
-                })
-                .create();
-
-        dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
-        });
-
-        dialog.show();
     }
 
 
