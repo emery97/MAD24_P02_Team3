@@ -1,9 +1,11 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,18 +16,19 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FriendsActivity extends AppCompatActivity implements UserAdapter.OnFriendAddListener {
-
     private SearchView searchView;
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private List<User> userList;
-    private List<User>friendList;
-    private List<String>friendUserId;
+    private List<User> friendList;
+    private List<String> friendUserId;
     private String currentUserId; // Ensure this is declared at the class level
     private static final String TAG = "friendsActivity";
 
@@ -59,14 +62,23 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                 fetchUsers(new FetchUsersCallback() {
                     @Override
                     public void onFetchCompleted(List<User> userList, List<User> friendList, List<String> friendUserId) {
-                        for(User user: userList){
-                            Log.d(TAG, "onFetchCompleted: "+ user.getName());
+                        for (User user : userList) {
+                            Log.d(TAG, "onFetchCompleted: " + user.getName());
                         }
                         showUsers();
                         setupSearchListener();
+                        storeFriendListInSharedPreferences(friendList);
                     }
                 });
             }
+        });
+
+        // Set onclicklistener for unfriend page
+        ImageButton unfriendButton = findViewById(R.id.friendsNavigation);
+        unfriendButton.setOnClickListener(v -> {
+            Log.d(TAG, "onCreate: UNFRIEND BUTTON");
+            Intent intent = new Intent(FriendsActivity.this, UnfriendActivity.class);
+            startActivity(intent);
         });
 
         Footer.setUpFooter(this);
@@ -77,8 +89,14 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         void onFetchCompleted(List<User> userList, List<User> friendList, List<String> friendUserId);
     }
 
-
-
+    private void storeFriendListInSharedPreferences(List<User> friendList) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(friendList);
+        editor.putString("friendList", json);
+        editor.apply();
+    }
 
     private void fetchUsers(FetchUsersCallback callback) {
         Log.d(TAG, "fetchUsers: " + currentUserId);
@@ -111,15 +129,12 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                         // Notify callback
                         callback.onFetchCompleted(userList, friendList, friendUserId);
 
-//                        Log.d(TAG, "fetchUsers USER LIST: " + userList.size());
-//                        Log.d(TAG, "fetchUsers friend list " + friendList.size());
-//                        Log.d(TAG, "fetchUsers:  FRIEND USER ID LIST  " + friendUserId.size());
-
                     } else {
                         Log.e("FriendsActivity", "Error fetching users", task.getException());
                     }
                 });
     }
+
     private void fetchCurrentUserFriends(FetchUsersCallback callback) {
         Log.d(TAG, "fetchCurrentUserFriends: " + currentUserId);
         db.collection("Account")
@@ -168,7 +183,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                             }
                             friendList.add(friend); // Add friend to friendList
                         }
-//                        Log.d(TAG, "Friend list size: " + friendList.size());
                         // Notify callback after fetching all friends
                         callback.onFetchCompleted(userList, friendList, friendUserId);
                     } else {
@@ -176,7 +190,6 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                     }
                 });
     }
-
 
     private void showUsers() {
         adapter.show(userList);

@@ -118,6 +118,9 @@
         <activity
             android:name=".FriendsActivity"
             android:exported="true" />
+        <activity
+            android:name=".UnfriendActivity"
+            android:exported="true" />
 
         <receiver
             android:name=".payment"
