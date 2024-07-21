@@ -172,7 +172,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class homepage extends AppCompatActivity implements SpeechRecognition.SpeechRecognitionListener {
+public class homepage extends AppCompatActivity implements SpeechRecognitionNav.SpeechRecognitionListener {
 
     private RecyclerView horizontalRecyclerView;
     private EventAdapter horizontalItemAdapter;
@@ -182,7 +182,7 @@ public class homepage extends AppCompatActivity implements SpeechRecognition.Spe
     private Spinner venueSpinner;
     private SharedPreferences sharedPreferences;
     private UserPreferences preferences;
-    private SpeechRecognition speechRecognitionHelper;
+    private SpeechRecognitionNav speechRecognitionHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,7 +262,7 @@ public class homepage extends AppCompatActivity implements SpeechRecognition.Spe
         });
 
         // Initialize and set up speech recognition
-        speechRecognitionHelper = new SpeechRecognition(this, this);
+        speechRecognitionHelper = new SpeechRecognitionNav(this, this);
         ImageButton speakerButton = findViewById(R.id.speakerButton);
         speakerButton.setOnClickListener(v -> speechRecognitionHelper.startListening());
     }
@@ -455,7 +455,7 @@ public class homepage extends AppCompatActivity implements SpeechRecognition.Spe
 
     @Override
     public void onResults(String result) {
-        String navigationCommand = SpeechRecognition.getNavigationCommand(result);
+        String navigationCommand = SpeechRecognitionNav.getNavigationCommand(result);
         if (navigationCommand != null) {
             switch (navigationCommand) {
                 case "homepage":

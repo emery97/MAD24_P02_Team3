@@ -11,13 +11,13 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class SpeechRecognition {
+public class SpeechRecognitionNav {
     private static final String TAG = "SpeechRecognition";
     private SpeechRecognizer speechRecognizer;
     private Intent recognizerIntent;
     private SpeechRecognitionListener listener;
 
-    public SpeechRecognition(Context context, SpeechRecognitionListener listener) {
+    public SpeechRecognitionNav(Context context, SpeechRecognitionListener listener) {
         this.listener = listener;
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
         speechRecognizer.setRecognitionListener(new RecognitionListener() {
