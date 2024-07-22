@@ -423,7 +423,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
 
         if (checkForArtistMatch(cleanedMessage)) {
-            hideSuggestedPrompts();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideSuggestedPrompts();
+                }
+            });
             return;
         }
 
@@ -556,23 +561,47 @@ public class TicketFinderChatbot extends AppCompatActivity {
         addMessageToChat(introMessage);
     }
 
-    private void addEventMessageToChat(Event event) {
-        // Check if the last message in the list is the same to avoid duplication
-        if (messageList.isEmpty() || !messageList.get(messageList.size() - 1).getMessage().equals(event.getArtist())) {
-            messageList.add(new Message(event));
-            chatAdapter.notifyDataSetChanged();
-            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-        }
+    private void addEventMessageToChat(final Event event) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (event != null) {
+                    Log.d("addEventMessageToChat", "Adding event message to chat: " + event.getArtist()); // Debugging log
+                    if (messageList.isEmpty() || !messageList.get(messageList.size() - 1).getMessage().equals(event.getArtist())) {
+                        messageList.add(new Message(event));
+                        chatAdapter.notifyDataSetChanged();
+                        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    } else {
+                        Log.d("addEventMessageToChat", "Duplicate event message not added."); // Debugging log
+                    }
+                } else {
+                    Log.e("addEventMessageToChat", "Received null event"); // Debugging log
+                }
+            }
+        });
     }
 
-    private void addMessageToChat(String message) {
-        // Check if the last message in the list is the same to avoid duplication
-        if (messageList.isEmpty() || !messageList.get(messageList.size() - 1).getMessage().equals(message)) {
-            messageList.add(new Message(message, false));
-            chatAdapter.notifyDataSetChanged();
-            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-        }
+
+    private void addMessageToChat(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (message != null) {
+                    Log.d("addMessageToChat", "Adding message to chat: " + message); // Debugging log
+                    if (messageList.isEmpty() || !messageList.get(messageList.size() - 1).getMessage().equals(message)) {
+                        messageList.add(new Message(message, false));
+                        chatAdapter.notifyDataSetChanged();
+                        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    } else {
+                        Log.d("addMessageToChat", "Duplicate message not added."); // Debugging log
+                    }
+                } else {
+                    Log.e("addMessageToChat", "Received null message"); // Debugging log
+                }
+            }
+        });
     }
+
 
 
 
