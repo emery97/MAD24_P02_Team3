@@ -219,7 +219,7 @@ Entertainment
   - Displays a map fragment with a pin on the event venue
   - Automatically zoomed in on the event venue area to display all necessary labels and surrounding details
  
- - **Google Maps Navigation**:
+- **Google Maps Navigation**:
   - Allows user to find the best route to the event venue from their current location
   - Clicking "Go to Google Maps" will open the Maps application in navigation mode, with the event venue automatically input as the destination
     
