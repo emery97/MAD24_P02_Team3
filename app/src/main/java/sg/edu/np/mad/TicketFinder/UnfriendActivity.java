@@ -31,17 +31,16 @@ public class UnfriendActivity extends AppCompatActivity {
         setContentView(R.layout.unfriend_friend_activity);
 
         try {
-            searchView = findViewById(R.id.searchFriends);
+            // Step 1: Initialize UI components
+            searchView = findViewById(R.id.searchFriendsToUnfriend);
             recyclerView = findViewById(R.id.exploreView);
             ImageButton addFriendButton = findViewById(R.id.addFriendPageButton);
 
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            friendList = new ArrayList<>();
-
-            // Retrieve friend list from SharedPreferences
+            // Step 2: Retrieve data from SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String json = sharedPreferences.getString("friendList", null); // Note the null check
             String currentUserId = sharedPreferences.getString("UserId", null); // Retrieve current user ID
+            friendList = new ArrayList<>();
             if (json != null && !json.isEmpty()) {
                 Gson gson = new Gson();
                 friendList = gson.fromJson(json, new TypeToken<List<User>>() {}.getType());
@@ -52,10 +51,12 @@ public class UnfriendActivity extends AppCompatActivity {
             // Log the retrieved friend list size for debugging
             Log.d(TAG, "Retrieved friend list size: " + friendList.size());
 
-            // Initialize the adapter and set it to the RecyclerView
-            adapter = new UnfriendAdapter(this, friendList,currentUserId);
+            // Step 3: Set up the RecyclerView and Adapter
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            adapter = new UnfriendAdapter(this, friendList, currentUserId);
             recyclerView.setAdapter(adapter);
 
+            // Step 4: Set up listeners
             // Set onclick listener for friend page
             addFriendButton.setOnClickListener(v -> {
                 Log.d(TAG, "Navigating to FriendsActivity");
@@ -63,9 +64,44 @@ public class UnfriendActivity extends AppCompatActivity {
                 startActivity(intent);
             });
 
+            // Set up search listener
+            setupSearchListener();
+
+            // Step 5: Footer setup
             Footer.setUpFooter(this);
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: ", e);
         }
+    }
+
+    private void showUsers() {
+        adapter.show(friendList);
+    }
+
+    private void setupSearchListener() {
+        Log.d(TAG, "setupSearchListener: " + friendList.size());
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "onQueryTextSubmit: " + query);
+                if (query == null || query.trim().isEmpty()) {
+                    adapter.show(friendList);
+                } else {
+                    adapter.filter(query); // Filter adapter based on user input
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "onQueryTextChange: " + newText);
+                if (newText == null || newText.trim().isEmpty()) {
+                    adapter.show(friendList);
+                } else {
+                    adapter.filter(newText); // Filter adapter based on user input
+                }
+                return false;
+            }
+        });
     }
 }
