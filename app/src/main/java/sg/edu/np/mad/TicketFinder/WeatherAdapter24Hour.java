@@ -38,6 +38,11 @@ public class WeatherAdapter24Hour extends RecyclerView.Adapter<WeatherAdapter24H
         notifyDataSetChanged();
     }
 
+    public void addWeatherData(List<WeatherData24> newWeatherData) {
+        weatherDataList.addAll(newWeatherData);
+        notifyDataSetChanged(); // Notify adapter of the updated data
+    }
+
     @Override
     public int getItemCount() {
         return weatherDataList.size();

@@ -6,15 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,11 +61,18 @@ public class weather extends AppCompatActivity {
     private RecyclerView recyclerView24HourForecast;
     private WeatherAdapter24Hour weatherAdapter24Hour;
     private Spinner spinnerForecastType;
+    private static final int PAGE_SIZE = 10; // Number of items per page
+    private int currentPage = 0;
+    private boolean isLoading = false;
+    private boolean hasMoreData = true;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        progressBar = findViewById(R.id.progressBar);
 
         searchViewWeather = findViewById(R.id.searchViewWeather);
         spinnerForecastType = findViewById(R.id.spinnerForecastType);
@@ -78,6 +88,28 @@ public class weather extends AppCompatActivity {
         weatherAdapter24Hour = new WeatherAdapter24Hour(new ArrayList<>()); // Initialize with empty list
         recyclerView24HourForecast.setLayoutManager(new LinearLayoutManager(this));
         recyclerView24HourForecast.setAdapter(weatherAdapter24Hour);
+
+        recyclerView24HourForecast.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager != null) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                    if (!isLoading && hasMoreData && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
+                        isLoading = true;
+                        currentPage++;
+                        fetch2HourWeatherData(currentPage);
+                    }
+                }
+            }
+        });
+
+
 
         // Initialize the switch and shared preferences
         weatherNotificationSwitch = findViewById(R.id.weatherNotificationSwitch);
@@ -153,7 +185,7 @@ public class weather extends AppCompatActivity {
                     // Parse JSON and handle data
                     parseWeatherData(responseData);
 
-                    fetch2HourWeatherData();
+                    fetch2HourWeatherData(currentPage);
                 } else {
                     Log.e(TAG, "Unsuccessful response: " + response.message());
                     // Handle unsuccessful response
@@ -162,7 +194,8 @@ public class weather extends AppCompatActivity {
         });
     }
 
-    private void fetch2HourWeatherData() {
+    private void fetch2HourWeatherData(int page) {
+        showLoading();
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -173,6 +206,8 @@ public class weather extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "2-Hour Forecast request failed: " + e.getMessage());
+                isLoading = false;
+                runOnUiThread(() -> hideLoading());
                 // Handle failure
             }
 
@@ -182,11 +217,18 @@ public class weather extends AppCompatActivity {
                     String responseData = response.body().string();
                     Log.d(TAG, "2-Hour Forecast request successful");
                     // Parse JSON and handle data
-                    parse2HourWeatherData(responseData);
+                    runOnUiThread(() -> {
+                        new Handler().postDelayed(() -> {
+                            parse2HourWeatherData(responseData, page);
+                            hideLoading();  // Hide ProgressBar when data is fetched
+                        }, 1000); // 3 seconds delay
+                    });
                 } else {
                     Log.e(TAG, "Unsuccessful 2-Hour Forecast response: " + response.message());
+                    runOnUiThread(() -> hideLoading());
                     // Handle unsuccessful response
                 }
+                isLoading = false;
             }
         });
     }
@@ -260,7 +302,7 @@ public class weather extends AppCompatActivity {
         }
     }
 
-    private void parse2HourWeatherData(String responseData) {
+    private void parse2HourWeatherData(String responseData, int page) {
         try {
             JSONObject json = new JSONObject(responseData);
             JSONArray areaMetadataArray = json.getJSONArray("area_metadata");
@@ -268,13 +310,11 @@ public class weather extends AppCompatActivity {
             JSONObject firstItem = items.getJSONObject(0);
             JSONArray forecasts = firstItem.getJSONArray("forecasts");
 
-            // List to hold 2-hour weather data
-            weatherData2HourList  = new ArrayList<>();
+            List<WeatherData24> newWeatherData2HourList = new ArrayList<>();
 
             // Map to hold the area name to location mapping
             Map<String, double[]> areaLocationMap = new HashMap<>();
 
-            // Loop through area metadata to get the name, latitude, and longitude
             for (int i = 0; i < areaMetadataArray.length(); i++) {
                 JSONObject areaMetadata = areaMetadataArray.getJSONObject(i);
                 String areaName = areaMetadata.getString("name");
@@ -285,8 +325,11 @@ public class weather extends AppCompatActivity {
                 areaLocationMap.put(areaName, new double[]{latitude, longitude});
             }
 
-            // Loop through forecasts to get the area and forecast description
-            for (int i = 0; i < forecasts.length(); i++) {
+            // Calculate start and end indices based on page and page size
+            int start = page * PAGE_SIZE;
+            int end = Math.min(start + PAGE_SIZE, forecasts.length());
+
+            for (int i = start; i < end; i++) {
                 JSONObject forecast = forecasts.getJSONObject(i);
                 String area = forecast.getString("area");
                 String forecastDescription = forecast.getString("forecast");
@@ -295,22 +338,19 @@ public class weather extends AppCompatActivity {
                 double latitude = location != null ? location[0] : 0;
                 double longitude = location != null ? location[1] : 0;
 
-                // Create WeatherData24 object with area, forecast, latitude, and longitude
                 WeatherData24 weatherData = new WeatherData24(area, forecastDescription, latitude, longitude);
-
-                // Add to the list for RecyclerView
-                weatherData2HourList.add(weatherData);
+                newWeatherData2HourList.add(weatherData);
             }
 
-            // Update UI with 2-hour weather data on the main thread
             runOnUiThread(() -> {
-                weatherAdapter24Hour = new WeatherAdapter24Hour(weatherData2HourList);
-                recyclerView24HourForecast.setAdapter(weatherAdapter24Hour);
+                if (newWeatherData2HourList.size() < PAGE_SIZE) {
+                    hasMoreData = false; // No more data to load
+                }
+                weatherAdapter24Hour.addWeatherData(newWeatherData2HourList);
             });
 
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing 2-Hour Forecast JSON: " + e.getMessage());
-            // Handle JSON parsing error
         }
     }
 
@@ -427,5 +467,13 @@ public class weather extends AppCompatActivity {
 
         // Update 2-hour forecast RecyclerView with filtered data
         weatherAdapter24Hour.filterList(filteredList24Hour);
+    }
+
+    private void showLoading() {
+        runOnUiThread(() -> progressBar.setVisibility(View.VISIBLE));
+    }
+
+    private void hideLoading() {
+        runOnUiThread(() -> progressBar.setVisibility(View.GONE));
     }
 }
