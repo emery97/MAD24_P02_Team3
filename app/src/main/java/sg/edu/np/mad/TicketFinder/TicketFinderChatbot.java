@@ -128,6 +128,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
                     handleUserMessage(userMessage);
                     messageInput.setText("");
+                    hideSuggestedPrompts(); // Hide suggested prompts after sending a message
                 }
             }
         });
@@ -608,7 +609,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
         messageInput.setText(prompt);
         messageInput.setSelection(prompt.length());
         lastClickedPrompt = prompt; // Store the last clicked prompt
-        suggestedPromptsRecyclerView.setVisibility(View.GONE);
     }
 
 //    private void detectLanguageAndTranslatePrompts(String userLanguage) {
