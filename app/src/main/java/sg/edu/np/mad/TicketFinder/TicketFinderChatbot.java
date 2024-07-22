@@ -613,63 +613,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
         messageInput.setSelection(prompt.length());
         lastClickedPrompt = prompt; // Store the last clicked prompt
     }
-
-//    private void detectLanguageAndTranslatePrompts(String userLanguage) {
-//        Log.d("detectLanguageAndTranslatePrompts", "Detecting language for prompts. User language: " + userLanguage); // Log the start of language detection
-//        String textToDetect = questionsList.isEmpty() ? "" : questionsList.get(0);
-//
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String detectedLanguage = translator.detectLanguage(textToDetect);
-//                    Log.d("detectLanguageAndTranslatePrompts", "Detected language for prompts: " + detectedLanguage); // Log the detected language
-//
-//                    if (!"en".equals(userLanguage)) {
-//                        translatePromptsToDetectedLanguage(userLanguage);
-//                    } else {
-//                        runOnUiThread(() -> {
-//                            suggestedPromptAdapter.updateData(questionsList);
-//                            suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
-//                            Log.d("detectLanguageAndTranslatePrompts", "Prompts updated in UI with original language"); // Log when prompts are updated with the original language
-//                        });
-//                    }
-//                } catch (Exception e) {
-//                    Log.e("detectLanguageAndTranslatePrompts", "Error in detecting language: ", e);
-//                    runOnUiThread(() -> {
-//                        suggestedPromptAdapter.updateData(questionsList);
-//                        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
-//                        Log.d("detectLanguageAndTranslatePrompts", "Fallback to original prompts in UI after detection error"); // Log when fallback to original prompts occurs
-//                    });
-//                }
-//            }
-//        });
-//    }
-//
-//
-//    private void translatePromptsToDetectedLanguage(final String targetLanguage) {
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    List<String> translatedPrompts = new ArrayList<>();
-//                    for (String prompt : questionsList) {
-//                        String translatedPrompt = translator.translate("en", targetLanguage, prompt);
-//                        translatedPrompts.add(translatedPrompt);
-//                        Log.d("translatePromptsToDetectedLanguage", "Original prompt: " + prompt + ", Translated prompt: " + translatedPrompt);
-//                    }
-//                    translatedQuestionsList = translatedPrompts; // Update the translated prompts list
-//                    runOnUiThread(() -> suggestedPromptAdapter.updateData(translatedPrompts));
-//                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
-//                    Log.d("translatePromptsToDetectedLanguage", "Prompts updated in UI with translated language");
-//                } catch (Exception e) {
-//                    Log.e("translatePromptsToDetectedLanguage", "Error translating prompts: ", e);
-//                    runOnUiThread(() -> suggestedPromptAdapter.updateData(questionsList));
-//                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
-//                }
-//            }
-//        });
-//    }
     // ------------------------------- END OF: suugested prompt methods -------------------------------
 
 
