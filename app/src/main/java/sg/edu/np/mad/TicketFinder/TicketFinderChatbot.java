@@ -113,6 +113,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
         fetchFAQFromFirestore();
         fetchEventsFromFirestore();
+        fetchGreetingsFromFirestore();
         showGreetingMsg();
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -121,89 +122,15 @@ public class TicketFinderChatbot extends AppCompatActivity {
                 String userMessage = messageInput.getText().toString().trim();
                 Log.d("sendButton", "User message: " + userMessage);
                 if (!userMessage.isEmpty()) {
-                    // Run the language detection in a background thread
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                // Detect language of the user message
-                                String detectedLanguage = translator.detectLanguage(userMessage);
-                                Log.d("sendButton", "Detected language: " + detectedLanguage);
-                                userLanguage = detectedLanguage;
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        messageList.add(new Message(userMessage, true));
-                                        chatAdapter.notifyDataSetChanged();
-                                        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-
-                                        // Check if the message is from the suggested prompts
-                                        int index = translatedQuestionsList.indexOf(userMessage);
-                                        String originalPrompt = index != -1 ? questionsList.get(index) : null;
-                                        Log.d("sendButton", "Original prompt: " + originalPrompt);
-
-                                        if (originalPrompt != null) {
-                                            // Find the answer associated with the original prompt
-                                            String answer = chatbotResponsesMap.get(originalPrompt.toLowerCase());
-                                            Log.d("sendButton", "Answer found: " + answer);
-
-                                            // Translate and send the message if the user language is not English
-                                            if ("en".equals(userLanguage)) {
-                                                addMessageToChat(answer);
-                                            } else {
-                                                Log.d("sendButton", "Translating answer to: " + userLanguage);
-                                                translateAndSendMessage(answer, userLanguage);
-                                            }
-                                        } else {
-                                            handleUserMessage(userMessage);
-                                        }
-
-                                        messageInput.setText("");
-                                    }
-                                });
-                            } catch (Exception e) {
-                                Log.e("sendButton", "Error detecting language", e);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        userLanguage = "en"; // Default to English in case of an error
-
-                                        messageList.add(new Message(userMessage, true));
-                                        chatAdapter.notifyDataSetChanged();
-                                        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-
-                                        // Check if the message is from the suggested prompts
-                                        int index = translatedQuestionsList.indexOf(userMessage);
-                                        String originalPrompt = index != -1 ? questionsList.get(index) : null;
-                                        Log.d("sendButton", "Original prompt: " + originalPrompt);
-
-                                        if (originalPrompt != null) {
-                                            // Find the answer associated with the original prompt
-                                            String answer = chatbotResponsesMap.get(originalPrompt.toLowerCase());
-                                            Log.d("sendButton", "Answer found: " + answer);
-
-                                            // Translate and send the message if the user language is not English
-                                            if ("en".equals(userLanguage)) {
-                                                addMessageToChat(answer);
-                                            } else {
-                                                Log.d("sendButton", "Translating answer to: " + userLanguage);
-                                                translateAndSendMessage(answer, userLanguage);
-                                            }
-                                        } else {
-                                            handleUserMessage(userMessage);
-                                        }
-
-                                        messageInput.setText("");
-                                    }
-                                });
-                            }
-                        }
-                    });
+                    // Add the user's message to the chat
+                    messageList.add(new Message(userMessage, true));
+                    chatAdapter.notifyDataSetChanged();
+                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+                    handleUserMessage(userMessage);
+                    messageInput.setText("");
                 }
             }
         });
-
 
         ImageView closeChatButton = findViewById(R.id.close_button);
         closeChatButton.setOnClickListener(new View.OnClickListener() {
@@ -277,11 +204,39 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private void handleUserMessage(final String message) {
         Log.d("handleUserMessage", "Received message: " + message);
 
+        // Clean the message
+        String cleanedMessage = cleanMessage(message);
+
+        // Check if the message matches any greeting first
+        for (Greeting greeting : greetingsList) {
+            String cleanedGreeting = cleanMessage(greeting.getGreeting()).toLowerCase();
+            Log.d("handleUserMessage", "Checking greeting: " + cleanedGreeting);
+
+            if (cleanedMessage.equalsIgnoreCase(cleanedGreeting)) {
+                Log.d("handleUserMessage", "Greeting matched: " + cleanedGreeting);
+                addMessageToChat(greeting.getResponse());
+                hideSuggestedPrompts();
+                return;
+            }
+        }
+
+        // Check if the message matches any artist name before detection then move on to detection and translation afterwards
+        if (checkForArtistMatch(cleanedMessage)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideSuggestedPrompts();
+                }
+            });
+            return;
+        }
+
+        // Run the language detection and processing in a background thread
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // Step 1: Detect Language using Google Cloud Translation API
+                    // Detect Language using Google Cloud Translation API
                     detectLanguageAndProcessMessage(message);
                 } catch (Exception e) {
                     Log.e("handleUserMessage", "Error in processing message: ", e);
@@ -289,6 +244,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         });
     }
+
 
     // ------------------------------- START OF: detecting if message is in english, otherwise call translateMessageToEnglishAndProcess method -------------------------------
     private void detectLanguageAndProcessMessage(final String message) {
@@ -361,13 +317,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private void processMessage(final String message, final String userLanguage) {
         String cleanedMessage = cleanMessage(message);
 
-//        if (isGreeting(cleanedMessage)) {
-//            String greetingResponse = getGreetingResponse();
-//            addMessageToChat(greetingResponse);
-//            hideSuggestedPrompts();
-//            return;
-//        }
-
         // Directly handle suggested prompts (original and translated)
         List<String> promptsToCheck = "en".equals(userLanguage) ? questionsList : translatedQuestionsList;
         for (int i = 0; i < promptsToCheck.size(); i++) {
@@ -380,17 +329,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
                 }
                 return;
             }
-        }
-
-
-        if (checkForArtistMatch(cleanedMessage)) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    hideSuggestedPrompts();
-                }
-            });
-            return;
         }
 
         String closestKeyword = findClosestKeyword(cleanedMessage);
@@ -502,21 +440,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
         return genericReplies.contains(reply) || reply.matches("[\\p{So}\\p{Cn}]+");
     }
 
-//    private boolean isGreeting(String message) {
-//        List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
-//        for (String greeting : greetings) {
-//            if (message.toLowerCase().contains(greeting)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private String getGreetingResponse() {
-//        List<String> responses = Arrays.asList("Hello! How can I assist you today?", "Hi there! What can I do for you?", "Hey! Need any help?");
-//        return responses.get(new Random().nextInt(responses.size()));
-//    }
-
     private void sendEventIntroMessage(String artist) {
         String introMessage = "Here are some details about the event featuring " + artist + ". You can click on the event details page to find out more!";
         addMessageToChat(introMessage);
@@ -562,11 +485,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-
 
 
 

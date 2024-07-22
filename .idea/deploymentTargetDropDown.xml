@@ -2,45 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="BookingHistoryDetails">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-20T07:53:50.427389200Z" />
-        </State>
-      </entry>
-      <entry key="ForumPage">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-22T06:34:27.509988400Z" />
-        </State>
-      </entry>
-      <entry key="MainActivity">
-        <State />
-      </entry>
       <entry key="app">
-        <State />
-      </entry>
-      <entry key="weather">
         <State>
           <targetSelectedWithDropDown>
             <Target>
@@ -48,12 +10,12 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                  <value value="C:\Users\joeyi\.android\avd\Pixel_8_Pro_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-22T06:18:56.539836100Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-07-22T09:46:21.427395500Z" />
         </State>
       </entry>
     </value>
