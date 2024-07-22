@@ -20,8 +20,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -239,16 +241,42 @@ public class dbHandler extends Application {
                 ArrayList<Faq> faqList = new ArrayList<>();
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Faq faq = document.toObject(Faq.class);
+                        Faq faq = new Faq();
+                        if (document.contains("Question")) {
+                            faq.setQuestion(document.getString("Question"));
+                        }
+                        if (document.contains("Answer")) {
+                            faq.setAnswer(document.getString("Answer"));
+                        }
+                        if (document.contains("Keywords")) {
+                            Object keywordsObj = document.get("Keywords");
+                            if (keywordsObj instanceof String) {
+                                String keywordsString = (String) keywordsObj;
+                                List<String> keywords = Arrays.asList(keywordsString.split(" "));
+                                faq.setKeywords(keywords);
+                            } else if (keywordsObj instanceof List) {
+                                try {
+                                    List<String> keywords = (List<String>) keywordsObj;
+                                    faq.setKeywords(keywords);
+                                } catch (ClassCastException e) {
+                                    Log.e("dbHandler", "Keywords field is not a List: " + e.getMessage());
+                                }
+                            } else {
+                                Log.e("dbHandler", "Unknown Keywords data type.");
+                            }
+                        }
                         faqList.add(faq);
+                        Log.d("dbHandler", "Fetched FAQ: " + faq.getQuestion());
                     }
                     firestoreCallback.onCallback(faqList);
                 } else {
-                    Log.w("faqError", "Error getting documents.", task.getException());
+                    Log.w("dbHandler", "Error getting documents.", task.getException());
                 }
             }
         });
     }
+
+
 
     public void getGreetings(FirestoreCallback<Greeting> firestoreCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
