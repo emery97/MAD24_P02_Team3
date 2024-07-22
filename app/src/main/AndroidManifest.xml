@@ -39,6 +39,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".ForumPage"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -58,7 +67,6 @@
             android:exported="false" />
 
         <receiver android:name=".EventWeatherNotification" />
-
 
         <activity
             android:name=".weather"
@@ -132,15 +140,13 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </receiver>
-<!--        <service-->
-<!--            android:name=".MyFirebaseMessagingService"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
-
+        </receiver> <!-- <service -->
+        <!-- android:name=".MyFirebaseMessagingService" -->
+        <!-- android:exported="false"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.google.firebase.MESSAGING_EVENT" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
