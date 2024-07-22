@@ -70,7 +70,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
 
         holder.addFriendButton.setOnClickListener(v ->
-                showTransferDialog(holder.itemView.getContext(), user)
+                addFriendDialogue(holder.itemView.getContext(), user)
         );
 
     }
@@ -109,7 +109,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return filteredList.size(); // Use filteredList
     }
 
-    private void showTransferDialog(Context context, User friend) {
+    private void addFriendDialogue(Context context, User friend) {
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle("Add Friend")
                 .setMessage("Do you want to add " + friend.getName() + " as your friend?")
@@ -129,6 +129,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
+
     private boolean checkIfCanAddAsFriend( User friend){
         Log.d(TAG, "checkIfCanAddAsFriend: " +friend.getUserId() +" "+ currentUserId );
         if(friend.getUserId().equals(currentUserId)){

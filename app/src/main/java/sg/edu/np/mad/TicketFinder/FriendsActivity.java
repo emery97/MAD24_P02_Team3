@@ -50,7 +50,7 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         currentUserId = sharedPreferences.getString("UserId", null);
 
-        Log.d(TAG, "Current User ID: " + currentUserId);
+//        Log.d(TAG, "Current User ID: " + currentUserId);
 
         adapter = new UserAdapter(this, userList, currentUserId);
         recyclerView.setAdapter(adapter);

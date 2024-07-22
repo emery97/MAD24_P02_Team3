@@ -63,6 +63,8 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private EventAdapter eventAdapter;
     private String userLanguage = "en"; // Default language
     private List<String> translatedQuestionsList = new ArrayList<>(); // Store translated prompts
+    private List<Greeting> greetingsList = new ArrayList<>();
+
 
 
     @Override
@@ -113,51 +115,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
         fetchEventsFromFirestore();
         showGreetingMsg();
 
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String userMessage = messageInput.getText().toString().trim();
-//                if (!userMessage.isEmpty()) {
-//                    messageList.add(new Message(userMessage, true));
-//                    chatAdapter.notifyDataSetChanged();
-//                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//                    handleUserMessage(userMessage);
-//                    messageInput.setText("");
-//                }
-//            }
-//        });
-
-//        sendButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String userMessage = messageInput.getText().toString().trim();
-//                if (!userMessage.isEmpty()) {
-//                    messageList.add(new Message(userMessage, true));
-//                    chatAdapter.notifyDataSetChanged();
-//                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-//
-//                    // Check if the message is from the suggested prompts
-//                    int index = translatedQuestionsList.indexOf(userMessage);
-//                    String originalPrompt = index != -1 ? questionsList.get(index) : null;
-//
-//                    if (originalPrompt != null) {
-//                        // Find the answer associated with the original prompt
-//                        String answer = chatbotResponsesMap.get(originalPrompt.toLowerCase());
-//
-//                        // Translate and send the message if the user language is not English
-//                        if ("en".equals(userLanguage)) {
-//                            addMessageToChat(answer);
-//                        } else {
-//                            translateAndSendMessage(answer, userLanguage);
-//                        }
-//                    } else {
-//                        handleUserMessage(userMessage);
-//                    }
-//
-//                    messageInput.setText("");
-//                }
-//            }
-//        });
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -266,34 +223,24 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
     // ------------------------------- START OF: fetching collections from database -------------------------------
     private void fetchFAQFromFirestore() {
-        AsyncTask.execute(new Runnable() {
+        dbHandler db = new dbHandler();
+        db.getFaq(new FirestoreCallback<Faq>() {
             @Override
-            public void run() {
-                firestoreDb.collection("FAQ").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String docId = document.getId();
-                                String keywordString = document.getString("Keywords");
-                                String response = document.getString("Answer");
-                                String question = document.getString("Question");
-                                if (keywordString != null && response != null && question != null) {
-                                    String[] keywords = keywordString.split(" ");
-                                    for (String keyword : keywords) {
-                                        keywordToDocIdMap.put(keyword.toLowerCase(), docId);
-                                        chatbotResponsesMap.put(keyword.toLowerCase(), response);
-                                    }
-                                    questionsList.add(question);
-                                    chatbotResponsesMap.put(question.toLowerCase(), response); // Add question and response to the map
-                                }
-                            }
-                            Log.d("fetchQuestions", "Questions fetched successfully: " + questionsList);
-                        } else {
-                            Log.w("fetchQuestions", "Error getting documents.", task.getException());
+            public void onCallback(ArrayList<Faq> faqList) {
+                for (Faq faq : faqList) {
+                    String question = faq.getQuestion();
+                    String answer = faq.getAnswer();
+                    List<String> keywords = faq.getKeywords();
+                    if (question != null && answer != null && keywords != null) {
+                        for (String keyword : keywords) {
+                            keywordToDocIdMap.put(keyword.toLowerCase(), question);
+                            chatbotResponsesMap.put(keyword.toLowerCase(), answer);
                         }
+                        questionsList.add(question);
+                        chatbotResponsesMap.put(question.toLowerCase(), answer);
                     }
-                });
+                }
+                Log.d("fetchQuestions", "Questions fetched successfully: " + questionsList);
             }
         });
     }
@@ -308,6 +255,20 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     Log.d("fetchEventsFromFirestore", "Artist: " + event.getArtist());
                 }
                 Log.d("fetchEvents", "Events fetched successfully: " + eventsList.size());
+            }
+        });
+    }
+
+    private void fetchGreetingsFromFirestore() {
+        dbHandler db = new dbHandler();
+        db.getGreetings(new FirestoreCallback<Greeting>() {
+            @Override
+            public void onCallback(ArrayList<Greeting> list) {
+                greetingsList = list;
+                for (Greeting greeting : greetingsList) {
+                    Log.d("fetchGreetingsFromFirestore", "Greeting: " + greeting.getGreeting());
+                }
+                runOnUiThread(() -> Log.d("fetchGreetings", "Greetings fetched successfully: " + greetingsList.size()));
             }
         });
     }
@@ -400,12 +361,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private void processMessage(final String message, final String userLanguage) {
         String cleanedMessage = cleanMessage(message);
 
-        if (isGreeting(cleanedMessage)) {
-            String greetingResponse = getGreetingResponse();
-            addMessageToChat(greetingResponse);
-            hideSuggestedPrompts();
-            return;
-        }
+//        if (isGreeting(cleanedMessage)) {
+//            String greetingResponse = getGreetingResponse();
+//            addMessageToChat(greetingResponse);
+//            hideSuggestedPrompts();
+//            return;
+//        }
 
         // Directly handle suggested prompts (original and translated)
         List<String> promptsToCheck = "en".equals(userLanguage) ? questionsList : translatedQuestionsList;
@@ -541,20 +502,20 @@ public class TicketFinderChatbot extends AppCompatActivity {
         return genericReplies.contains(reply) || reply.matches("[\\p{So}\\p{Cn}]+");
     }
 
-    private boolean isGreeting(String message) {
-        List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
-        for (String greeting : greetings) {
-            if (message.toLowerCase().contains(greeting)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String getGreetingResponse() {
-        List<String> responses = Arrays.asList("Hello! How can I assist you today?", "Hi there! What can I do for you?", "Hey! Need any help?");
-        return responses.get(new Random().nextInt(responses.size()));
-    }
+//    private boolean isGreeting(String message) {
+//        List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
+//        for (String greeting : greetings) {
+//            if (message.toLowerCase().contains(greeting)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private String getGreetingResponse() {
+//        List<String> responses = Arrays.asList("Hello! How can I assist you today?", "Hi there! What can I do for you?", "Hey! Need any help?");
+//        return responses.get(new Random().nextInt(responses.size()));
+//    }
 
     private void sendEventIntroMessage(String artist) {
         String introMessage = "Here are some details about the event featuring " + artist + ". You can click on the event details page to find out more!";
