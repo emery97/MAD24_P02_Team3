@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -50,7 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (holder.getItemViewType() == VIEW_TYPE_BOT) {
             ((BotViewHolder) holder).bind(message);
         } else {
-            ((EventViewHolder) holder).bind(message.getEvent());
+            ((EventViewHolder) holder).bind(message.getEventList());
         }
     }
 
@@ -59,7 +60,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Message message = messageList.get(position);
         if (message.isUser()) {
             return VIEW_TYPE_USER;
-        } else if (message.getEvent() != null) {
+        } else if (message.getEventList() != null) {
             return VIEW_TYPE_EVENT;
         } else {
             return VIEW_TYPE_BOT;
@@ -109,10 +110,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             eventRecyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext()));
         }
 
-        public void bind(Event event) {
-            ArrayList<Event> eventList = new ArrayList<>();
-            eventList.add(event);
-            eventAdapter.setSearchList(eventList); // Update the adapter with the single event
+        public void bind(List<Event> events) {
+            eventAdapter.setSearchList(new ArrayList<>(events)); // Update the adapter with the list of events
         }
     }
 }

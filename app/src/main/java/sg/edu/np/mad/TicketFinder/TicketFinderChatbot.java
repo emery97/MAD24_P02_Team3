@@ -370,15 +370,15 @@ public class TicketFinderChatbot extends AppCompatActivity {
     // ------------------------------- START OF: artist name check method -------------------------------
     private boolean checkForArtistMatch(String message) {
         String[] userWords = message.split(" ");
+        List<Event> matchedEvents = new ArrayList<>();
+
         for (Event event : eventsList) {
             String artist = event.getArtist().toLowerCase();
 
             // Check for full artist name match
             for (String userWord : userWords) {
                 if (getLevenshteinDistance(userWord.toLowerCase(), artist) <= 1) {
-                    sendEventIntroMessage(artist);
-                    addEventMessageToChat(event);
-                    return true;
+                    matchedEvents.add(event);
                 }
             }
 
@@ -386,14 +386,19 @@ public class TicketFinderChatbot extends AppCompatActivity {
             for (int i = 0; i < userWords.length - 1; i++) {
                 String combinedUserWords = userWords[i].toLowerCase() + " " + userWords[i + 1].toLowerCase();
                 if (getLevenshteinDistance(combinedUserWords, artist) <= 2) {
-                    sendEventIntroMessage(artist);
-                    addEventMessageToChat(event);
-                    return true;
+                    matchedEvents.add(event);
                 }
             }
         }
+
+        if (!matchedEvents.isEmpty()) {
+            sendEventIntroMessage(matchedEvents.get(0).getArtist());
+            addEventMessageToChat(matchedEvents);
+            return true;
+        }
         return false;
     }
+
     // ------------------------------- END OF: artist name check method -------------------------------
 
 
@@ -463,25 +468,23 @@ public class TicketFinderChatbot extends AppCompatActivity {
         addMessageToChat(introMessage);
     }
 
-    private void addEventMessageToChat(final Event event) {
+    private void addEventMessageToChat(final List<Event> events) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (event != null) {
-                    Log.d("addEventMessageToChat", "Adding event message to chat: " + event.getArtist()); // Debugging log
-                    if (messageList.isEmpty() || !messageList.get(messageList.size() - 1).getMessage().equals(event.getArtist())) {
-                        messageList.add(new Message(event));
-                        chatAdapter.notifyDataSetChanged();
-                        chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-                    } else {
-                        Log.d("addEventMessageToChat", "Duplicate event message not added."); // Debugging log
-                    }
+                if (events != null && !events.isEmpty()) {
+                    Log.d("addEventMessageToChat", "Adding event messages to chat: " + events.size() + " events");
+
+                    messageList.add(new Message(events));
+                    chatAdapter.notifyDataSetChanged();
+                    chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
                 } else {
-                    Log.e("addEventMessageToChat", "Received null event"); // Debugging log
+                    Log.e("addEventMessageToChat", "Received null or empty event list");
                 }
             }
         });
     }
+
 
 
     private void addMessageToChat(final String message) {
