@@ -64,7 +64,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private String userLanguage = "en"; // Default language
     private List<String> translatedQuestionsList = new ArrayList<>(); // Store translated prompts
     private List<Greeting> greetingsList = new ArrayList<>();
-
+    private String lastClickedPrompt = ""; // Store the last clicked prompt
 
 
     @Override
@@ -271,27 +271,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
 
     // ------------------------------- START OF: detecting if message is in english, otherwise call translateMessageToEnglishAndProcess method -------------------------------
-//    private void detectLanguageAndProcessMessage(final String message) {
-//        AsyncTask.execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String detectedLanguage = translator.detectLanguage(message);
-//                    Log.d("detectLanguageAndProcessMessage", "Detected language: " + detectedLanguage);
-//
-//                    if (!"en".equals(detectedLanguage)) {
-//                        translateMessageToEnglishAndProcess(message, detectedLanguage);
-//                    } else {
-//                        processMessage(message, "en");
-//                    }
-//                } catch (Exception e) {
-//                    Log.e("detectLanguageAndProcessMessage", "Error in detecting language: ", e);
-//                    processMessage(message, "en");
-//                }
-//            }
-//        });
-//    }
-    private void detectLanguageAndProcessMessage(final String message) {
+    private void detectLanguageAndProcessMessage(final String message) { // because if you type for example 'erferfer' the detected language may identify it as an actual language. but if the content stays the same then you know the user typed gibberish. so instead of setting the language to detected language if the content stayed the same, assign the detected language to what it was
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -322,25 +302,6 @@ public class TicketFinderChatbot extends AppCompatActivity {
     }
 
     // ------------------------------- END OF: detecting if message is in english, otherwise call translateMessageToEnglishAndProcess method -------------------------------
-
-
-    // ------------------------------- START OF: translate msg to english before comparing with keywords method -------------------------------
-    private void translateMessageToEnglishAndProcess(final String message, final String detectedLanguage) {
-        AsyncTask.execute(new Runnable() { // this method is for messages that are not detected in english
-            @Override
-            public void run() {
-                try {
-                    String translatedMessage = translator.translate(detectedLanguage, "en", message);
-                    Log.d("translateMessageToEnglishAndProcess", "Translated message: " + translatedMessage);
-                    processMessage(translatedMessage, detectedLanguage);
-                } catch (Exception e) {
-                    Log.e("translateMessageToEnglishAndProcess", "Error in translation: ", e);
-                    processMessage(message, detectedLanguage);
-                }
-            }
-        });
-    }
-    // ------------------------------- END OF: translate msg to english before comparing with keywords method -------------------------------
 
 
 
@@ -375,13 +336,14 @@ public class TicketFinderChatbot extends AppCompatActivity {
         // Directly handle suggested prompts (original and translated)
         List<String> promptsToCheck = "en".equals(userLanguage) ? questionsList : translatedQuestionsList;
         for (int i = 0; i < promptsToCheck.size(); i++) {
-            if (promptsToCheck.get(i).equalsIgnoreCase(cleanedMessage)) {
+            if (promptsToCheck.get(i).equalsIgnoreCase(cleanedMessage) || promptsToCheck.get(i).equalsIgnoreCase(lastClickedPrompt)) {
                 String answer = chatbotResponsesMap.get(questionsList.get(i).toLowerCase());
                 if ("en".equals(userLanguage)) {
                     addMessageToChat(answer);
                 } else {
                     translateAndSendMessage(answer, userLanguage);
                 }
+                lastClickedPrompt = ""; // Clear the last clicked prompt
                 return;
             }
         }
@@ -645,6 +607,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private void onSuggestedPromptClick(String prompt) {
         messageInput.setText(prompt);
         messageInput.setSelection(prompt.length());
+        lastClickedPrompt = prompt; // Store the last clicked prompt
         suggestedPromptsRecyclerView.setVisibility(View.GONE);
     }
 
