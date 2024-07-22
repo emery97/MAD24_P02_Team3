@@ -41,6 +41,7 @@ public class UnfriendActivity extends AppCompatActivity {
             // Retrieve friend list from SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
             String json = sharedPreferences.getString("friendList", null); // Note the null check
+            String currentUserId = sharedPreferences.getString("UserId", null); // Retrieve current user ID
             if (json != null && !json.isEmpty()) {
                 Gson gson = new Gson();
                 friendList = gson.fromJson(json, new TypeToken<List<User>>() {}.getType());
@@ -52,7 +53,7 @@ public class UnfriendActivity extends AppCompatActivity {
             Log.d(TAG, "Retrieved friend list size: " + friendList.size());
 
             // Initialize the adapter and set it to the RecyclerView
-            adapter = new UnfriendAdapter(this, friendList);
+            adapter = new UnfriendAdapter(this, friendList,currentUserId);
             recyclerView.setAdapter(adapter);
 
             // Set onclick listener for friend page
