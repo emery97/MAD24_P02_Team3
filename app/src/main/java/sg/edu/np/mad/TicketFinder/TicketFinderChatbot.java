@@ -211,13 +211,25 @@ public class TicketFinderChatbot extends AppCompatActivity {
         String cleanedMessage = cleanMessage(message);
 
         // Check if the message matches any greeting first
+        String closestGreeting = null;
+        int minDistance = Integer.MAX_VALUE;
+
         for (Greeting greeting : greetingsList) {
             String cleanedGreeting = cleanMessage(greeting.getGreeting()).toLowerCase();
             Log.d("handleUserMessage", "Checking greeting: " + cleanedGreeting);
 
-            if (cleanedMessage.equalsIgnoreCase(cleanedGreeting)) {
-                Log.d("handleUserMessage", "Greeting matched: " + cleanedGreeting);
-                addMessageToChat(greeting.getResponse());
+            int distance = getLevenshteinDistance(cleanedMessage, cleanedGreeting);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestGreeting = greeting.getGreeting();
+            }
+        }
+
+        if (minDistance <= 2 && closestGreeting != null) {
+            Greeting matchedGreeting = getGreetingByText(closestGreeting);
+            if (matchedGreeting != null) {
+                Log.d("handleUserMessage", "Greeting matched: " + closestGreeting);
+                addMessageToChat(matchedGreeting.getResponse());
                 hideSuggestedPrompts();
                 return;
             }
@@ -246,6 +258,15 @@ public class TicketFinderChatbot extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private Greeting getGreetingByText(String text) {
+        for (Greeting greeting : greetingsList) {
+            if (greeting.getGreeting().equalsIgnoreCase(text)) {
+                return greeting;
+            }
+        }
+        return null;
     }
 
 
