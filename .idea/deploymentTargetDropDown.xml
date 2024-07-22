@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="BookingHistoryDetails">
+      <entry key="app">
         <State>
           <targetSelectedWithDropDown>
             <Target>
@@ -10,16 +10,13 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                  <value value="C:\Users\joeyi\.android\avd\Pixel_8_Pro_API_34_2.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-20T07:53:50.427389200Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-07-22T07:27:35.585977600Z" />
         </State>
-      </entry>
-      <entry key="app">
-        <State />
       </entry>
     </value>
   </component>

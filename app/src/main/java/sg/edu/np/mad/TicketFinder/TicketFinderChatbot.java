@@ -543,9 +543,8 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
     private boolean isGreeting(String message) {
         List<String> greetings = Arrays.asList("hi", "hello", "hey", "good morning", "good afternoon", "good evening", "how is your day", "how are you");
-        String[] words = message.toLowerCase().split("\\s+");
-        for (String word : words) {
-            if (greetings.contains(word)) {
+        for (String greeting : greetings) {
+            if (message.toLowerCase().contains(greeting)) {
                 return true;
             }
         }
