@@ -225,9 +225,37 @@ Entertainment
   - xxxxx
     
 ## Chatbot with Translation and speech to text capabilities [JOEYI]
-- **xxxxx**:
-  - xxxxx
-  - xxxxx
+### Multilingual Support - Google Cloud Translation API
+- Automatically detects the language of the user input and responds accordingly.
+- Provides translations for both questions and answers, ensuring seamless communication in various languages.
+- Ensures accurate and relevant responses by processing the messages in the correct language.
+
+### Speech-to-Text Integration
+- Allows users to interact with the chatbot using voice commands.
+- Converts spoken language into text for processing, enhancing accessibility and ease of use.
+
+### Event Information Retrieval
+- Provides detailed information about various events, including start times, locations, and artist details.
+- Can answer specific questions related to events such as ticket purchase, refund policies, and accessibility options.
+
+### Smart Reply Suggestions - Firebase ML Smart Reply API
+- Utilizes Firebase Smart Reply to suggest relevant responses based on the conversation context.
+
+### Keyword Matching
+- Uses Levenshtein Distance algorithm to find the closest matching keyword from the user input.
+- Ensures accurate responses even with minor typos or variations in the user's questions.
+
+### Suggested Prompts
+- Displays a list of suggested prompts to guide users on what they can ask.
+- Prompts are translated into the detected language for better user understanding.
+
+### FAQ Integration
+- Fetches frequently asked questions (FAQs) from the Firestore database.
+- Provides quick and accurate answers to common queries related to events and services.
+
+### User-Friendly Interface
+- Features an intuitive and easy-to-navigate user interface.
+- Provides a smooth and engaging user experience with clear and concise responses.
     
 ## Add event to calendar app [WEIYING]
 - **xxxxx**:
