@@ -225,7 +225,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         }
 
-        if (minDistance <= 2 && closestGreeting != null) {
+        if (minDistance <= 1 && closestGreeting != null) {
             Greeting matchedGreeting = getGreetingByText(closestGreeting);
             if (matchedGreeting != null) {
                 Log.d("handleUserMessage", "Greeting matched: " + closestGreeting);
@@ -317,6 +317,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
     // ------------------------------- START OF: translate answers to detected language before sending it back to the user -------------------------------
     private void translateAndSendMessage(final String message, final String targetLanguage) {
         Log.d("translateAndSendMessage", "Starting translation from 'en' to: " + targetLanguage);
+        userLanguage = targetLanguage;
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -563,13 +564,48 @@ public class TicketFinderChatbot extends AppCompatActivity {
             Log.d("showSuggestedPrompts", "No prompts to show.");
             return; // No data to show
         }
-        runOnUiThread(() -> {
-            suggestedPromptAdapter.updateData(questionsList);
-            suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
-            suggestedPromptAdapter.notifyDataSetChanged();
-            Log.d("showSuggestedPrompts", "Suggested prompts shown.");
+
+        if (!userLanguage.equals("en")) {
+            translatePromptsToUserLanguage(userLanguage);
+        } else {
+            runOnUiThread(() -> {
+                suggestedPromptAdapter.updateData(questionsList);
+                suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+                suggestedPromptAdapter.notifyDataSetChanged();
+                Log.d("showSuggestedPrompts", "Suggested prompts shown.");
+            });
+        }
+    }
+
+
+    private void translatePromptsToUserLanguage(final String targetLanguage) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<String> translatedPrompts = new ArrayList<>();
+                    for (String prompt : questionsList) {
+                        String translatedPrompt = translator.translate("en", targetLanguage, prompt);
+                        translatedPrompts.add(translatedPrompt);
+                        Log.d("translatePromptsToUserLanguage", "Original prompt: " + prompt + ", Translated prompt: " + translatedPrompt);
+                    }
+                    translatedQuestionsList = translatedPrompts; // Update the translated prompts list
+                    runOnUiThread(() -> {
+                        suggestedPromptAdapter.updateData(translatedPrompts);
+                        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+                    });
+                    Log.d("translatePromptsToUserLanguage", "Prompts updated in UI with translated language");
+                } catch (Exception e) {
+                    Log.e("translatePromptsToUserLanguage", "Error translating prompts: ", e);
+                    runOnUiThread(() -> {
+                        suggestedPromptAdapter.updateData(questionsList);
+                        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+                    });
+                }
+            }
         });
     }
+
 
 
     private void hideSuggestedPrompts() {
