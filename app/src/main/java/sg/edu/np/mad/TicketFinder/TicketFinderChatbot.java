@@ -154,10 +154,12 @@ public class TicketFinderChatbot extends AppCompatActivity {
         db.getFaq(new FirestoreCallback<Faq>() {
             @Override
             public void onCallback(ArrayList<Faq> faqList) {
+                Log.d("fetchFAQFromFirestore", "FAQ list size: " + faqList.size());
                 for (Faq faq : faqList) {
                     String question = faq.getQuestion();
                     String answer = faq.getAnswer();
                     List<String> keywords = faq.getKeywords();
+                    Log.d("fetchFAQFromFirestore", "Processing FAQ - Question: " + question + ", Answer: " + answer + ", Keywords: " + keywords);
                     if (question != null && answer != null && keywords != null) {
                         for (String keyword : keywords) {
                             keywordToDocIdMap.put(keyword.toLowerCase(), question);
@@ -168,6 +170,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     }
                 }
                 Log.d("fetchQuestions", "Questions fetched successfully: " + questionsList);
+                runOnUiThread(() -> showSuggestedPrompts()); // Update UI after fetching data
             }
         });
     }
@@ -386,7 +389,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
         messageList.add(new Message(welcomeMessage, false));
         chatAdapter.notifyDataSetChanged();
         chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
-        showSuggestedPrompts(userLanguage); // default language is english
+        runOnUiThread(() -> showSuggestedPrompts()); // Ensure this runs on the UI thread
     }
 
 
@@ -408,14 +411,14 @@ public class TicketFinderChatbot extends AppCompatActivity {
                             SmartReplySuggestionResult result = task.getResult();
                             if (result.getStatus() == SmartReplySuggestionResult.STATUS_NOT_SUPPORTED_LANGUAGE) {
                                 translateAndSendMessage("I don't understand the question.", userLanguage); // --------------- changes made for translation
-                                showSuggestedPrompts(userLanguage); // --------------- changes made for translation
+                                showSuggestedPrompts(); // --------------- changes made for translation
                             } else if (result.getStatus() == SmartReplySuggestionResult.STATUS_SUCCESS) {
                                 List<SmartReplySuggestion> suggestions = result.getSuggestions();
                                 if (!suggestions.isEmpty()) {
                                     String reply = suggestions.get(0).getText();
                                     if (isGenericOrEmojiReply(reply)) {
                                         translateAndSendMessage("I don't understand the question.", userLanguage); // --------------- changes made for translation
-                                        showSuggestedPrompts(userLanguage); // --------------- changes made for translation
+                                        showSuggestedPrompts(); // --------------- changes made for translation
                                     } else {
                                         addMessageToChat(reply);
                                         hideSuggestedPrompts();
@@ -423,7 +426,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
                                     Log.d("SmartReply", "Reply: " + reply);
                                 } else {
                                     translateAndSendMessage("I don't understand the question.", userLanguage); // --------------- changes made for translation
-                                    showSuggestedPrompts(userLanguage); // --------------- changes made for translation
+                                    showSuggestedPrompts(); // --------------- changes made for translation
                                     Log.d("SmartReply", "No suggestions available.");
                                 }
                             }
@@ -534,69 +537,18 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
     // ------------------------------- START OF: suugested prompt methods -------------------------------
     // left to do is to translate suggested prompt to detected language
-    private void showSuggestedPrompts(String userLanguage) {
-        Log.d("showSuggestedPrompts", "User language: " + userLanguage); // Log the detected user language
-        detectLanguageAndTranslatePrompts(userLanguage);
-    }
-
-    private void detectLanguageAndTranslatePrompts(String userLanguage) {
-        Log.d("detectLanguageAndTranslatePrompts", "Detecting language for prompts. User language: " + userLanguage); // Log the start of language detection
-        String textToDetect = questionsList.isEmpty() ? "" : questionsList.get(0);
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String detectedLanguage = translator.detectLanguage(textToDetect);
-                    Log.d("detectLanguageAndTranslatePrompts", "Detected language for prompts: " + detectedLanguage); // Log the detected language
-
-                    if (!"en".equals(userLanguage)) {
-                        translatePromptsToDetectedLanguage(userLanguage);
-                    } else {
-                        runOnUiThread(() -> {
-                            suggestedPromptAdapter.updateData(questionsList);
-                            suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
-                            Log.d("detectLanguageAndTranslatePrompts", "Prompts updated in UI with original language"); // Log when prompts are updated with the original language
-                        });
-                    }
-                } catch (Exception e) {
-                    Log.e("detectLanguageAndTranslatePrompts", "Error in detecting language: ", e);
-                    runOnUiThread(() -> {
-                        suggestedPromptAdapter.updateData(questionsList);
-                        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
-                        Log.d("detectLanguageAndTranslatePrompts", "Fallback to original prompts in UI after detection error"); // Log when fallback to original prompts occurs
-                    });
-                }
-            }
+    private void showSuggestedPrompts() {
+        if (questionsList.isEmpty()) {
+            Log.d("showSuggestedPrompts", "No prompts to show.");
+            return; // No data to show
+        }
+        runOnUiThread(() -> {
+            suggestedPromptAdapter.updateData(questionsList);
+            suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+            suggestedPromptAdapter.notifyDataSetChanged();
+            Log.d("showSuggestedPrompts", "Suggested prompts shown.");
         });
     }
-
-
-    private void translatePromptsToDetectedLanguage(final String targetLanguage) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    List<String> translatedPrompts = new ArrayList<>();
-                    for (String prompt : questionsList) {
-                        String translatedPrompt = translator.translate("en", targetLanguage, prompt);
-                        translatedPrompts.add(translatedPrompt);
-                        Log.d("translatePromptsToDetectedLanguage", "Original prompt: " + prompt + ", Translated prompt: " + translatedPrompt);
-                    }
-                    translatedQuestionsList = translatedPrompts; // Update the translated prompts list
-                    runOnUiThread(() -> suggestedPromptAdapter.updateData(translatedPrompts));
-                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
-                    Log.d("translatePromptsToDetectedLanguage", "Prompts updated in UI with translated language");
-                } catch (Exception e) {
-                    Log.e("translatePromptsToDetectedLanguage", "Error translating prompts: ", e);
-                    runOnUiThread(() -> suggestedPromptAdapter.updateData(questionsList));
-                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
-                }
-            }
-        });
-    }
-
-
 
 
     private void hideSuggestedPrompts() {
@@ -608,6 +560,63 @@ public class TicketFinderChatbot extends AppCompatActivity {
         messageInput.setSelection(prompt.length());
         suggestedPromptsRecyclerView.setVisibility(View.GONE);
     }
+
+//    private void detectLanguageAndTranslatePrompts(String userLanguage) {
+//        Log.d("detectLanguageAndTranslatePrompts", "Detecting language for prompts. User language: " + userLanguage); // Log the start of language detection
+//        String textToDetect = questionsList.isEmpty() ? "" : questionsList.get(0);
+//
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    String detectedLanguage = translator.detectLanguage(textToDetect);
+//                    Log.d("detectLanguageAndTranslatePrompts", "Detected language for prompts: " + detectedLanguage); // Log the detected language
+//
+//                    if (!"en".equals(userLanguage)) {
+//                        translatePromptsToDetectedLanguage(userLanguage);
+//                    } else {
+//                        runOnUiThread(() -> {
+//                            suggestedPromptAdapter.updateData(questionsList);
+//                            suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+//                            Log.d("detectLanguageAndTranslatePrompts", "Prompts updated in UI with original language"); // Log when prompts are updated with the original language
+//                        });
+//                    }
+//                } catch (Exception e) {
+//                    Log.e("detectLanguageAndTranslatePrompts", "Error in detecting language: ", e);
+//                    runOnUiThread(() -> {
+//                        suggestedPromptAdapter.updateData(questionsList);
+//                        suggestedPromptsRecyclerView.setVisibility(View.VISIBLE);
+//                        Log.d("detectLanguageAndTranslatePrompts", "Fallback to original prompts in UI after detection error"); // Log when fallback to original prompts occurs
+//                    });
+//                }
+//            }
+//        });
+//    }
+//
+//
+//    private void translatePromptsToDetectedLanguage(final String targetLanguage) {
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    List<String> translatedPrompts = new ArrayList<>();
+//                    for (String prompt : questionsList) {
+//                        String translatedPrompt = translator.translate("en", targetLanguage, prompt);
+//                        translatedPrompts.add(translatedPrompt);
+//                        Log.d("translatePromptsToDetectedLanguage", "Original prompt: " + prompt + ", Translated prompt: " + translatedPrompt);
+//                    }
+//                    translatedQuestionsList = translatedPrompts; // Update the translated prompts list
+//                    runOnUiThread(() -> suggestedPromptAdapter.updateData(translatedPrompts));
+//                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
+//                    Log.d("translatePromptsToDetectedLanguage", "Prompts updated in UI with translated language");
+//                } catch (Exception e) {
+//                    Log.e("translatePromptsToDetectedLanguage", "Error translating prompts: ", e);
+//                    runOnUiThread(() -> suggestedPromptAdapter.updateData(questionsList));
+//                    runOnUiThread(() -> suggestedPromptsRecyclerView.setVisibility(View.VISIBLE));
+//                }
+//            }
+//        });
+//    }
     // ------------------------------- END OF: suugested prompt methods -------------------------------
 
 

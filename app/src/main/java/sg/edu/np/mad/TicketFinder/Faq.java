@@ -3,41 +3,41 @@ package sg.edu.np.mad.TicketFinder;
 import java.util.List;
 
 public class Faq {
-    private String question;
-    private String answer;
-    private List<String> keywords;
+    private String Question;
+    private String Answer;
+    private List<String> Keywords;
 
     public Faq() {
         // Default constructor required for calls to DataSnapshot.getValue(Faq.class)
     }
 
-    public Faq(String question, String answer, List<String> keywords) {
-        this.question = question;
-        this.answer = answer;
-        this.keywords = keywords;
+    public Faq(String Question, String Answer, List<String> Keywords) {
+        this.Question = Question;
+        this.Answer = Answer;
+        this.Keywords = Keywords;
     }
 
     public String getQuestion() {
-        return question;
+        return Question;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setQuestion(String Question) {
+        this.Question = Question;
     }
 
     public String getAnswer() {
-        return answer;
+        return Answer;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setAnswer(String Answer) {
+        this.Answer = Answer;
     }
 
     public List<String> getKeywords() {
-        return keywords;
+        return Keywords;
     }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+    public void setKeywords(List<String> Keywords) {
+        this.Keywords = Keywords;
     }
 }
