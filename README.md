@@ -219,7 +219,7 @@ Entertainment
   - Displays a map fragment with a pin on the event venue
   - Automatically zoomed in on the event venue area to display all necessary labels and surrounding details
  
-  - **Google Maps Navigation**:
+ - **Google Maps Navigation**:
   - Allows user to find the best route to the event venue from their current location
   - Clicking "Go to Google Maps" will open the Maps application in navigation mode, with the event venue automatically input as the destination
     
@@ -231,17 +231,17 @@ Entertainment
  
 - **Event Venue Details - Google Places API**:
   - Dynamically displays the following details if they are available:
-      - RecyclerView of all available venue images
-      - Opening Hours
-      - Contact/Phone number
-      - Website Link
-      - Wheelchair accessibility
-      - Average rating and total rating count
-      - RecyclerView of reviews left by users. Included details:
-          - Review author
-          - Review time (relative to current time)
-          - Given Rating
-          - Review Text
+    - RecyclerView of all available venue images
+    - Opening Hours
+    - Contact/Phone number
+    - Website Link
+    - Wheelchair accessibility
+    - Average rating and total rating count
+    - RecyclerView of reviews left by users. Included details:
+      - Review author
+      - Review time (relative to current time)
+      - Given Rating
+      - Review Text
     
 ## When changing profile picture, allow user to take picture using the camera [IVAN]
 - **xxxxx**:
