@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0E5"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     android:paddingLeft="36dp"
     android:paddingTop="12dp"
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="Username"
-        android:textColor="#4C240A"
+        android:textColor="@color/black"
         android:textSize="16sp"
         tools:textStyle="bold" />
 
@@ -28,9 +28,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Username"
+        android:importantForAutofill="no"
         android:inputType="text"
-        android:textSize="14sp"
-        android:importantForAutofill="no"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/RegEmail"
@@ -39,7 +39,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:text="Email"
-        android:textColor="#4C240A"
+        android:textColor="@color/black"
         android:textSize="16sp"
         tools:textStyle="bold" />
 
@@ -50,9 +50,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Email"
+        android:importantForAutofill="no"
         android:inputType="textEmailAddress"
-        android:textSize="14sp"
-        android:importantForAutofill="no"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/RegPh"
@@ -61,7 +61,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:text="Phone Number"
-        android:textColor="#4C240A"
+        android:textColor="@color/black"
         android:textSize="16sp"
         tools:textStyle="bold" />
 
@@ -72,9 +72,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="Enter your Phone Number"
+        android:importantForAutofill="no"
         android:inputType="phone"
-        android:textSize="14sp"
-        android:importantForAutofill="no"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/RegPassword"
@@ -83,7 +83,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:text="Password"
-        android:textColor="#4C240A"
+        android:textColor="@color/black"
         android:textSize="16sp"
         tools:textStyle="bold" />
 
@@ -94,9 +94,9 @@
         android:layout_gravity="center_horizontal"
         android:ems="10"
         android:hint="New Password"
+        android:importantForAutofill="no"
         android:inputType="textPassword"
-        android:textSize="14sp"
-        android:importantForAutofill="no"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/passwordReq"
@@ -112,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:backgroundTint="#462109"
+        android:backgroundTint="#D9AA52"
         android:text="Register"
         android:textColor="#FEFEFE"
         android:textSize="20sp" />

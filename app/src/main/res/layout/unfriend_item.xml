@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFFFFF"
     android:padding="8dp">
 
     <ImageView
@@ -24,11 +25,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Name"
-        android:textSize="25dp"
-        android:padding="5dp"
         android:ellipsize="end"
         android:maxLines="1"
+        android:padding="5dp"
+        android:text="Name"
+        android:textSize="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toEndOf="@+id/profilePicture"
@@ -39,8 +40,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#1B2B40"
-        android:text="Unfriend"
         android:padding="5dp"
+        android:text="Unfriend"
         android:textColor="@color/white"
         app:layout_constraintStart_toEndOf="@+id/profilePicture"
         app:layout_constraintTop_toBottomOf="@+id/friendName" />

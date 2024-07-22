@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     android:padding="20dp">
 
@@ -9,14 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter your reminder"
-        android:textColorHint="@color/black"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColorHint="@color/black" />
 
     <Button
         android:id="@+id/buttonSaveReminder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:textColor="@color/black"
-        android:text="Save" />
+        android:background="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:text="Save"
+        android:textColor="@color/black" />
 </LinearLayout>

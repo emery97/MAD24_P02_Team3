@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0E5"
+    android:background="#FFFFFF"
     android:fitsSystemWindows="true"
     tools:context=".BookingHistoryDetails">
 
@@ -14,51 +14,50 @@
         layout="@layout/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/weatherbooking1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:layout_marginTop="24dp"
         android:textColor="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@id/include"
-        android:layout_marginTop="24dp"/>
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/include" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weatherRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/include"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/include" />
 
 
     <ImageButton
         android:id="@+id/scanQRCodeButton"
         android:layout_width="40sp"
         android:layout_height="40sp"
-        android:src="@drawable/scanner"
-        app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView"
-        android:onClick="scanQRCode"
         android:background="#F4F0E5"
+        android:onClick="scanQRCode"
         android:scaleType="fitCenter"
-    />
+        android:src="@drawable/scanner"
+        app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView" />
 
     <TextView
         android:id="@+id/bookinghistorytext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Booking History"
         android:textSize="26sp"
-        app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/recyclerView"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -71,16 +70,16 @@
         app:layout_constraintTop_toBottomOf="@id/bookinghistorytext" />
 
     <Button
-        android:id= "@+id/upcomingConcertButton"
+        android:id="@+id/upcomingConcertButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/footer"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#D9AA52"
         android:text="Upcoming Concerts"
         android:textColor="@color/white"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="10dp"
-        android:backgroundTint="#D9AA52"/>
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- footer -->
     <include
@@ -89,7 +88,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
