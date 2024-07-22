@@ -63,6 +63,8 @@ public class TicketFinderChatbot extends AppCompatActivity {
     private EventAdapter eventAdapter;
     private String userLanguage = "en"; // Default language
     private List<String> translatedQuestionsList = new ArrayList<>(); // Store translated prompts
+    private List<Greeting> greetingsList = new ArrayList<>();
+
 
 
     @Override
@@ -253,6 +255,20 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     Log.d("fetchEventsFromFirestore", "Artist: " + event.getArtist());
                 }
                 Log.d("fetchEvents", "Events fetched successfully: " + eventsList.size());
+            }
+        });
+    }
+
+    private void fetchGreetingsFromFirestore() {
+        dbHandler db = new dbHandler();
+        db.getGreetings(new FirestoreCallback<Greeting>() {
+            @Override
+            public void onCallback(ArrayList<Greeting> list) {
+                greetingsList = list;
+                for (Greeting greeting : greetingsList) {
+                    Log.d("fetchGreetingsFromFirestore", "Greeting: " + greeting.getGreeting());
+                }
+                runOnUiThread(() -> Log.d("fetchGreetings", "Greetings fetched successfully: " + greetingsList.size()));
             }
         });
     }
