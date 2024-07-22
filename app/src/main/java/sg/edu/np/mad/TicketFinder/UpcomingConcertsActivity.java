@@ -74,6 +74,7 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                             Date currentDate = new Date();
 
                             for (QueryDocumentSnapshot document : querySnapshot) {
+                                String documentId = document.getId();
                                 String eventTitle = document.getString("ConcertTitle");
                                 String seatCategory = document.getString("SeatCategory");
                                 String seatNumber = document.getString("SeatNumber");
@@ -97,7 +98,7 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
                                     Date concertDate = sdf.parse(time);
                                     if (concertDate != null && concertDate.after(currentDate)) {
-                                        BookingDetails bookingDetails = new BookingDetails(eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
+                                        BookingDetails bookingDetails = new BookingDetails(documentId,eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                         upcomingConcertsList.add(bookingDetails);
                                         upcomingConcertsTimestamps.put(bookingDetails, purchaseTimeTimestamp); // Store timestamp separately
                                     }

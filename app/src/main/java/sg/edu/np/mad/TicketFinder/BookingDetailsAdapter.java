@@ -2,6 +2,7 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -66,11 +67,24 @@ public class BookingDetailsAdapter extends RecyclerView.Adapter<BookingDetailsAd
         return bookingDetailsList.size();
     }
 
+
+    public BookingDetails getBookingDetailsAtPosition(int position) {
+        return bookingDetailsList.get(position);
+    }
+
+    public void removeItem(int position) {
+        if (position >= 0 && position < bookingDetailsList.size()) {
+            bookingDetailsList.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, bookingDetailsList.size()); // Notify the range change
+        }
+    }
+
     // get views from xml
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView EventTitle,Datebought,eventDate,seatCategory, seatNumber, totalPrice, quantity, paymentMethod;
         LinearLayout expandableLayout;
-        Button viewMoreButton, detailsbtn;
+        Button viewMoreButton, detailsbtn, deleteButton;
 
         public ViewHolder(View itemView) {
             super(itemView);

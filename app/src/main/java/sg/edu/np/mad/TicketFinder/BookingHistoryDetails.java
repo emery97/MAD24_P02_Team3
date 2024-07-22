@@ -11,8 +11,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -56,6 +58,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
     private final TextView[] weatherTexts = new TextView[4];
     private static final String TAG = "BookingHistoryDetails";
     private DocumentReference qrCodeRef;
+    private List<String> documentIdList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,8 +188,10 @@ public class BookingHistoryDetails extends AppCompatActivity {
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
                             // Clear existing booking details list
                             bookingDetailsList.clear();
+
                             // Populate booking details list
                             for (QueryDocumentSnapshot document : querySnapshot) {
+                                String documentId = document.getId();
                                 String eventTitle = document.getString("ConcertTitle");
                                 String seatCategory = document.getString("SeatCategory");
                                 String seatNumber = document.getString("SeatNumber");
@@ -207,7 +212,7 @@ public class BookingHistoryDetails extends AppCompatActivity {
                                 String purchaseTimeString = formatTimestamp(purchaseTimeTimestamp);
 
                                 // Create BookingDetails object and add to list
-                                BookingDetails bookingDetails = new BookingDetails(eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
+                                BookingDetails bookingDetails = new BookingDetails(documentId,eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
                                 bookingDetailsList.add(bookingDetails);
                             }
 
@@ -228,6 +233,9 @@ public class BookingHistoryDetails extends AppCompatActivity {
                             // Initialize and set adapter for RecyclerView
                             bookingDetailsAdapter = new BookingDetailsAdapter(bookingDetailsList);
                             recyclerView.setAdapter(bookingDetailsAdapter);
+
+                            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(bookingDetailsAdapter));
+                            itemTouchHelper.attachToRecyclerView(recyclerView);
                         } else {
                             Log.d("BookingHistoryDetails", "No booking details found");
                         }
