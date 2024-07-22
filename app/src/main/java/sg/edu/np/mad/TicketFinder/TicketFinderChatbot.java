@@ -230,7 +230,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
             if (matchedGreeting != null) {
                 Log.d("handleUserMessage", "Greeting matched: " + closestGreeting);
                 addMessageToChat(matchedGreeting.getResponse());
-                hideSuggestedPrompts();
+                showSuggestedPrompts();
                 return;
             }
         }
@@ -271,6 +271,26 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
 
     // ------------------------------- START OF: detecting if message is in english, otherwise call translateMessageToEnglishAndProcess method -------------------------------
+//    private void detectLanguageAndProcessMessage(final String message) {
+//        AsyncTask.execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    String detectedLanguage = translator.detectLanguage(message);
+//                    Log.d("detectLanguageAndProcessMessage", "Detected language: " + detectedLanguage);
+//
+//                    if (!"en".equals(detectedLanguage)) {
+//                        translateMessageToEnglishAndProcess(message, detectedLanguage);
+//                    } else {
+//                        processMessage(message, "en");
+//                    }
+//                } catch (Exception e) {
+//                    Log.e("detectLanguageAndProcessMessage", "Error in detecting language: ", e);
+//                    processMessage(message, "en");
+//                }
+//            }
+//        });
+//    }
     private void detectLanguageAndProcessMessage(final String message) {
         AsyncTask.execute(new Runnable() {
             @Override
@@ -280,7 +300,16 @@ public class TicketFinderChatbot extends AppCompatActivity {
                     Log.d("detectLanguageAndProcessMessage", "Detected language: " + detectedLanguage);
 
                     if (!"en".equals(detectedLanguage)) {
-                        translateMessageToEnglishAndProcess(message, detectedLanguage);
+                        String translatedMessage = translator.translate(detectedLanguage, "en", message);
+                        Log.d("translateMessageToEnglishAndProcess", "Translated message: " + translatedMessage);
+
+                        if (translatedMessage.equals(message)) {
+                            // If the translated message is the same as the original message, process as is
+                            processMessage(message, "en");
+                        } else {
+                            // Otherwise, process the translated message
+                            processMessage(translatedMessage, detectedLanguage);
+                        }
                     } else {
                         processMessage(message, "en");
                     }
@@ -291,6 +320,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
             }
         });
     }
+
     // ------------------------------- END OF: detecting if message is in english, otherwise call translateMessageToEnglishAndProcess method -------------------------------
 
 
