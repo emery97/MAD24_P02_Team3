@@ -27,6 +27,7 @@ import java.util.Set;
 
 public class dbHandler extends Application {
     private Set<String> dictionary = new HashSet<>(); // Initialize the dictionary here
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -129,7 +130,7 @@ public class dbHandler extends Application {
         });
     }
 
-    public void getSeatCategoryData(FirestoreCallback<SeatCategory> firestoreCallback){
+    public void getSeatCategoryData(FirestoreCallback<SeatCategory> firestoreCallback) {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -145,9 +146,9 @@ public class dbHandler extends Application {
 
                 ArrayList<SeatCategory> seatCategoryList = new ArrayList<>();
 
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
 
-                    for (QueryDocumentSnapshot document : task.getResult()){
+                    for (QueryDocumentSnapshot document : task.getResult()) {
 
                         SeatCategory seatCategory = new SeatCategory();
 
@@ -196,8 +197,6 @@ public class dbHandler extends Application {
                         }
 
 
-
-
                         if (document.contains("Seats")) {
 
                             ArrayList<String> seatList = (ArrayList<String>) document.get("Seats");
@@ -218,13 +217,11 @@ public class dbHandler extends Application {
 
                     Log.d("seatCategorySize", "getData: Callback invoked with seatCategory size: " + seatCategoryList.size());
 
-                }else{
+                } else {
 
                     Log.w("seatCategoryError", "Error getting documents.", task.getException());
 
                 }
-
-
 
 
             }
@@ -232,27 +229,24 @@ public class dbHandler extends Application {
         });
     }
 
-    public void addFaq(String question, String answer, String keywords) {
+    public void getFaq(FirestoreCallback<Faq> firestoreCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference faqCollection = db.collection("FAQ");
 
-        Map<String, Object> faq = new HashMap<>();
-        faq.put("Question", question);
-        faq.put("Answer", answer);
-        faq.put("Keywords", keywords.split(" "));
-
-        faqCollection.add(faq)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("dbHandler", "FAQ added with ID: " + documentReference.getId());
+        faqCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<Faq> faqList = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Faq faq = document.toObject(Faq.class);
+                        faqList.add(faq);
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("dbHandler", "Error adding FAQ", e);
-                    }
-                });
+                    firestoreCallback.onCallback(faqList);
+                } else {
+                    Log.w("faqError", "Error getting documents.", task.getException());
+                }
+            }
+        });
     }
 }
