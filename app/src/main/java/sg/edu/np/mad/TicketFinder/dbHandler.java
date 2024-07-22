@@ -249,4 +249,33 @@ public class dbHandler extends Application {
             }
         });
     }
+
+    public void getGreetings(FirestoreCallback<Greeting> firestoreCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference greetingsCollection = db.collection("Greetings");
+
+        greetingsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<Greeting> greetingList = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Greeting greeting = new Greeting();
+                        if (document.contains("Greeting")) {
+                            greeting.setGreeting(document.getString("Greeting"));
+                        }
+                        if (document.contains("Response")) {
+                            greeting.setResponse(document.getString("Response"));
+                        }
+                        greetingList.add(greeting);
+                    }
+                    firestoreCallback.onCallback(greetingList);
+                    Log.d("dbHandler", "getGreetings: Callback invoked with greetingList size: " + greetingList.size());
+                } else {
+                    Log.w("greetingError", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
 }
