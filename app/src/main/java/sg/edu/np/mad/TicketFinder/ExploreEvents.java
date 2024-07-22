@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -83,9 +82,16 @@ public class ExploreEvents extends AppCompatActivity {
         setupSearchBar(); // Setup search bar
         setupFilterButton(); // Setup filter button
 
-
         Footer.setUpFooter(this); // Set up footer
 
+        // Check if searchArtist was passed from speech recognition and apply filter
+        Intent intent = getIntent();
+        String searchArtist = intent.getStringExtra("searchArtist");
+        if (searchArtist != null) {
+            searchByArtist = true;
+            searchText = searchArtist;
+            applyFilters();
+        }
     }
 
     @Override
