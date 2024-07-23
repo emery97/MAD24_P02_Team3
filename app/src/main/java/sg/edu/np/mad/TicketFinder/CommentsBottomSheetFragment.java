@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,12 +9,16 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -105,7 +110,6 @@ public class CommentsBottomSheetFragment extends BottomSheetDialogFragment {
                         });
             }
         });
-
         // Start listening for comments
         startListeningForComments();
     }
@@ -116,16 +120,22 @@ public class CommentsBottomSheetFragment extends BottomSheetDialogFragment {
                     .whereEqualTo("documentId", documentId)
                     .addSnapshotListener((snapshot, e) -> {
                         if (e != null) {
-                            // Handle error
+                            Log.w("CommentsBottomSheetFragment", "Listen failed.", e);
                             return;
                         }
 
-                        if (snapshot != null && !snapshot.isEmpty()) {
-                            commentList.clear();
+                        if (snapshot != null) {
+                            List<ForumComment> tempList = new ArrayList<>();
                             for (DocumentSnapshot doc : snapshot.getDocuments()) {
                                 ForumComment comment = doc.toObject(ForumComment.class);
-                                commentList.add(comment);
+                                if (comment != null) {
+                                    tempList.add(comment);
+                                }
                             }
+                            // Sort locally
+                            tempList.sort((c1, c2) -> Long.compare(c2.getTimestamp(), c1.getTimestamp()));
+                            commentList.clear();
+                            commentList.addAll(tempList);
                             commentAdapter.notifyDataSetChanged();
                         }
                     });

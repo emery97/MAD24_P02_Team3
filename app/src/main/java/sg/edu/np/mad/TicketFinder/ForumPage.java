@@ -82,6 +82,7 @@ public class ForumPage extends AppCompatActivity {
     private List<Uri> imageUris = new ArrayList<>();
     private LinearLayout imageContainer;
     private static final int PICK_IMAGES_REQUEST = 1;
+    private NotificationHelper notificationHelper;
 
 
     @Override
@@ -89,6 +90,7 @@ public class ForumPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forum_page);
+        notificationHelper = new NotificationHelper(this);
 
         eventSpinner = findViewById(R.id.event_spinner);
         inputText = findViewById(R.id.input_text);
@@ -161,6 +163,8 @@ public class ForumPage extends AppCompatActivity {
                                 fadeOutView(spinnerContainer);
                                 fadeOutView(inputContainer);
                                 createButton.setVisibility(View.VISIBLE);
+
+                                notificationHelper.sendNotification("Post Created", "Post successfully created: " + selectedEvent);
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
@@ -181,6 +185,8 @@ public class ForumPage extends AppCompatActivity {
                                     fadeOutView(spinnerContainer);
                                     fadeOutView(inputContainer);
                                     createButton.setVisibility(View.VISIBLE);
+
+                                    notificationHelper.sendNotification("Post Created", "Post successfully created: " + selectedEvent);
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
