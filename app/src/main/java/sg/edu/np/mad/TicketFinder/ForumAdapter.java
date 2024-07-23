@@ -1,12 +1,17 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,6 +71,14 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         ForumImageAdapter imageAdapter = new ForumImageAdapter(forum.getImageUrls());
         holder.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         holder.imagesRecyclerView.setAdapter(imageAdapter);
+
+        holder.commentsButton.setOnClickListener(v -> {
+            CommentsBottomSheetFragment bottomSheet = new CommentsBottomSheetFragment();
+            Bundle args = new Bundle();
+            args.putString("documentId", forum.getDocumentId());
+            bottomSheet.setArguments(args);
+            bottomSheet.show(((FragmentActivity) holder.itemView.getContext()).getSupportFragmentManager(), bottomSheet.getTag());
+        });
     }
 
     @Override
@@ -77,6 +90,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         TextView nameTextView, messageTextView, eventTextView, emailTextView,timestampTextView;
         ImageView profileImageView;
         RecyclerView imagesRecyclerView;
+        Button commentsButton;
 
         public ForumViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -86,6 +100,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
             timestampTextView = itemView.findViewById(R.id.forum_timestamp);
             profileImageView = itemView.findViewById(R.id.profile_image);
             imagesRecyclerView = itemView.findViewById(R.id.image_recycler_view);
+            commentsButton = itemView.findViewById(R.id.commentsbutton);
         }
     }
 }

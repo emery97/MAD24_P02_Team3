@@ -14,10 +14,12 @@ public class Forum {
     private String profilePicUrl;
     private Timestamp currenttimestamp;
     private List<String> imageUrls;
+    private String documentId;
 
     public Forum() {
     }
-    public Forum(String userId, String name, String email, String message, String event, String profilePicUrl,List<String> imageUrls) {
+    public Forum(String documentId,String userId, String name, String email, String message, String event, String profilePicUrl,List<String> imageUrls) {
+        this.documentId = documentId;
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -83,5 +85,13 @@ public class Forum {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 }

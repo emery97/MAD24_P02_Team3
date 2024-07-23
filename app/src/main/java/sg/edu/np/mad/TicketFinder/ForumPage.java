@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -147,7 +148,9 @@ public class ForumPage extends AppCompatActivity {
             if (!message.isEmpty()) {
                 if (imageUris.isEmpty()) {
                     // No images to upload, proceed with saving the message directly
-                    Forum messageData = new Forum(userIdString, name, email, message, selectedEvent, profilePicUrl, new ArrayList<>());
+                    DocumentReference newForumRef = db.collection("Forum").document();
+                    String documentId = newForumRef.getId();
+                    Forum messageData = new Forum(documentId,userIdString, name, email, message, selectedEvent, profilePicUrl, new ArrayList<>());
 
                     db.collection("Forum").add(messageData)
                             .addOnSuccessListener(documentReference -> {
@@ -165,7 +168,9 @@ public class ForumPage extends AppCompatActivity {
                 } else {
                     // Upload images and then save the message
                     uploadImagesToFirebaseStorage(imageUris, imageUrls -> {
-                        Forum messageData = new Forum(userIdString, name, email, message, selectedEvent, profilePicUrl, imageUrls);
+                        DocumentReference newForumRef = db.collection("Forum").document();
+                        String documentId = newForumRef.getId();
+                        Forum messageData = new Forum(documentId ,userIdString, name, email, message, selectedEvent, profilePicUrl, imageUrls);
 
                         db.collection("Forum").add(messageData)
                                 .addOnSuccessListener(documentReference -> {
@@ -310,9 +315,12 @@ public class ForumPage extends AppCompatActivity {
                         List<Forum> updatedForums = new ArrayList<>();
                         for (DocumentSnapshot document : snapshots.getDocuments()) {
                             Forum forum = document.toObject(Forum.class);
-                            if (forum != null && !documentIds.contains(document.getId())) {
-                                updatedForums.add(forum);
-                                documentIds.add(document.getId());
+                            if (forum != null) {
+                                forum.setDocumentId(document.getId()); // Set the document ID
+                                if (!documentIds.contains(document.getId())) {
+                                    updatedForums.add(forum);
+                                    documentIds.add(document.getId());
+                                }
                             }
                         }
                         if (!updatedForums.isEmpty()) {
