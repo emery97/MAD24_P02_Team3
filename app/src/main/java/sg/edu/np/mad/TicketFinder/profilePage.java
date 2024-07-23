@@ -109,14 +109,8 @@ public class profilePage extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        // Check if user is authenticated
-        if (firebaseUser == null) {
-            // Redirect to login page if user is not authenticated
-            Log.e(TAG, "FirebaseUser is null, redirecting to login");
-            Intent intent = new Intent(profilePage.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        // Redirect to login if user is not authenticated
+        redirectToLoginIfNoUser();
 
         // Get userId from SharedPreferences
         userId = sharedPreferences.getString("userId", "N/A");
@@ -265,34 +259,37 @@ public class profilePage extends AppCompatActivity {
 
     // Method to fetch userId from Firestore using email
     private void fetchUserId() {
-        // Match account email to entry in database
-        db.collection("Account").whereEqualTo("Email", firebaseUser.getEmail()).get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        // Get userId
-                        DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-                        userId = documentSnapshot.getId();
+        if (firebaseUser != null) {
+            // Match account email to entry in database
+            db.collection("Account").whereEqualTo("Email", firebaseUser.getEmail()).get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            // Get userId
+                            DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                            userId = documentSnapshot.getId();
 
-                        // Save userId to SharedPreferences
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("userId", userId);
-                        editor.apply();
+                            // Save userId to SharedPreferences
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("userId", userId);
+                            editor.apply();
 
-                        // Load user data
-                        loadUserData();
-                    } else { // No matches in database
-                        Log.e(TAG, "No matching document found in Firestore");
-                        Toast.makeText(this, "No user data found. Please log in again.", Toast.LENGTH_SHORT).show();
-                        mAuth.signOut();
-                        Intent intent = new Intent(profilePage.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .addOnFailureListener(e -> { // Error handling
-                    Log.e(TAG, "Error fetching userId from Firestore", e);
-                    Toast.makeText(this, "Error fetching user data. Please try again later.", Toast.LENGTH_SHORT).show();
-                });
+                            // Load user data
+                            loadUserData();
+                        } else { // No matches in database
+                            Log.e(TAG, "No matching document found in Firestore");
+                            Toast.makeText(this, "No user data found. Please log in again.", Toast.LENGTH_SHORT).show();
+                            mAuth.signOut();
+                            redirectToLoginIfNoUser();
+                        }
+                    })
+                    .addOnFailureListener(e -> { // Error handling
+                        Log.e(TAG, "Error fetching userId from Firestore", e);
+                        Toast.makeText(this, "Error fetching user data. Please try again later.", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Log.e(TAG, "FirebaseUser is null in fetchUserId");
+            redirectToLoginIfNoUser();
+        }
     }
 
     // Method to load user data
@@ -343,6 +340,7 @@ public class profilePage extends AppCompatActivity {
             }).addOnFailureListener(e -> Log.e(TAG, "Failed to fetch user data from Firestore", e));
         } else {
             Log.e(TAG, "FirebaseUser is null in loadUserData");
+            redirectToLoginIfNoUser();
         }
     }
 
@@ -497,6 +495,7 @@ public class profilePage extends AppCompatActivity {
         } else {
             Log.e(TAG, "FirebaseUser is null");
             Toast.makeText(profilePage.this, "Failed to update profile: FirebaseUser not found", Toast.LENGTH_SHORT).show();
+            redirectToLoginIfNoUser();
         }
     }
 
@@ -523,9 +522,7 @@ public class profilePage extends AppCompatActivity {
                                                 Toast.makeText(profilePage.this, "Account deleted successfully", Toast.LENGTH_SHORT).show();
 
                                                 // Redirect to login page
-                                                Intent intent = new Intent(profilePage.this, MainActivity.class);
-                                                startActivity(intent);
-                                                finish();
+                                                redirectToLoginIfNoUser();
                                             } else {
                                                 // Error handling for Firebase Authentication deletion
                                                 Log.e(TAG, "Error deleting user from Firebase Authentication", task.getException());
@@ -546,6 +543,7 @@ public class profilePage extends AppCompatActivity {
         } else {
             Log.e(TAG, "FirebaseUser is null");
             Toast.makeText(this, "User is not authenticated", Toast.LENGTH_SHORT).show();
+            redirectToLoginIfNoUser();
         }
     }
 
@@ -706,4 +704,15 @@ public class profilePage extends AppCompatActivity {
         builder.show();
     }
 
+    // Method to redirect to MainActivity if no user is authenticated
+    private void redirectToLoginIfNoUser() {
+        if (firebaseUser == null) {
+            Log.e(TAG, "No authenticated user, redirecting to login");
+            // Clear SharedPreferences
+            sharedPreferences.edit().clear().apply();
+            Intent intent = new Intent(profilePage.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
 }
