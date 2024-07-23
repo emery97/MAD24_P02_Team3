@@ -104,7 +104,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-
     static class BotViewHolder extends RecyclerView.ViewHolder {
         private final TextView botMessage;
 
