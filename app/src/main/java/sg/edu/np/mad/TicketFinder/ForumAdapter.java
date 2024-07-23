@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -61,6 +62,10 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
                         holder.profileImageView.setImageResource(R.drawable.profileimage); // Fallback to default image
                     });
         }
+
+        ForumImageAdapter imageAdapter = new ForumImageAdapter(forum.getImageUrls());
+        holder.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        holder.imagesRecyclerView.setAdapter(imageAdapter);
     }
 
     @Override
@@ -71,6 +76,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
     public static class ForumViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, messageTextView, eventTextView, emailTextView,timestampTextView;
         ImageView profileImageView;
+        RecyclerView imagesRecyclerView;
 
         public ForumViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -79,6 +85,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
             eventTextView = itemView.findViewById(R.id.forum_event);
             timestampTextView = itemView.findViewById(R.id.forum_timestamp);
             profileImageView = itemView.findViewById(R.id.profile_image);
+            imagesRecyclerView = itemView.findViewById(R.id.image_recycler_view);
         }
     }
 }

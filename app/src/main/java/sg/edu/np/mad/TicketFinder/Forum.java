@@ -1,6 +1,8 @@
 package sg.edu.np.mad.TicketFinder;
 
 import java.security.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Forum {
     private String userId;
@@ -11,10 +13,11 @@ public class Forum {
     private long timestamp;
     private String profilePicUrl;
     private Timestamp currenttimestamp;
+    private List<String> imageUrls;
 
     public Forum() {
     }
-    public Forum(String userId, String name, String email, String message, String event, String profilePicUrl) {
+    public Forum(String userId, String name, String email, String message, String event, String profilePicUrl,List<String> imageUrls) {
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -22,6 +25,7 @@ public class Forum {
         this.event = event;
         this.timestamp = System.currentTimeMillis();
         this.profilePicUrl = profilePicUrl;
+        this.imageUrls = imageUrls;
     }
 
     public String getUserId() {
@@ -73,4 +77,11 @@ public class Forum {
     }
     public String getProfilePicUrl() { return profilePicUrl; }
     public void setProfilePicUrl(String profilePicUrl) { this.profilePicUrl = profilePicUrl; }
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
 }

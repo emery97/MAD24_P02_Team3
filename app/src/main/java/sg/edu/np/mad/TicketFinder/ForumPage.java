@@ -1,10 +1,17 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +20,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +45,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +75,13 @@ public class ForumPage extends AppCompatActivity {
     private Set<String> documentIds = new HashSet<>();
     private static final int PAGE_SIZE = 5;
     private String profilePicUrl;
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri imageUri;
+    private ImageView selectedImage;
+    private List<Uri> imageUris = new ArrayList<>();
+    private LinearLayout imageContainer;
+    private static final int PICK_IMAGES_REQUEST = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +95,17 @@ public class ForumPage extends AppCompatActivity {
         spinnerContainer = findViewById(R.id.spinner_container);
         inputContainer = findViewById(R.id.input_container);
         Button createButton = findViewById(R.id.create_button);
+        ImageButton uploadButton = findViewById(R.id.upload_button);
+//        selectedImage = findViewById(R.id.selected_image);
+        imageContainer = findViewById(R.id.image_container);
+        uploadButton.setColorFilter(Color.WHITE);
+
+        uploadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImagePicker();
+            }
+        });
 
         db = FirebaseFirestore.getInstance();
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
@@ -104,7 +137,6 @@ public class ForumPage extends AppCompatActivity {
 
         setupRealTimeListener();
 
-        // Set up button click listener
         iconButton.setOnClickListener(v -> {
             if (selectedEvent == null || selectedEvent.equals("Select an event")) {
                 Toast.makeText(ForumPage.this, "Please select an event from the dropdown", Toast.LENGTH_SHORT).show();
@@ -113,26 +145,49 @@ public class ForumPage extends AppCompatActivity {
 
             String message = inputText.getText().toString().trim();
             if (!message.isEmpty()) {
-                // Create a Message object
-                Forum messageData = new Forum(userIdString, name, email, message, selectedEvent,profilePicUrl);
+                if (imageUris.isEmpty()) {
+                    // No images to upload, proceed with saving the message directly
+                    Forum messageData = new Forum(userIdString, name, email, message, selectedEvent, profilePicUrl, new ArrayList<>());
 
-                // Save the message data to Firestore
-                db.collection("Forum").add(messageData)
-                        .addOnSuccessListener(documentReference -> {
-                            Toast.makeText(ForumPage.this, "Message sent for event: " + selectedEvent, Toast.LENGTH_SHORT).show();
-                            inputText.setText(""); // Clear the input text
+                    db.collection("Forum").add(messageData)
+                            .addOnSuccessListener(documentReference -> {
+                                Toast.makeText(ForumPage.this, "Message sent for event: " + selectedEvent, Toast.LENGTH_SHORT).show();
+                                inputText.setText(""); // Clear the input text
+                                imageUris.clear(); // Clear the image URIs
+                                imageContainer.removeAllViews(); // Remove all images from the container
+                                fadeOutView(spinnerContainer);
+                                fadeOutView(inputContainer);
+                                createButton.setVisibility(View.VISIBLE);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    // Upload images and then save the message
+                    uploadImagesToFirebaseStorage(imageUris, imageUrls -> {
+                        Forum messageData = new Forum(userIdString, name, email, message, selectedEvent, profilePicUrl, imageUrls);
 
-                            fadeOutView(spinnerContainer);
-                            fadeOutView(inputContainer);
-                            createButton.setVisibility(View.VISIBLE);
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
-                        });
+                        db.collection("Forum").add(messageData)
+                                .addOnSuccessListener(documentReference -> {
+                                    Toast.makeText(ForumPage.this, "Message sent for event: " + selectedEvent, Toast.LENGTH_SHORT).show();
+                                    inputText.setText(""); // Clear the input text
+                                    imageUris.clear(); // Clear the image URIs
+                                    imageContainer.removeAllViews(); // Remove all images from the container
+                                    fadeOutView(spinnerContainer);
+                                    fadeOutView(inputContainer);
+                                    createButton.setVisibility(View.VISIBLE);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                                });
+                    });
+                }
             } else {
                 Toast.makeText(ForumPage.this, "Please enter a message", Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
         createButton.setOnClickListener(v -> {
             fadeInView(spinnerContainer);
@@ -350,6 +405,129 @@ public class ForumPage extends AppCompatActivity {
         marginParamsInput.bottomMargin = 0;
         inputContainer.setLayoutParams(marginParamsInput);
     }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // Allow multiple images
+        startActivityForResult(intent, PICK_IMAGES_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK && data != null) {
+            if (data.getClipData() != null) {
+                // Multiple images selected
+                int count = data.getClipData().getItemCount();
+                for (int i = 0; i < count && i < 3; i++) {
+                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                    imageUris.add(imageUri);
+                    displayImage(imageUri);
+                }
+            } else if (data.getData() != null) {
+                // Single image selected
+                Uri imageUri = data.getData();
+                imageUris.add(imageUri);
+                displayImage(imageUri);
+            }
+        }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float scaleWidth = ((float) maxWidth) / width;
+        float scaleHeight = ((float) maxHeight) / height;
+        float scale = Math.min(scaleWidth, scaleHeight);
+
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+    }
+
+    private void displayImage(Uri imageUri) {
+        // Create a FrameLayout to hold the ImageView and the remove button
+        FrameLayout frameLayout = new FrameLayout(this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        frameLayout.setLayoutParams(layoutParams);
+
+        // Create and configure the ImageView
+        ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        ));
+        imageView.setPadding(4, 4, 4, 4);
+
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            Bitmap resizedBitmap = resizeBitmap(bitmap, 300, 300); // Resize to a max width/height of 300px
+            imageView.setImageBitmap(resizedBitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create and configure the remove button
+        ImageButton removeButton = new ImageButton(this);
+        removeButton.setImageResource(android.R.drawable.ic_delete); // Use a delete icon
+        removeButton.setBackgroundColor(Color.TRANSPARENT); // Transparent background
+        removeButton.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP | Gravity.END
+        ));
+        removeButton.setPadding(8, 8, 8, 8);
+        removeButton.setOnClickListener(v -> {
+            // Remove the image view from the container and URI from the list
+            imageContainer.removeView(frameLayout);
+            imageUris.remove(imageUri);
+        });
+
+        // Add the ImageView and remove button to the FrameLayout
+        frameLayout.addView(imageView);
+        frameLayout.addView(removeButton);
+
+        // Add the FrameLayout to the container
+        imageContainer.addView(frameLayout);
+    }
+
+
+    private void uploadImagesToFirebaseStorage(List<Uri> imageUris, OnUploadCompleteListener listener) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        List<String> imageUrls = new ArrayList<>();
+        int totalImages = imageUris.size();
+        int[] uploadedImages = {0};
+
+        for (Uri imageUri : imageUris) {
+            StorageReference imageRef = storageRef.child("Forumimages/" + System.currentTimeMillis() + ".jpg");
+            imageRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                imageUrls.add(uri.toString());
+                                uploadedImages[0]++;
+                                if (uploadedImages[0] == totalImages) {
+                                    listener.onUploadComplete(imageUrls);
+                                }
+                            })
+                            .addOnFailureListener(exception -> {
+                                Toast.makeText(ForumPage.this, "Failed to get download URL", Toast.LENGTH_SHORT).show();
+                            }))
+                    .addOnFailureListener(exception -> {
+                        Toast.makeText(ForumPage.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+    private interface OnUploadCompleteListener {
+        void onUploadComplete(List<String> imageUrls);
+    }
+
 
     @Override
     protected void onDestroy() {
