@@ -27,14 +27,28 @@
             app:lottie_rawRes="@raw/bot_icon" />
     </androidx.cardview.widget.CardView>
 
+    <!-- Arrow Down Animation -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/arrow_down_animation"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="11dp"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/arrow_down"
+        app:layout_constraintTop_toTopOf="@id/chatbot_icon_container"
+        app:layout_constraintBottom_toBottomOf="@id/chatbot_icon_container"
+        app:layout_constraintStart_toEndOf="@id/chatbot_icon_container"
+        android:visibility="gone"/>
+
     <!-- RecyclerView for Event Item Layout -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/eventRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/chatbot_icon_container"
+        app:layout_constraintStart_toEndOf="@id/arrow_down_animation"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

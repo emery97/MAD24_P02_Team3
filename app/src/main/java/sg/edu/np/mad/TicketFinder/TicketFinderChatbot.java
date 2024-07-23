@@ -464,9 +464,14 @@ public class TicketFinderChatbot extends AppCompatActivity {
     }
 
     private void sendEventIntroMessage(String artist) {
-        String introMessage = "Here are some details about the event featuring " + artist + ". You can click on the event details page to find out more!";
-        addMessageToChat(introMessage);
+        runOnUiThread(() -> {
+            // Add the arrow down animation
+            messageList.add(new Message("arrow_down_animation", false)); // This will trigger the arrow down animation view
+            chatAdapter.notifyDataSetChanged();
+            chatRecyclerView.smoothScrollToPosition(messageList.size() - 1);
+        });
     }
+
 
     private void addEventMessageToChat(final List<Event> events) {
         runOnUiThread(new Runnable() {

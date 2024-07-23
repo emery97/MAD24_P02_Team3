@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_USER = 0;
     private static final int VIEW_TYPE_BOT = 1;
     private static final int VIEW_TYPE_EVENT = 2;
-
+    private static final int VIEW_TYPE_ARROW_DOWN = 3;
     private final Context context;
     private final ArrayList<Message> messageList;
 
@@ -30,7 +31,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.messageList = messageList;
     }
 
-    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
@@ -40,11 +40,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         } else if (viewType == VIEW_TYPE_BOT) {
             view = LayoutInflater.from(context).inflate(R.layout.bot_message, parent, false);
             return new BotViewHolder(view);
+        } else if (viewType == VIEW_TYPE_ARROW_DOWN) {
+            view = LayoutInflater.from(context).inflate(R.layout.item_chat_event, parent, false);
+            return new ArrowDownViewHolder(view);
         } else {
             view = LayoutInflater.from(context).inflate(R.layout.item_chat_event, parent, false);
-            return new EventViewHolder(view); // Use the correct layout for events
+            return new EventViewHolder(view);
         }
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -53,22 +57,40 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((UserViewHolder) holder).bind(message);
         } else if (holder.getItemViewType() == VIEW_TYPE_BOT) {
             ((BotViewHolder) holder).bind(message);
+        } else if (holder.getItemViewType() == VIEW_TYPE_ARROW_DOWN) {
+            // No binding needed for the arrow down animation as it starts automatically
+            ((ArrowDownViewHolder) holder).arrowDownAnimation.setVisibility(View.VISIBLE);
         } else {
             ((EventViewHolder) holder).bind(message.getEventList());
         }
     }
+
 
     @Override
     public int getItemViewType(int position) {
         Message message = messageList.get(position);
         if (message.isUser()) {
             return VIEW_TYPE_USER;
+        } else if (message.getMessage() != null && message.getMessage().equals("arrow_down_animation")) {
+            return VIEW_TYPE_ARROW_DOWN;
         } else if (message.getEventList() != null) {
             return VIEW_TYPE_EVENT;
         } else {
             return VIEW_TYPE_BOT;
         }
     }
+
+    // New ViewHolder for Arrow Down Animation
+    static class ArrowDownViewHolder extends RecyclerView.ViewHolder {
+        private final LottieAnimationView arrowDownAnimation;
+
+        public ArrowDownViewHolder(@NonNull View itemView) {
+            super(itemView);
+            arrowDownAnimation = itemView.findViewById(R.id.arrow_down_animation);
+        }
+    }
+
+
 
     @Override
     public int getItemCount() {
