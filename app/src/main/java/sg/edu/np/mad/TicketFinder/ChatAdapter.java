@@ -1,6 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,18 +75,35 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return messageList.size();
     }
 
-    static class UserViewHolder extends RecyclerView.ViewHolder {
+    class UserViewHolder extends RecyclerView.ViewHolder {
         private final TextView userMessage;
+        private final de.hdodenhof.circleimageview.CircleImageView profileImageView;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             userMessage = itemView.findViewById(R.id.user_message);
+            profileImageView = itemView.findViewById(R.id.profile_image);
         }
 
         public void bind(Message message) {
             userMessage.setText(message.getMessage());
+
+            // ----------- Start of changes -----------
+            // Retrieve the profile picture URL from SharedPreferences
+            SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+            String profilePicUrl = sharedPreferences.getString("ProfilePicUrl", null);
+
+            // Load the profile picture using Glide
+            if (profilePicUrl != null) {
+                Glide.with(context)
+                        .load(profilePicUrl)
+                        .circleCrop()
+                        .into(profileImageView);
+            }
+            // ----------- End of changes -----------
         }
     }
+
 
     static class BotViewHolder extends RecyclerView.ViewHolder {
         private final TextView botMessage;
