@@ -286,7 +286,7 @@ public class TicketFinderChatbot extends AppCompatActivity {
 
                         if (translatedMessage.equals(message)) {
                             // If the translated message is the same as the original message, process as is
-                            processMessage(message, "en");
+                            processMessage(message, userLanguage); // because user may not be speaking in english previously. so set it as userlanguage instead of 'en'
                         } else {
                             // Otherwise, process the translated message
                             processMessage(translatedMessage, detectedLanguage);
