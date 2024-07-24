@@ -30,9 +30,9 @@
     <!-- Arrow Down Animation -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/arrow_down_animation"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_margin="11dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginLeft="20dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/arrow_down"
