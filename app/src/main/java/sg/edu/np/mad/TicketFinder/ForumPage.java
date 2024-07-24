@@ -34,6 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -138,6 +139,10 @@ public class ForumPage extends AppCompatActivity {
         forumAdapter = new ForumAdapter(forumList);
         recyclerView.setAdapter(forumAdapter);
 
+        ItemTouchHelper.Callback callback = new ForumSwipeCallBack(forumAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
         setupRealTimeListener();
 
         iconButton.setOnClickListener(v -> {
@@ -224,7 +229,6 @@ public class ForumPage extends AppCompatActivity {
             return false;
         });
     }
-
     private void setupSpinnerWithPlaceholder() {
         // Create a list with a placeholder item
         List<String> eventNames = new ArrayList<>();
@@ -323,16 +327,30 @@ public class ForumPage extends AppCompatActivity {
                             Forum forum = document.toObject(Forum.class);
                             if (forum != null) {
                                 forum.setDocumentId(document.getId()); // Set the document ID
-                                if (!documentIds.contains(document.getId())) {
+
+                                // Check if the forum item already exists in the list
+                                boolean exists = false;
+                                for (int i = 0; i < forumList.size(); i++) {
+                                    if (forumList.get(i).getDocumentId().equals(document.getId())) {
+                                        // Update existing forum item
+                                        forumList.set(i, forum);
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+                                // If item doesn't exist, add it to the list
+                                if (!exists) {
                                     updatedForums.add(forum);
                                     documentIds.add(document.getId());
                                 }
                             }
                         }
+
+                        // Update the adapter with new data
                         if (!updatedForums.isEmpty()) {
                             forumList.addAll(updatedForums);
-                            forumAdapter.notifyDataSetChanged();
                         }
+                        forumAdapter.notifyDataSetChanged();
                     }
                 });
     }

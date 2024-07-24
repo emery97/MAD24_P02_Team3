@@ -1,5 +1,6 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
@@ -27,9 +30,12 @@ import java.util.Locale;
 public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHolder> {
 
     private List<Forum> forumList;
+    private FirebaseFirestore db;
 
     public ForumAdapter(List<Forum> forumList) {
         this.forumList = forumList;
+        db = FirebaseFirestore.getInstance();
+
     }
 
     @NonNull
@@ -84,6 +90,30 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
     @Override
     public int getItemCount() {
         return forumList.size();
+    }
+
+    public void onDeleteClicked(int position) {
+        Forum forumToRemove = forumList.get(position);
+        String documentId = forumToRemove.getDocumentId();
+
+        // Delete from Firestore
+        db.collection("Forum").document(documentId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("ForumAdapter", "DocumentSnapshot successfully deleted!");
+                    forumList.remove(position);
+                    notifyItemRemoved(position);
+                })
+                .addOnFailureListener(e -> Log.w("ForumAdapter", "Error deleting document", e));
+    }
+
+    public void onEditClicked(int position) {
+        // Handle edit action
+        Forum forumToEdit = forumList.get(position);
+        // Implement your edit logic
+    }
+    public List<Forum> getForumList() {
+        return forumList;
     }
 
     public static class ForumViewHolder extends RecyclerView.ViewHolder {

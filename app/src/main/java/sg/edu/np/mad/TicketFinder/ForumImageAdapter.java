@@ -20,6 +20,9 @@ public class ForumImageAdapter extends RecyclerView.Adapter<ForumImageAdapter.Im
     public ForumImageAdapter(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
 
     @NonNull
     @Override
