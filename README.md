@@ -244,10 +244,10 @@ Entertainment
       - Given Rating
       - Review Text
  
-  - **Nearby Places - Google Places API**
-    - Allows users to find nearby places of interest (restaurants, parking, public transit)
-    - Type of nearby places is selectable using radio buttons, with the option of hiding all nearby places markers
-    - All relevant nearby places are marked with blue coloured markers on the Google Map fragment, distinguishing them from the event marker  
+- **Nearby Places - Google Places API**
+  - Allows users to find nearby places of interest (restaurants, parking, public transit)
+  - Type of nearby places is selectable using radio buttons, with the option of hiding all nearby places markers
+  - All relevant nearby places are marked with blue coloured markers on the Google Map fragment, distinguishing them from the event marker  
 
 ## When changing profile picture, allow user to take picture using the camera [IVAN]
 - **xxxxx**:
