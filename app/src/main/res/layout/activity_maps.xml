@@ -90,14 +90,6 @@
                             android:textSize="24sp" />
 
                         <Button
-                            android:id="@+id/mapTypeButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:backgroundTint="#D9AA52"
-                            android:text="Change Map Type" />
-
-                        <Button
                             android:id="@+id/gMapButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -106,6 +98,78 @@
                             android:text="Go To Google Maps"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/mapOptionsHolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Map Options"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/mapTypeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:backgroundTint="#D9AA52"
+                            android:text="Change Map Type" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Show nearby:"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <RadioGroup
+                            android:id="@+id/placeTypeGroup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/restaurantRadioButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Restaurants" />
+
+                            <RadioButton
+                                android:id="@+id/parkingRadioButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Parking" />
+
+                            <RadioButton
+                                android:id="@+id/transitRadioButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Public Transit" />
+                            <RadioButton
+                                android:id="@+id/hideRadioButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hide"
+                                android:checked="true"/>
+                        </RadioGroup>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -63,6 +64,11 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "maps";
     private static final String BASE_URL = "https://maps.googleapis.com/maps/api/";
     private static final String API_KEY = "AIzaSyAtrYJH3VUAJgo-qhxicKkjihd8pPSuEII";
+
+    private static final int PROXIMITY_RADIUS = 1500;
+
+    private String selectedPlaceType = "restaurant"; // Default place type
+    private List<Marker> placeMarkers = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +127,25 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 } else {
                     Log.e("maps", "Venue address is null");
+                }
+            }
+        });
+
+        RadioGroup placeTypeGroup = findViewById(R.id.placeTypeGroup);
+        placeTypeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.restaurantRadioButton) {
+                    selectedPlaceType = "restaurant";
+                    fetchNearbyPlaces(gMap.getCameraPosition().target);
+                } else if (checkedId == R.id.parkingRadioButton) {
+                    selectedPlaceType = "parking";
+                    fetchNearbyPlaces(gMap.getCameraPosition().target);
+                } else if (checkedId == R.id.transitRadioButton) {
+                    selectedPlaceType = "transit_station";
+                    fetchNearbyPlaces(gMap.getCameraPosition().target);
+                } else if (checkedId == R.id.hideRadioButton) {
+                    hideNearbyPlaces();
                 }
             }
         });
@@ -331,5 +356,54 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 });
         builder.show();
+    }
+
+    private void fetchNearbyPlaces(LatLng location) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        PlacesService service = retrofit.create(PlacesService.class);
+
+        // Clear existing markers
+        hideNearbyPlaces();
+
+        Call<NearbyPlacesResponse> call = service.getNearbyPlaces(
+                selectedPlaceType,
+                location.latitude + "," + location.longitude,
+                PROXIMITY_RADIUS,
+                API_KEY);
+
+        call.enqueue(new Callback<NearbyPlacesResponse>() {
+            @Override
+            public void onResponse(Call<NearbyPlacesResponse> call, Response<NearbyPlacesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (NearbyPlacesResponse.Result place : response.body().results) {
+                        LatLng placeLocation = new LatLng(place.geometry.location.lat, place.geometry.location.lng);
+                        Marker marker = gMap.addMarker(new MarkerOptions()
+                                .position(placeLocation)
+                                .title(place.name)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        placeMarkers.add(marker);
+                    }
+
+                } else {
+                    Log.e(TAG, "Nearby Places request failed with status: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NearbyPlacesResponse> call, Throwable t) {
+                Log.e(TAG, "Nearby Places request failed: " + t.getMessage());
+            }
+        });
+    }
+
+    private void hideNearbyPlaces() {
+        for (Marker marker : placeMarkers) {
+            marker.remove();
+        }
+        placeMarkers.clear();
     }
 }
