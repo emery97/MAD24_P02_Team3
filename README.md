@@ -249,9 +249,8 @@ Entertainment
   - Type of nearby places is selectable using radio buttons, with the option of hiding all nearby places markers
   - All relevant nearby places are marked with blue coloured markers on the Google Map fragment, distinguishing them from the event marker  
 
-# Ticket Finder App Stage 2 Features by Koh Yung Chun Ivan
 
-## Biometric Integration
+## Biometric Integration [Koh Yung Chun Ivan]
 Biometric authentication has been implemented in multiple sections of the Ticket Finder app to enhance security and user convenience. The biometric features include:
 
 ### Sign In Page
@@ -272,7 +271,7 @@ Biometric authentication has been implemented in multiple sections of the Ticket
   - Users are prompted to use biometric authentication to retrieve saved payment information.
   - Implementation: `payment.java` uses `BiometricPrompt` for retrieving and autofilling saved payment details, enhancing the security and convenience of the payment process.
 
-## Image Upload for Profile Pictures
+## Image Upload for Profile Pictures [Koh Yung Chun Ivan]
 Users can now upload or capture their profile pictures directly within the app. This feature allows users to personalize their profiles with ease.
 
 ### Profile Picture Upload
@@ -281,7 +280,7 @@ Users can now upload or capture their profile pictures directly within the app. 
   - The selected image is uploaded to Firebase Storage and updated in Firestore.
   - Implementation: `profilePage.java` handles image upload functionality, including permission checks for camera and storage access, and updates the profile picture URL in Firestore.
 
-## Enhanced Stage 1 Feature: User Event Preferences
+## Enhanced Stage 1 Feature: User Event Preferences [Koh Yung Chun Ivan]
 The user event preferences feature has been enhanced to better tailor event recommendations based on user interests.
 
 ### Setting and Saving Preferences
@@ -296,7 +295,7 @@ The user event preferences feature has been enhanced to better tailor event reco
   - Events matching user preferences are prioritized and displayed prominently.
   - Implementation: The home page fetches user preferences from Firestore and uses them to filter and display recommended events.
 
-## Speech Navigation
+## Speech Navigation [Koh Yung Chun Ivan]
 Speech recognition capabilities have been integrated into the app to enhance accessibility and user interaction.
 
 ### Voice Command Navigation
