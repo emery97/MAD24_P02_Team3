@@ -395,12 +395,25 @@ public class payment extends AppCompatActivity {
 
     private void postTickets(int startingTicketID, String userId, String name, String concertName, String time) {
         List<Map<String, Object>> ticketList = new ArrayList<>();
-
-        // DELETE
-        Map<String, Object> bookingDetails = new HashMap<>();
-
         List<Integer> ticketIDs = new ArrayList<>();  // Initialize ticketIDs list
         int currentTicketID = startingTicketID;
+
+        // Initialize bookingDetails map
+        Map<String, Object> bookingDetails = new HashMap<>();
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        int quantity = getIntent().getIntExtra("quantity", 1);
+        String paymentMethod = paymentmethod.getSelectedItem().toString();
+
+        bookingDetails.put("ConcertTitle", concertName);
+        bookingDetails.put("EventTime", time);
+        bookingDetails.put("Name", name);
+        bookingDetails.put("PaymentMethod", paymentMethod);
+        bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
+        bookingDetails.put("Quantity", quantity);
+        bookingDetails.put("TotalPrice", totalPrice);
+        bookingDetails.put("userId", userId);
+
+        boolean firstSeatAdded = false;
 
         for (Map.Entry<String, ArrayList<String>> entry : latestSeatMap.entrySet()) {
             String seatCategoryKey = entry.getKey();
@@ -420,33 +433,12 @@ public class payment extends AppCompatActivity {
                 ticketList.add(ticket);
                 ticketIDs.add(currentTicketID++); // Add ticketID to list and increment
 
-                // DELETE
-                bookingDetails.put("ConcertTitle", concertName);
-                bookingDetails.put("EventTime", time);
-                bookingDetails.put("Name", name);
-                bookingDetails.put("SeatCategory", seatCategoryKey);
-                bookingDetails.put("SeatNumber", seatNumber);
-                bookingDetails.put("TicketID", currentTicketID); // Use incremental ID
-                bookingDetails.put("userId", userId);
-
-                // DELETE
-                double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
-                int quantity = getIntent().getIntExtra("quantity", 1);
-                String paymentMethod = paymentmethod.getSelectedItem().toString();
-
-
-                bookingDetails.put("PaymentMethod", paymentMethod);
-                bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
-                bookingDetails.put("Quantity", quantity);
-                bookingDetails.put("TotalPrice", totalPrice);
-
-                db.collection("BookingDetails").add(bookingDetails)
-                        .addOnSuccessListener(documentReference -> {
-                            Log.d(TAG, "Booking details added with ID: " + documentReference.getId());
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
-                        });
+                // Add seat details to bookingDetails once
+                if (!firstSeatAdded) {
+                    bookingDetails.put("SeatCategory", seatCategoryKey);
+                    bookingDetails.put("SeatNumber", seatNumber);
+                    firstSeatAdded = true;
+                }
             }
         }
 
@@ -461,9 +453,25 @@ public class payment extends AppCompatActivity {
                     });
         }
 
+        // Add booking details to Firestore once
+        db.collection("BookingDetails").add(bookingDetails)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Booking details added with ID: " + documentReference.getId());
+                    editCardNumber.setText("");
+                    editAddress.setText("");
+                    editCVV.setText("");
+                    editExpiry.setText("");
+                    editName.setText("");
+                    editPostalCode.setText("");
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
+                });
+
         // After tickets are added, you can now post the booking details
         postBookingDetailsToFirestore(ticketIDs, userId, name, concertName, time);
     }
+
 
     private void postBookingDetailsToFirestore(List<Integer> ticketIDs, String userId, String name, String concertName, String time) {
         // Get booking details from intent
