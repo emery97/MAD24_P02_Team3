@@ -218,6 +218,7 @@ Entertainment
 - **Google Map Fragment of the venue**:
   - Displays a map fragment with a pin on the event venue
   - Automatically zoomed in on the event venue area to display all necessary labels and surrounding details
+  - Allows user the option to display different map type views (Normal, Satellite, Terrain, Hybrid)
  
 - **Google Maps Navigation**:
   - Allows user to find the best route to the event venue from their current location
@@ -242,7 +243,12 @@ Entertainment
       - Review time (relative to current time)
       - Given Rating
       - Review Text
-    
+ 
+  - **Nearby Places - Google Places API**
+    - Allows users to find nearby places of interest (restaurants, parking, public transit)
+    - Type of nearby places is selectable using radio buttons, with the option of hiding all nearby places markers
+    - All relevant nearby places are marked with blue coloured markers on the Google Map fragment, distinguishing them from the event marker  
+
 ## When changing profile picture, allow user to take picture using the camera [IVAN]
 - **xxxxx**:
   - xxxxx
