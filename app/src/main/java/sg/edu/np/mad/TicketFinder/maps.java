@@ -1,6 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
@@ -45,6 +47,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -89,6 +95,14 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
 
         TextView name = findViewById(R.id.venueName);
         name.setText(eventObj.getVenue());
+
+        Button mapTypeButton = findViewById(R.id.mapTypeButton);
+        mapTypeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMapTypeSelectorDialog();
+            }
+        });
 
         Button gMapButton = findViewById(R.id.gMapButton);
         gMapButton.setOnClickListener(new View.OnClickListener() {
@@ -291,5 +305,31 @@ public class maps extends AppCompatActivity implements OnMapReadyCallback {
             recyclerView.setAdapter(new VenueReviewAdapter(result.reviews));
             reviewsHolder.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void showMapTypeSelectorDialog() {
+        final String[] mapTypes = {"Normal", "Satellite", "Terrain", "Hybrid"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Map Type")
+                .setItems(mapTypes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                                break;
+                            case 1:
+                                gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                break;
+                            case 2:
+                                gMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                                break;
+                            case 3:
+                                gMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                break;
+                        }
+                    }
+                });
+        builder.show();
     }
 }

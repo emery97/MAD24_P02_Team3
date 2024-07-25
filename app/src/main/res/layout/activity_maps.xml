@@ -23,7 +23,7 @@
         app:title="Venue Details"
         app:titleTextColor="@android:color/white" />
 
-    <androidx.core.widget.NestedScrollView
+    <sg.edu.np.mad.TicketFinder.CustomScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/footer"
@@ -88,6 +88,14 @@
                             android:text="Address"
                             android:textAlignment="center"
                             android:textSize="24sp" />
+
+                        <Button
+                            android:id="@+id/mapTypeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:backgroundTint="#D9AA52"
+                            android:text="Change Map Type" />
 
                         <Button
                             android:id="@+id/gMapButton"
@@ -356,7 +364,7 @@
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+    </sg.edu.np.mad.TicketFinder.CustomScrollView>
 
     <include
         android:id="@+id/footer"
