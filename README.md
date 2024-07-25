@@ -249,10 +249,74 @@ Entertainment
   - Type of nearby places is selectable using radio buttons, with the option of hiding all nearby places markers
   - All relevant nearby places are marked with blue coloured markers on the Google Map fragment, distinguishing them from the event marker  
 
-## When changing profile picture, allow user to take picture using the camera [IVAN]
-- **xxxxx**:
-  - xxxxx
-  - xxxxx
+# Ticket Finder App Stage 2 Features by Koh Yung Chun Ivan
+
+## Biometric Integration
+Biometric authentication has been implemented in multiple sections of the Ticket Finder app to enhance security and user convenience. The biometric features include:
+
+### Sign In Page
+- **Biometric Login**:
+  - Users can authenticate their identity using biometric credentials (fingerprint or face recognition) to log in quickly and securely.
+  - Biometric prompts are integrated to retrieve saved email and password for autofill.
+  - Implementation: `SignIn.java` utilizes `BiometricPrompt` to handle biometric authentication and credential retrieval, ensuring a seamless and secure login process.
+
+### Profile Page
+- **Biometric Authentication for Editing Profile**:
+  - Users can enable biometric authentication to edit their profile information, ensuring only authorized changes are made.
+  - Before allowing profile edits, the app prompts the user for biometric authentication.
+  - Implementation: `profilePage.java` includes biometric prompts to enable editing and updating user information, such as changing the password and uploading profile pictures securely.
+
+### Payment Page
+- **Biometric Autofill for Payment Details**:
+  - During the payment process, biometric authentication is used to autofill saved card details, making the process faster and more secure.
+  - Users are prompted to use biometric authentication to retrieve saved payment information.
+  - Implementation: `payment.java` uses `BiometricPrompt` for retrieving and autofilling saved payment details, enhancing the security and convenience of the payment process.
+
+## Image Upload for Profile Pictures
+Users can now upload or capture their profile pictures directly within the app. This feature allows users to personalize their profiles with ease.
+
+### Profile Picture Upload
+- **Upload or Capture Photo**:
+  - Users can choose between taking a new photo or selecting one from the gallery.
+  - The selected image is uploaded to Firebase Storage and updated in Firestore.
+  - Implementation: `profilePage.java` handles image upload functionality, including permission checks for camera and storage access, and updates the profile picture URL in Firestore.
+
+## Enhanced Stage 1 Feature: User Event Preferences
+The user event preferences feature has been enhanced to better tailor event recommendations based on user interests.
+
+### Setting and Saving Preferences
+- **Prompt for Preferences**:
+  - When users log in for the first time or if preferences are not set, they are prompted to select their favorite genres from a list.
+  - The selected preferences are saved in Firestore.
+  - Implementation: `MainActivity.java` checks user preferences on login and prompts for preferences if not already set, ensuring relevant event recommendations are provided to the user.
+
+### Utilizing Preferences for Recommendations
+- **Personalized Event Recommendations**:
+  - Event recommendations on the home page are tailored based on the saved user preferences.
+  - Events matching user preferences are prioritized and displayed prominently.
+  - Implementation: The home page fetches user preferences from Firestore and uses them to filter and display recommended events.
+
+## Speech Navigation
+Speech recognition capabilities have been integrated into the app to enhance accessibility and user interaction.
+
+### Voice Command Navigation
+- **Speech Recognition**:
+  - Users can navigate the app and perform actions using voice commands.
+  - Converts spoken language into text for processing, making it easier for users to interact with the app without relying on manual input.
+  - Implementation: `SpeechRecognitionNav.java` implements speech recognition using `SpeechRecognizer` and processes voice commands to navigate the app.
+
+### Navigation Based on Voice Commands
+- **Interpreting Commands**:
+  - The app interprets voice commands to navigate to different pages such as home, explore events, booking history, or profile page.
+  - Can also recognize specific event titles to navigate directly to event details.
+  - Implementation: The `getNavigationCommand` method in `SpeechRecognitionNav.java` processes the recognized speech text and determines the appropriate navigation action.
+
+### Integration with Home Page
+- **Voice Command Activation**:
+  - The home page includes a button to activate speech recognition.
+  - Users can use voice commands to navigate the app, enhancing accessibility and ease of use.
+  - Implementation: `homepage.java` sets up speech recognition and handles navigation based on recognized voice commands.
+
     
 ## Chatbot with Translation and speech to text capabilities [JOEYI]
 ### Multilingual Support - Google Cloud Translation API
