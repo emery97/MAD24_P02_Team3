@@ -1,41 +1,68 @@
 package sg.edu.np.mad.TicketFinder;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.common.reflect.TypeToken;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.gson.Gson;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class BuyTicket extends AppCompatActivity {
+public class BuyTicket extends AppCompatActivity implements SeatSelectionFragment.OnInputValidListener {
 
     // List to hold seat categories
     private ArrayList<SeatCategory> seatCategoryList = new ArrayList<>();
-    // AutoCompleteTextView for selecting seat category
-    private AutoCompleteTextView autoCompleteTextView;
-    // AutoCompleteTextView for selecting seat number
-    private AutoCompleteTextView seatAutoCompleteTextView;
-    // Selected seat category
-    private String chosenSeatCategory;
+
     // Counter to track runtime
     private int runTime = 0;
     // Button to book tickets
     private Button booked;
-    // EditText for entering quantity
-    private EditText quantityEditText;
+    private List<Boolean> fragmentValidStates = new ArrayList<>();
+
+    // for populating dropdown through fragments
+    private EditText quantityInput;
+    private int quantityEntered = 0;
+    private LinearLayout dynamicContainer;
+    // to get the seat cat:seat num
+    private SeatSelectionViewModel viewModel;
+    private HashMap<String, ArrayList<String>> latestSeatMap = new HashMap<>();
+    private double totalPrice = 0.0;
+    private int remainingPricesToFetch;
+
+    private static String TAG = "buyTicket";
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +76,12 @@ public class BuyTicket extends AppCompatActivity {
         Event eventObj = (Event) eventIntent.getSerializableExtra("event");
 
         // Initialize views
-        autoCompleteTextView = findViewById(R.id.auto_complete_txt);
-        seatAutoCompleteTextView = findViewById(R.id.auto_complete_txt2);
         booked = findViewById(R.id.button_booked);
-        quantityEditText = findViewById(R.id.quantity);
+        booked.setVisibility(View.INVISIBLE);  // Initially hide the button
 
-        // Initially disable the dropdowns
-        autoCompleteTextView.setEnabled(false);
-        seatAutoCompleteTextView.setEnabled(false);
+
+        quantityInput = findViewById(R.id.quantityInput);
+        dynamicContainer = findViewById(R.id.dynamic_container);
 
         // set chosenConcertTitle to concert user choose in event details page
         // Get chosen concert title
@@ -64,234 +89,206 @@ public class BuyTicket extends AppCompatActivity {
         String concertTitle = getIntent().getStringExtra("eventTitle");
         chosenConcertTitle.setText(concertTitle);
 
-        // Get references for conclusion data
-        TextView selectedSeatCat = findViewById(R.id.selectedSeatCat);
-        TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
-
         // Initialize PhotoView
         PhotoView imageMap = findViewById(R.id.imageMap);
         imageMap.setImageResource(R.drawable.bigger_font_data);
 
-        // Fetch seat category data from Firestore
-        dbHandler handler = new dbHandler();
-        handler.getSeatCategoryData(new FirestoreCallback<SeatCategory>() {
+
+        // Initialize ViewModel
+        viewModel = new ViewModelProvider(this).get(SeatSelectionViewModel.class);
+
+        // Observe seatMap changes
+        viewModel.getSeatMap().observe(this, new Observer<HashMap<String, ArrayList<String>>>() {
             @Override
-            public void onCallback(ArrayList<SeatCategory> retrievedSeatCategoryList) {
-                // Add retrieved seat categories to the list
-                seatCategoryList.addAll(retrievedSeatCategoryList);
-
-                // Extract seat category names
-                ArrayList<String> seatCategoryNames = new ArrayList<>();
-                for (SeatCategory seatCategory : seatCategoryList) {
-                    if (seatCategory.getCategory() != null) {
-                        seatCategoryNames.add(seatCategory.getCategory());
-                    }
-                }
-
-                // referenced from chatgpt
-                // Update the adapter with the new data
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Create ArrayAdapter for seat categories
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(BuyTicket.this, android.R.layout.simple_dropdown_item_1line, seatCategoryNames);
-                        autoCompleteTextView.setAdapter(adapter);
-                        // Enable the dropdown after setting the adapter
-                        autoCompleteTextView.setEnabled(true);
-                    }
-                });
+            public void onChanged(HashMap<String, ArrayList<String>> updatedSeatMap) {
+                Log.d(TAG, "onCreate: " + updatedSeatMap);
+                latestSeatMap = updatedSeatMap;
             }
         });
 
-        // Handle item selection in the seat category dropdown
-        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the selected item
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                // Set the chosen seat category
-                chosenSeatCategory = selectedItem;
-                // Show a toast message indicating the selection
-                Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
-                // Filter seat numbers based on the selected category
-                filterSeatsByCategory(selectedItem);
-                // Increment the runtime counter
-                runTime++;
-                // Update selected seat category text
-                selectedSeatCat.setText(selectedItem);
-                // Log the runtime check
-                Log.d("RUNTIME CHECK!!", String.valueOf(runTime));
-            }
-        });
-
-        // Handle item selection in the seat number dropdown
-        seatAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the selected item
-                String selectedItem = (String) parent.getItemAtPosition(position);
-                // Update the selected seat number text
-                selectedSeatNum.setText(selectedItem);
-                // Show a toast message indicating the selection
-                Toast.makeText(BuyTicket.this, "You've chosen: " + selectedItem, Toast.LENGTH_SHORT).show();
-                // Log the selected seat number
-                Log.d("seatNumberToastMessage", "DONE " + selectedItem);
-                // Update button visibility
-                bookedAppear();
-            }
-        });
-
-        // Log the quantity edit text value
-        Log.d("QUANTITY EDIT TEXT", "onCreate: " + quantityEditText.getText().toString());
-        // Update button visibility
-        bookedAppear();
 
         // Handle click on the booked button
         booked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String concertName = chosenConcertTitle.getText().toString().trim();
+
                 // Get selected seat number
-                String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
+                //String selectedSeatNumber = seatAutoCompleteTextView.getText().toString().trim();
+
+                // reset variables
+                totalPrice = 0.0;
+                remainingPricesToFetch = 0;
                 // Find price of selected seat
-                double seatPrice = findSeatPrice(selectedSeatNumber);
-                // Get selected seat category
-                String selectedSeatCategory = chosenSeatCategory;
-                // Get quantity entered by the user
-                String quantityText = quantityEditText.getText().toString().trim();
-                int quantity = Integer.parseInt(quantityText);
-                // Calculate total price
-                double totalPrice = seatPrice * quantity;
-                String eventTiming = getIntent().getStringExtra("eventTiming");
-                // Create intent to start payment activity
-                Intent intent = new Intent(BuyTicket.this, payment.class);
-                intent.putExtra("event", eventObj); // Pass the Event object
-                intent.putExtra("concertName", concertName);
-                intent.putExtra("totalPrice", totalPrice);
-                intent.putExtra("seatCategory", selectedSeatCategory);
-                intent.putExtra("seatNumber", selectedSeatNumber);
-                intent.putExtra("quantity", quantity);
-                intent.putExtra("eventTiming", eventTiming);
-                startActivity(intent);
+                for (Map.Entry<String, ArrayList<String>> entry : latestSeatMap.entrySet()) {
+                    String seatCategoryKey = entry.getKey();
+                    ArrayList<String> seatNumbers = entry.getValue();
+
+                    for (String seatNumber : seatNumbers) {
+                        remainingPricesToFetch++; // Increment the count of remaining prices to fetch
+
+                        findSeatPrice(seatCategoryKey, new PriceCallback() {
+                            @Override
+                            public void onPriceFetched(double seatPrice) {
+                                // Check if all prices have been fetched
+                                remainingPricesToFetch--;
+                                if (remainingPricesToFetch == 0) {
+                                    // All prices have been fetched, now proceed to the next step
+                                    onAllPricesFetched(concertName, eventObj, latestSeatMap);
+                                }
+                            }
+                        });
+                    }
+                }
             }
+        });
+
+        // referenced from chatgpt
+        // Adding texwatcher for quantity input
+        quantityInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                String quantityText = quantityInput.getText().toString();
+                try {
+                    quantityEntered = Integer.parseInt(quantityText);
+                    handleQuantityChange(quantityText);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(BuyTicket.this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+            return false;
         });
 
         // Set up footer
         Footer.setUpFooter(this);
     }
 
-    // Method to filter seats by category
-    private void filterSeatsByCategory(String category) {
-        // List to hold filtered seat numbers
-        ArrayList<String> seatNumbers = new ArrayList<>();
-        for (SeatCategory seatCategory : seatCategoryList) {
-            if (seatCategory.getCategory().equals(category)) {
-                seatNumbers.addAll(seatCategory.getSeats());
-                break;
-            }
-        }
-        // referenced from chatgpt
-        // Update the seat number dropdown adapter
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(BuyTicket.this, android.R.layout.simple_dropdown_item_1line, seatNumbers);
-                seatAutoCompleteTextView.setAdapter(adapter);
-                // Enable the seat dropdown after setting the adapter
-                seatAutoCompleteTextView.setEnabled(true);
-                // Reset seat number text if user chooses a new seat category
-                if (runTime >= 1) {
-                    seatAutoCompleteTextView.setText("");
-                    selectedSeatNum.setText("");
-                }
-            }
-        });
+
+    private void onAllPricesFetched(String concertName, Event eventObj, HashMap seatMap){
+        // Get quantity entered by the user
+        String quantityText = quantityInput.getText().toString().trim();
+        int quantity = Integer.parseInt(quantityText);
+
+        String eventTiming = getIntent().getStringExtra("eventTiming");
+
+        // Create intent to start payment activity
+        Intent intent = new Intent(BuyTicket.this, payment.class);
+        intent.putExtra("event", eventObj); // Pass the Event object
+        intent.putExtra("concertName", concertName);
+        intent.putExtra("totalPrice", totalPrice);
+        intent.putExtra("seatMap", seatMap);
+        intent.putExtra("quantity", quantity);
+        intent.putExtra("eventTiming", eventTiming);
+        startActivity(intent);
+
     }
+
+    // asking if quantity entered is final
+    private void showConfirmationDialog(int quantity) {
+        // Building dialogue
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure with this quantity? ")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(BuyTicket.this, "Continue entering your seat number and seat category at the bottom", Toast.LENGTH_SHORT).show();
+                        addDynamicFragments(quantity);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Get the buttons and set their custom styles
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        // Apply the custom styles
+        positiveButton.setTextColor(Color.parseColor("#976954"));
+        negativeButton.setTextColor(Color.parseColor("#976954"));
+    }
+
+    // handling the quantity input
+    private void handleQuantityChange(String quantityText) {
+        try {
+            int quantity = Integer.parseInt(quantityText);
+            showConfirmationDialog(quantity);
+        } catch (NumberFormatException e) {
+            Toast.makeText(BuyTicket.this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // adding seat cat and seat num drop down fragment
+    private void addDynamicFragments(int quantity) {
+        // Clear existing fragments
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+
+        // Initialize the list based on the quantity
+        initializeFragmentValidStates(quantity);
+
+        // Add new fragments based on quantity
+        for (int i = 0; i < quantity; i++) {
+            Fragment fragment = SeatSelectionFragment.newInstance(i);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.add(dynamicContainer.getId(), fragment, "fragment" + i).commit();
+        }
+    }
+
+
+    private void initializeFragmentValidStates(int numberOfFragments) {
+        fragmentValidStates = new ArrayList<>(Collections.nCopies(numberOfFragments, false));
+        Log.d(TAG, "Initialized fragmentValidStates: " + fragmentValidStates.toString());
+    }
+
+    @Override
+    public void onInputValid(boolean isValid, int fragmentIndex) {
+        if (fragmentIndex >= 0 && fragmentIndex < fragmentValidStates.size()) {
+            fragmentValidStates.set(fragmentIndex, isValid);
+            Log.d(TAG, "Fragment index: " + fragmentIndex + ", Valid: " + isValid);
+            Log.d(TAG, "Current fragmentValidStates: " + fragmentValidStates.toString());
+            updateBookedButtonVisibility();
+        } else {
+            Log.e(TAG, "Invalid fragment index: " + fragmentIndex);
+        }
+    }
+
+    private void updateBookedButtonVisibility() {
+        boolean allValid = !fragmentValidStates.contains(false);
+        Log.d(TAG, "All fragments valid: " + allValid);
+        booked.setVisibility(allValid ? View.VISIBLE : View.INVISIBLE);
+        Log.d(TAG, "Button visibility: " + (allValid ? "VISIBLE" : "INVISIBLE"));
+    }
+    public interface PriceCallback {
+        void onPriceFetched(double price);
+    }
+
 
     // Method to find the price of a seat
-    private double findSeatPrice(String seatNumber) {
-        for (SeatCategory seatCategory : seatCategoryList) {
-            if (seatCategory.getSeats().contains(seatNumber)) {
-                return seatCategory.getSeatCategoryPrice();
-            }
-        }
-        return 0.0;
+    private void findSeatPrice(String seatCategoryKey, PriceCallback callback) {
+        db.collection("SeatCategory")
+                .whereEqualTo("Category", seatCategoryKey)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            double price = document.getDouble("Price");
+                            Log.d(TAG, "findSeatPrice: "+seatCategoryKey+" "+ price);
+                            totalPrice+=price;
+                            callback.onPriceFetched(price);
+                            return;
+                        }
+                    } else {
+                        Log.e("BuyTicket", "Error fetching seat price", task.getException());
+                        callback.onPriceFetched(0.0); // Return 0.0 in case of an error
+                    }
+                });
     }
 
-    // Method to manage the visibility of the booked button
-    private void bookedAppear() {
-        // References to conclusion data
-        TextView selectedSeatCat = findViewById(R.id.selectedSeatCat);
-        TextView selectedSeatNum = findViewById(R.id.selectedSeatNum);
-
-        // referenced from chatgpt
-        // Add a TextWatcher to quantityEditText
-        quantityEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not required
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                try {
-                    // Update button visibility based on all conditions here
-                    if (selectedSeatCat.getText().toString().trim().length() > 0 &&
-                            selectedSeatNum.getText().toString().trim().length() > 0 &&
-                            Integer.parseInt(String.valueOf(quantityEditText.getText())) > 0) {
-                        // Ensure user enters a quantity greater than 0
-                        booked.setVisibility(View.VISIBLE);
-                    }
-                    if (Integer.parseInt(String.valueOf(quantityEditText.getText())) == 0) {
-                        booked.setVisibility(View.INVISIBLE);
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(BuyTicket.this, "Please enter a number more than 0 ", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Not required
-            }
-        });
-
-        // referenced from chatgpt
-        // Add a TextWatcher to seatAutoCompleteTextView
-        seatAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Not required
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Update selected seat number text
-                Log.d("selected seat num change", "selectedSeatNum: " + selectedSeatNum.getText());
-                selectedSeatNum.setText(s.toString().trim());
-                // Hide booked button if no seat number is selected
-                if (selectedSeatNum == null || selectedSeatNum.getText().toString().trim().length() == 0) {
-                    booked.setVisibility(View.INVISIBLE);
-                }
-                try {
-                    // Update button visibility based on all conditions here
-                    if (selectedSeatCat.getText().toString().trim().length() > 0 &&
-                            selectedSeatNum.getText().toString().trim().length() > 0 &&
-                            Integer.parseInt(String.valueOf(quantityEditText.getText())) > 0) {
-                        // Ensure user enters a quantity greater than 0
-                        booked.setVisibility(View.VISIBLE);
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(BuyTicket.this, "Please enter a valid quantity (numbers only)", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // Not required
-            }
-        });
-    }
 }
 
