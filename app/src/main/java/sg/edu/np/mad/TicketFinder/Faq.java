@@ -17,26 +17,32 @@ public class Faq {
         this.Keywords = Keywords;
     }
 
+    // Getter for Question
     public String getQuestion() {
         return Question;
     }
 
+    // Setter for Question
     public void setQuestion(String Question) {
         this.Question = Question;
     }
 
+    // Getter for Answer
     public String getAnswer() {
         return Answer;
     }
 
+    // Setter for Answer
     public void setAnswer(String Answer) {
         this.Answer = Answer;
     }
 
+    // Getter for Keywords
     public List<String> getKeywords() {
         return Keywords;
     }
 
+    // Setter for Keywords
     public void setKeywords(List<String> Keywords) {
         this.Keywords = Keywords;
     }
