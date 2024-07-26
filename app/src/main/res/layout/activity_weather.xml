@@ -3,9 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingLeft="16dp"
     android:paddingTop="16dp"
-    android:paddingRight="16dp"
     android:paddingBottom="16dp"
     android:background="@android:color/white">
 
@@ -15,14 +13,41 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/WeatherDetailsText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:text="Weather Forecast"
-            android:gravity="center_horizontal" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/backimagebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/baseline_arrow_back_24" />
+
+            <!-- TextView centered horizontally -->
+            <TextView
+                android:id="@+id/WeatherDetailsText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="45sp"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:text="Weather Forecast"
+                android:gravity="center" />
+        </LinearLayout>
+
+<!--        <TextView-->
+<!--            android:id="@+id/WeatherDetailsText"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="24sp"-->
+<!--            android:textColor="@color/black"-->
+<!--            android:text="Weather Forecast"-->
+<!--            android:gravity="center_horizontal" />-->
 
         <Spinner
             android:id="@+id/spinnerForecastType"
@@ -30,7 +55,7 @@
             android:layout_height="wrap_content"
             android:paddingRight="32dp"
             android:paddingLeft="16dp"
-            android:layout_marginLeft="130dp"
+            android:layout_marginLeft="150dp"
             android:layout_marginTop="8dp"
             android:entries="@array/forecast_type_array"
             android:background="@drawable/spinner_background" />
@@ -40,6 +65,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginLeft="16sp"
+            android:layout_marginRight="16sp"
             android:queryHint="Enter date (dd MMM yyyy)"
             android:background="@drawable/search_view_background" />
 
@@ -48,6 +75,8 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:paddingTop="8dp"
+            android:layout_marginLeft="16sp"
+            android:layout_marginRight="16sp"
             android:clipToPadding="false"
             android:clipChildren="false"
             android:scrollbars="vertical"
@@ -58,6 +87,8 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:paddingTop="8dp"
+            android:layout_marginLeft="16sp"
+            android:layout_marginRight="16sp"
             android:clipToPadding="false"
             android:clipChildren="false"
             android:scrollbars="vertical" />
@@ -77,5 +108,24 @@
             android:text="Enable Daily Weather Notifications"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/reminderstext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reminders"
+            android:layout_marginLeft="10sp"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/remindersrecyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:scrollbars="vertical" />
+
+
     </LinearLayout>
 </ScrollView>

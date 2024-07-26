@@ -4,9 +4,9 @@
     <value>
       <entry key="BookingHistoryDetails">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
+          <targetSelectedWithDropDown>
             <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
+              <type value="QUICK_BOOT_TARGET" />
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
@@ -14,8 +14,8 @@
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-25T15:41:20.044452400Z" />
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-07-26T10:49:47.543033500Z" />
         </State>
       </entry>
       <entry key="ForumPage">
@@ -31,7 +31,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-25T15:40:45.700703900Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-07-26T08:57:15.062257600Z" />
         </State>
       </entry>
       <entry key="app">
@@ -48,6 +48,25 @@
             </Target>
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-07-24T13:37:10.287844300Z" />
+        </State>
+      </entry>
+      <entry key="profilePage">
+        <State />
+      </entry>
+      <entry key="weather">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\kohye\.android\avd\Pixel_8_Pro_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-07-24T18:02:58.052478400Z" />
         </State>
       </entry>
     </value>

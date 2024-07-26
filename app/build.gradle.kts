@@ -116,6 +116,7 @@ dependencies {
 
     // for unfriend activity
     implementation ("com.google.code.gson:gson:2.8.6")
+    implementation ("it.xabaras.android:recyclerview-swipedecorator:1.4")
 
     // for fragment for seat cat and seat num
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")

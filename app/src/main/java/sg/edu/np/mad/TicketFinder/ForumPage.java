@@ -3,12 +3,17 @@ package sg.edu.np.mad.TicketFinder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.Manifest;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -24,6 +29,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +39,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -52,6 +62,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.security.Timestamp;
 import java.util.ArrayList;
@@ -84,7 +95,9 @@ public class ForumPage extends AppCompatActivity {
     private LinearLayout imageContainer;
     private static final int PICK_IMAGES_REQUEST = 1;
     private NotificationHelper notificationHelper;
-
+    private SearchView searchViewForum;
+    private Spinner filterEventSpinner;
+    private String selectedFilterEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +105,8 @@ public class ForumPage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forum_page);
         notificationHelper = new NotificationHelper(this);
+
+        db = FirebaseFirestore.getInstance();
 
         eventSpinner = findViewById(R.id.event_spinner);
         inputText = findViewById(R.id.input_text);
@@ -111,7 +126,6 @@ public class ForumPage extends AppCompatActivity {
             }
         });
 
-        db = FirebaseFirestore.getInstance();
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userIdString = sharedPreferences.getString("UserId", null);
         String name = sharedPreferences.getString("Name", null);
@@ -169,7 +183,6 @@ public class ForumPage extends AppCompatActivity {
                                 fadeOutView(inputContainer);
                                 createButton.setVisibility(View.VISIBLE);
 
-                                notificationHelper.sendNotification("Post Created", "Post successfully created: " + selectedEvent);
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
@@ -191,7 +204,6 @@ public class ForumPage extends AppCompatActivity {
                                     fadeOutView(inputContainer);
                                     createButton.setVisibility(View.VISIBLE);
 
-                                    notificationHelper.sendNotification("Post Created", "Post successfully created: " + selectedEvent);
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(ForumPage.this, "Failed to send message", Toast.LENGTH_SHORT).show();
@@ -279,7 +291,6 @@ public class ForumPage extends AppCompatActivity {
                     }
                 });
     }
-
 
     private boolean isTouchInsideView(View view, float x, float y) {
         int[] location = new int[2];
@@ -559,7 +570,7 @@ public class ForumPage extends AppCompatActivity {
     private interface OnUploadCompleteListener {
         void onUploadComplete(List<String> imageUrls);
     }
-
+    
 
     @Override
     protected void onDestroy() {

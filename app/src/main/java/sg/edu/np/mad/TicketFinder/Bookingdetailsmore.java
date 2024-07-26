@@ -430,13 +430,13 @@ public class Bookingdetailsmore extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, EventWeatherNotification.class);
 
-        // Assuming textViewEventDate and textViewTemperature are TextViews in your layout
-        String eventDate = textViewEventDate.getText().toString();
-        String temperature = textViewTemperature.getText().toString();
-        String forecast = textViewForecast.getText().toString();
-        String weatherdate = textViewWeatherDate.getText().toString();
-        String weatherdetails = textViewWeatherDetails.getText().toString();
-        String eventTitle = getIntent().getStringExtra("event_title");
+        // Ensure TextViews are not null
+        String eventDate = (textViewEventDate != null) ? textViewEventDate.getText().toString() : "No Event Date";
+        String temperature = (textViewTemperature != null) ? textViewTemperature.getText().toString() : "No Temperature";
+        String forecast = (textViewForecast != null) ? textViewForecast.getText().toString() : "No Forecast";
+        String weatherdate = (textViewWeatherDate != null) ? textViewWeatherDate.getText().toString() : "No Weather Date";
+        String weatherdetails = (textViewWeatherDetails != null) ? textViewWeatherDetails.getText().toString() : "No Weather Details";
+        String eventTitle = getIntent().getStringExtra("event_tistle");
         String dateBought = getIntent().getStringExtra("date_bought");
         String seatCategory = getIntent().getStringExtra("seat_category");
         String seatNumber = getIntent().getStringExtra("seat_number");
@@ -472,6 +472,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
 
         Log.d(TAG, "scheduleNotification: Notification scheduled for " + calendar.getTime());
     }
+
 
 
     private void cancelScheduledNotification(String eventIdentifier) {

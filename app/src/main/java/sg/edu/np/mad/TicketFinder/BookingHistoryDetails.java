@@ -81,6 +81,12 @@ public class BookingHistoryDetails extends AppCompatActivity {
         weatherAdapter = new bookingweatheradapter(weatherItemList);
         weatherRecyclerView.setAdapter(weatherAdapter);
 
+        TextView viewMoreButton = findViewById(R.id.Morebutton);
+        viewMoreButton.setOnClickListener(v -> {
+            Intent intent = new Intent(BookingHistoryDetails.this, weather.class);
+            startActivity(intent);
+        });
+
         // Get user ID from shared preferences and fetch booking details
         String userId = sharedPreferences.getString("UserId", null);
         if (userId != null) {

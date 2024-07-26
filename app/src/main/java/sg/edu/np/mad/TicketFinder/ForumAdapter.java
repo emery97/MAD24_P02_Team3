@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -31,11 +33,12 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
 
     private List<Forum> forumList;
     private FirebaseFirestore db;
+    private ForumPage forumPage;
 
     public ForumAdapter(List<Forum> forumList) {
         this.forumList = forumList;
+        this.forumPage = forumPage;
         db = FirebaseFirestore.getInstance();
-
     }
 
     @NonNull
@@ -77,6 +80,24 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         ForumImageAdapter imageAdapter = new ForumImageAdapter(forum.getImageUrls());
         holder.imagesRecyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         holder.imagesRecyclerView.setAdapter(imageAdapter);
+        if (forum.getImageUrls() != null && !forum.getImageUrls().isEmpty()) {
+            holder.arrowLeft.setVisibility(View.VISIBLE);
+            holder.arrowRight.setVisibility(View.VISIBLE);
+        } else {
+            holder.arrowLeft.setVisibility(View.GONE);
+            holder.arrowRight.setVisibility(View.GONE);
+        }
+
+        final int scrollAmount = 200; // Adjust this value based on your needs
+
+        holder.arrowLeft.setOnClickListener(v -> {
+            holder.imagesRecyclerView.smoothScrollBy(-scrollAmount, 0);
+        });
+
+        holder.arrowRight.setOnClickListener(v -> {
+            holder.imagesRecyclerView.smoothScrollBy(scrollAmount, 0);
+        });
+
 
         holder.commentsButton.setOnClickListener(v -> {
             CommentsBottomSheetFragment bottomSheet = new CommentsBottomSheetFragment();
@@ -90,6 +111,16 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
     @Override
     public int getItemCount() {
         return forumList.size();
+    }
+
+
+    public void updateList(List<Forum> newList) {
+        forumList = newList;
+        notifyDataSetChanged();
+    }
+    public void filterList(List<Forum> filteredList) {
+        this.forumList = filteredList;
+        notifyDataSetChanged();
     }
 
     public void onDeleteClicked(int position) {
@@ -121,6 +152,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         ImageView profileImageView;
         RecyclerView imagesRecyclerView;
         Button commentsButton;
+        ImageButton arrowLeft, arrowRight;
 
         public ForumViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -131,6 +163,8 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
             profileImageView = itemView.findViewById(R.id.profile_image);
             imagesRecyclerView = itemView.findViewById(R.id.image_recycler_view);
             commentsButton = itemView.findViewById(R.id.commentsbutton);
+            arrowLeft = itemView.findViewById(R.id.arrow_left);
+            arrowRight = itemView.findViewById(R.id.arrow_right);
         }
     }
 }

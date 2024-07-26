@@ -1,104 +1,77 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
-
 import androidx.core.app.NotificationCompat;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import android.text.TextUtils;
 
 public class WeatherNotificationReceiver extends BroadcastReceiver {
     private static final String TAG = "WeatherNotification";
-    private static final String CHANNEL_ID = "WeatherChannel";
+    private static final String CHANNEL_ID = "weather_notifications";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        fetchWeatherDataAndNotify(context);
+        fetchRemindersAndNotify(context);
         scheduleNextAlarm(context);
     }
 
-    private void fetchWeatherDataAndNotify(final Context context) {
-        OkHttpClient client = new OkHttpClient();
+    private void fetchRemindersAndNotify(final Context context) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("UserId", null);
 
-        Request request = new Request.Builder()
-                .url("https://api.data.gov.sg/v1/environment/4-day-weather-forecast")
-                .build();
+        if (userId == null) {
+            Log.e(TAG, "User ID is null");
+            return;
+        }
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "Network request failed: " + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-
-                    try {
-                        JSONObject json = new JSONObject(responseData);
-                        JSONArray items = json.getJSONArray("items");
-                        JSONObject firstItem = items.getJSONObject(0);
-                        JSONArray forecasts = firstItem.getJSONArray("forecasts");
-
-                        if (forecasts.length() > 0) {
-                            JSONObject firstForecast = forecasts.getJSONObject(0);
-                            String forecastDate = firstForecast.getString("date");
-                            String weatherSummary = firstForecast.getString("forecast");
-
-                            // Format date for display
-                            String formattedDate = formatDate(forecastDate);
-
-                            // Send notification with date and weather summary
-                            sendNotification(context, formattedDate, weatherSummary);
+        db.collection("Reminders")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> remindersText = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : task.getResult()) {
+                            String area = doc.getString("area");
+                            String forecast = doc.getString("forecast");
+                            remindersText.add(area + ": " + forecast);
                         }
-                    } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing JSON: " + e.getMessage());
+
+                        String remindersString = remindersText.isEmpty() ? "No reminders for today." : TextUtils.join("\n", remindersText);
+                        sendNotification(context, remindersString);
+                    } else {
+                        Log.w(TAG, "Error getting documents.", task.getException());
                     }
-                } else {
-                    Log.e(TAG, "Unsuccessful response: " + response.message());
-                }
-            }
-        });
+                });
     }
 
-    private void sendNotification(Context context, String forecastDate, String weatherSummary) {
+    private void sendNotification(Context context, String remindersString) {
         createNotificationChannel(context);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.app_logo)
-                .setContentTitle("Daily Weather Forecast")
-                .setContentText(forecastDate + ": " + weatherSummary) // Include date and weather summary
+                .setSmallIcon(R.drawable.app_logo) // Ensure this icon exists
+                .setContentTitle("Daily Weather Reminders")
+                .setContentText(remindersString)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(remindersString)) // For longer texts
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setColor(Color.BLUE)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setAutoCancel(true);
-
-        Intent notificationIntent = new Intent(context, weather.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        builder.setContentIntent(contentIntent);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
@@ -109,27 +82,16 @@ public class WeatherNotificationReceiver extends BroadcastReceiver {
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Weather Notifications";
-            String description = "Channel for daily weather notifications";
+            String description = "Channel for daily weather reminders";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.setLightColor(Color.BLUE);
 
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
-        }
-    }
-
-    private String formatDate(String dateString) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        try {
-            Date date = dateFormat.parse(dateString);
-            SimpleDateFormat formattedDateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-            return formattedDateFormat.format(date);
-        } catch (Exception e) {
-            Log.e(TAG, "Error formatting date: " + e.getMessage());
-            return "";
         }
     }
 
@@ -144,14 +106,12 @@ public class WeatherNotificationReceiver extends BroadcastReceiver {
             return;
         }
 
-        // Set the alarm to trigger at the same time the next day (e.g., 8:49 PM)
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.DAY_OF_YEAR, 1); // Set for the next day
-        calendar.set(Calendar.HOUR_OF_DAY, 13); // Set to 8 PM (24-hour format)
-        calendar.set(Calendar.MINUTE, 2); // Set to 49 minutes
+        calendar.set(Calendar.HOUR_OF_DAY, 13); // Set to 1 PM (24-hour format)
+        calendar.set(Calendar.MINUTE, 2); // Set to 2 minutes
         calendar.set(Calendar.SECOND, 0); // Set to 0 seconds
-
 
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }

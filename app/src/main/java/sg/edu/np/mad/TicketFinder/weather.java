@@ -2,14 +2,22 @@ package sg.edu.np.mad.TicketFinder;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Spinner;
@@ -19,8 +27,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +47,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +55,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import android.Manifest;
 
 public class weather extends AppCompatActivity {
     private final TextView[] weatherTexts = new TextView[4];
@@ -61,18 +79,29 @@ public class weather extends AppCompatActivity {
     private RecyclerView recyclerView24HourForecast;
     private WeatherAdapter24Hour weatherAdapter24Hour;
     private Spinner spinnerForecastType;
+    private ImageButton backimagebutton;
     private static final int PAGE_SIZE = 10; // Number of items per page
     private int currentPage = 0;
     private boolean isLoading = false;
     private boolean hasMoreData = true;
     private ProgressBar progressBar;
-
+    private RecyclerView remindersrecyclerview;
+    private WeatherReminderAdapter weatherReminderAdapter;
+    private ListenerRegistration reminderListener;
+    private List<WeatherReminder> reminderList;
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+        db = FirebaseFirestore.getInstance();
 
         progressBar = findViewById(R.id.progressBar);
+        backimagebutton = findViewById(R.id.backimagebutton);
+        backimagebutton.setOnClickListener(v -> {
+            Intent intent = new Intent(weather.this, BookingHistoryDetails.class);
+            startActivity(intent);
+        });
 
         searchViewWeather = findViewById(R.id.searchViewWeather);
         spinnerForecastType = findViewById(R.id.spinnerForecastType);
@@ -84,8 +113,18 @@ public class weather extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(weatherAdapter);
 
+        remindersrecyclerview = findViewById(R.id.remindersrecyclerview);
+        weatherReminderAdapter = new WeatherReminderAdapter(new ArrayList<>());
+        remindersrecyclerview.setLayoutManager(new LinearLayoutManager(this));
+        remindersrecyclerview.setAdapter(weatherReminderAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(remindersrecyclerview);
+
+        setupFirestoreListener();
+
         recyclerView24HourForecast = findViewById(R.id.recyclerView24HourForecast);
-        weatherAdapter24Hour = new WeatherAdapter24Hour(new ArrayList<>()); // Initialize with empty list
+        weatherAdapter24Hour = new WeatherAdapter24Hour(this,new ArrayList<>()); // Initialize with empty list
         recyclerView24HourForecast.setLayoutManager(new LinearLayoutManager(this));
         recyclerView24HourForecast.setAdapter(weatherAdapter24Hour);
 
@@ -125,7 +164,8 @@ public class weather extends AppCompatActivity {
             editor.apply();
 
             if (isChecked) {
-                scheduleDailyNotification(this);
+//                scheduleDailyNotification(this);
+                showTimePickerDialog();
             } else {
                 cancelDailyWeatherNotification();
             }
@@ -162,6 +202,83 @@ public class weather extends AppCompatActivity {
             scheduleDailyNotification(this);
         }
     }
+
+    private WeatherReminder removedItem;
+    private int removedPosition;
+    private String removedItemId;
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN |
+            ItemTouchHelper.START | ItemTouchHelper.END, ItemTouchHelper.LEFT) {
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+            // Swap the items in the adapter
+            weatherReminderAdapter.swapItems(fromPosition, toPosition);
+
+            // Notify the adapter of the move
+            weatherReminderAdapter.notifyItemMoved(fromPosition, toPosition);
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (direction == ItemTouchHelper.LEFT) {
+                int position = viewHolder.getAdapterPosition();
+                removedItem = weatherReminderAdapter.getItem(position);
+                removedPosition = position;
+
+                // Remove the item from the adapter
+                weatherReminderAdapter.removeItem(position);
+
+                // Get the document ID from the removed item
+                String documentId = removedItem.getDocumentId(); // Ensure you have a method to get the document ID
+
+                if (documentId != null) {
+                    // Delete the document from Firestore
+                    db.collection("Reminders").document(documentId).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w(TAG, "Error deleting document", e);
+                            });
+                } else {
+                    Log.e(TAG, "Document ID is null, cannot delete document");
+                }
+
+                // Show Snackbar with Undo option
+                Snackbar snackbar = Snackbar.make(recyclerView, "Item removed", Snackbar.LENGTH_LONG);
+                snackbar.setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Restore the item if Undo is clicked
+                        weatherReminderAdapter.restoreItem(removedItem, removedPosition);
+                        addReminderToFirestore(removedItem);
+                    }
+                });
+                snackbar.show();
+            }
+        }
+
+
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addSwipeLeftBackgroundColor(Color.parseColor("#FF0000"))
+                    .addSwipeLeftActionIcon(R.drawable.baseline_delete_24)
+                    .create()
+                    .decorate();
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+        }
+    };
+
 
     private void fetchWeatherData() {
         OkHttpClient client = new OkHttpClient();
@@ -221,6 +338,7 @@ public class weather extends AppCompatActivity {
                         new Handler().postDelayed(() -> {
                             parse2HourWeatherData(responseData, page);
                             hideLoading();  // Hide ProgressBar when data is fetched
+                            compareAndUpdateWeatherData();
                         }, 1000); // 3 seconds delay
                     });
                 } else {
@@ -346,6 +464,7 @@ public class weather extends AppCompatActivity {
                 if (newWeatherData2HourList.size() < PAGE_SIZE) {
                     hasMoreData = false; // No more data to load
                 }
+                weatherData2HourList.addAll(newWeatherData2HourList);
                 weatherAdapter24Hour.addWeatherData(newWeatherData2HourList);
             });
 
@@ -378,6 +497,35 @@ public class weather extends AppCompatActivity {
         return dateFormat.format(date);
     }
 
+    private void showTimePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, selectedHour, selectedMinute) -> {
+            // Store selected time in shared preferences
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("notificationHour", selectedHour);
+            editor.putInt("notificationMinute", selectedMinute);
+            editor.apply();
+
+            // Schedule the notification at the selected time
+            scheduleDailyNotification(this);
+        }, hour, minute, true);
+
+        timePickerDialog.setOnShowListener(dialog -> {
+            Button positiveButton = timePickerDialog.getButton(TimePickerDialog.BUTTON_POSITIVE);
+            Button negativeButton = timePickerDialog.getButton(TimePickerDialog.BUTTON_NEGATIVE);
+
+            // Change button colors
+            int color = ContextCompat.getColor(this, R.color.black);
+            positiveButton.setTextColor(color);
+            negativeButton.setTextColor(color);
+        });
+
+        timePickerDialog.show();
+    }
+
     private void scheduleDailyNotification(Context context) {
         Log.d(TAG, "Scheduling daily weather notification");
 
@@ -389,12 +537,16 @@ public class weather extends AppCompatActivity {
             return;
         }
 
-        // Set the alarm to trigger at a specific time each day (e.g., 8:49 PM)
+        // Retrieve the selected time from shared preferences
+        int hour = sharedPreferences.getInt("notificationHour", 10); // Default to 8 AM if not set
+        int minute = sharedPreferences.getInt("notificationMinute", 0); // Default to 0 minutes if not set
+
+        // Set the alarm to trigger at the user-selected time each day
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 17); // Set to 8 PM (24-hour format)
-        calendar.set(Calendar.MINUTE, 55); // Set to 49 minutes
-        calendar.set(Calendar.SECOND, 0); // Set to 0 seconds
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
 
         // If the time is in the past for today, set it for tomorrow
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
@@ -406,6 +558,7 @@ public class weather extends AppCompatActivity {
         // Set an exact alarm to ensure it triggers at the precise time
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
     }
+
 
     private void cancelDailyWeatherNotification() {
         Log.d(TAG, "Canceling daily weather notification");
@@ -452,6 +605,7 @@ public class weather extends AppCompatActivity {
 
         // Filter for 2-hour forecast
         if (weatherData2HourList == null || weatherData2HourList.isEmpty()) {
+            Log.d(TAG, "2-hour forecast data is empty");
             return;
         }
 
@@ -465,7 +619,7 @@ public class weather extends AppCompatActivity {
             }
         }
 
-        // Update 2-hour forecast RecyclerView with filtered data
+        Log.d(TAG, "Filtering 2-hour data: " + filteredList24Hour.size() + " items found");
         weatherAdapter24Hour.filterList(filteredList24Hour);
     }
 
@@ -475,5 +629,102 @@ public class weather extends AppCompatActivity {
 
     private void hideLoading() {
         runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+    }
+
+    private void setupFirestoreListener() {
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("UserId", null);
+
+        reminderListener = db.collection("Reminders")
+                .whereEqualTo("userId", userId)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    if (snapshots != null && !snapshots.isEmpty()) {
+                        List<WeatherReminder> reminders = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            String area = doc.getString("area");
+                            String forecast = doc.getString("forecast");
+                            String documentId = doc.getId(); // Get the document ID
+
+                            WeatherReminder reminder = new WeatherReminder(area, forecast,documentId);
+                            reminders.add(reminder);
+                        }
+                        weatherReminderAdapter.setReminderList(reminders);
+                    }
+                });
+    }
+
+    private void addReminderToFirestore(WeatherReminder reminder) {
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = sharedPreferences.getString("UserId", null);
+        Map<String, Object> reminderMap = new HashMap<>();
+        reminderMap.put("area", reminder.getArea());
+        reminderMap.put("forecast", reminder.getForecast());
+        reminderMap.put("userId", userId); // Add the user ID
+
+        db.collection("Reminders").document(reminder.getDocumentId())
+                .set(reminderMap)
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Reminder re-added"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error adding document: ", e));
+    }
+
+
+    private void compareAndUpdateWeatherData() {
+        db.collection("Reminders")
+                .whereEqualTo("userId", getUserId()) // Assuming you have a method to get the user ID
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                        Map<String, WeatherReminder> currentRemindersMap = new HashMap<>();
+
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            String area = doc.getString("area");
+                            String forecast = doc.getString("forecast");
+                            String documentId = doc.getId();
+
+                            WeatherReminder reminder = new WeatherReminder(area, forecast, documentId);
+                            currentRemindersMap.put(area, reminder);
+                        }
+
+                        // Compare with new data
+                        List<WeatherReminder> newReminders = weatherReminderAdapter.getReminderList();
+                        for (WeatherReminder newReminder : newReminders) {
+                            WeatherReminder existingReminder = currentRemindersMap.get(newReminder.getArea());
+
+                            if (existingReminder != null && !existingReminder.getForecast().equals(newReminder.getForecast())) {
+                                // Update Firebase
+                                updateReminderInFirestore(newReminder);
+                            } else if (existingReminder == null) {
+                                // Add new reminder
+                                addReminderToFirestore(newReminder);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error fetching reminders: ", e));
+    }
+
+    private void updateReminderInFirestore(WeatherReminder reminder) {
+        db.collection("Reminders").document(reminder.getDocumentId())
+                .update("forecast", reminder.getForecast())
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Reminder updated successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating reminder: ", e));
+    }
+
+    private String getUserId() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("UserId", null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (reminderListener != null) {
+            reminderListener.remove();
+        }
     }
 }
