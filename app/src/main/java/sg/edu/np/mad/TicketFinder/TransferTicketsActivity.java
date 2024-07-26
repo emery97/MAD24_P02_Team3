@@ -1,6 +1,7 @@
 package sg.edu.np.mad.TicketFinder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,21 +71,26 @@ public class TransferTicketsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         friendsList = new ArrayList<>();
 
+        // Retrieve data from intent
+        Intent intent = getIntent();
+        String seatCategory = intent.getStringExtra("SEAT_CATEGORY");
+        String seatNumber = intent.getStringExtra("SEAT_NUMBER");
+        String concertName = intent.getStringExtra("CONCERT_NAME");
+
+        Log.d(TAG, "Received intent data: Seat Category: " + seatCategory + ", Seat Number: " + seatNumber + ", Concert Name: " + concertName);
+
         // Get shared preferences for user data
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String currentUserId = sharedPreferences.getString("UserId", null);
 
-        // Get the concertName and purchaseTime from intent
-        concertName = getIntent().getStringExtra("CONCERT_NAME");
-        String purchaseTimeString = getIntent().getStringExtra("PURCHASE_TIME");
+        // Get the purchaseTime from intent
         long purchaseTimeSeconds = getIntent().getLongExtra("PURCHASE_TIME_DB_SECONDS", 0);
         int purchaseTimeNanoseconds = getIntent().getIntExtra("PURCHASE_TIME_DB_NANOSECONDS", 0);
-
         Timestamp purchaseTimeDb = new Timestamp(purchaseTimeSeconds, purchaseTimeNanoseconds);
 
-        Log.d("TransferTicketsActivity", "Received concertName: " + concertName + ", purchaseTime: " + purchaseTimeString + ", purchaseTimeDb: " + purchaseTimeDb.toDate().toString());
+        Log.d(TAG, "Received purchaseTime: " + purchaseTimeDb.toDate().toString());
 
-        friendsAdapter = new FriendsAdapter(this, friendsList, currentUserId, concertName, purchaseTimeDb);
+        friendsAdapter = new FriendsAdapter(this, friendsList, currentUserId, concertName, seatCategory, seatNumber);
         recyclerView.setAdapter(friendsAdapter);
 
         // Initialize Firebase components
@@ -100,6 +106,7 @@ public class TransferTicketsActivity extends AppCompatActivity {
         // Set up footer
         Footer.setUpFooter(this);
     }
+
 
     private void fetchFriends(String currentUserId) {
         db.collection("Account")

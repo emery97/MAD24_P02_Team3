@@ -23,20 +23,23 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.List;
 
+// ACTUAL TRANSFER TICKET HAPPENS HERE !!
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> {
 
     private static final String TAG = "FriendsAdapter";
     private List<User> friendsList;
     private Context context;
     private FirebaseFirestore db;
-    private String concertName;
-    private Timestamp purchaseTime;
+    private String concertTitle;
+    private String seatCategory;
+    private String seatNumber;
 
-    public FriendsAdapter(Context context, List<User> friendsList, String currentUserId, String concertName, Timestamp purchaseTime) {
+    public FriendsAdapter(Context context, List<User> friendsList, String currentUserId, String concertTitle, String seatCategory, String seatNumber) {
         this.context = context;
         this.friendsList = friendsList;
-        this.concertName = concertName;
-        this.purchaseTime = purchaseTime;
+        this.concertTitle = concertTitle;
+        this.seatCategory = seatCategory;
+        this.seatNumber = seatNumber;
         db = FirebaseFirestore.getInstance();
     }
 
@@ -59,9 +62,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
             holder.profilePicture.setImageResource(R.drawable.profileimage); // Set a default image if no URL is provided
         }
 
-        holder.friendTransferButton.setOnClickListener(v ->
-                showTransferDialog(holder.itemView.getContext(), friend)
-        );
+        holder.friendTransferButton.setOnClickListener(v -> showTransferDialog(holder.itemView.getContext(), friend));
     }
 
     @Override
@@ -70,7 +71,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     }
 
     public static class FriendViewHolder extends RecyclerView.ViewHolder {
-
         ImageView profilePicture;
         TextView friendName;
         Button friendTransferButton;
@@ -102,26 +102,27 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
 
-    public void transferTicketFromDatabase(User friend) {
-        Log.d("FriendsAdapter", "Querying with concertName: " + concertName + ", purchaseTime: " + purchaseTime.toDate().toString());
+    private void transferTicketFromDatabase(User friend) {
+        Log.d(TAG, "Querying with concertTitle: " + concertTitle + ", seatCategory: " + seatCategory + ", seatNumber: " + seatNumber);
 
-        db.collection("BookingDetails")
-                .whereEqualTo("ConcertTitle", concertName)
-                .whereEqualTo("PurchaseTime", purchaseTime)
+        db.collection("Ticket")
+                .whereEqualTo("ConcertTitle", concertTitle)
+                .whereEqualTo("SeatCategory", seatCategory)
+                .whereEqualTo("SeatNumber", seatNumber)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d("FriendsAdapter", "Found document: " + document.getId());
-                            db.collection("BookingDetails").document(document.getId())
+                            Log.d(TAG, "Found document: " + document.getId());
+                            db.collection("Ticket").document(document.getId())
                                     .update("Name", friend.getName(), "userId", friend.getUserId())
                                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
                                     .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                         }
                     } else {
-                        Log.w("FriendsAdapter", "No matching document found for update.");
+                        Log.w(TAG, "No matching document found for update.");
                     }
                 });
     }
-
 }
+

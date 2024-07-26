@@ -40,6 +40,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             Intent intent = new Intent(holder.itemView.getContext(), TransferTicketsActivity.class);
             intent.putExtra("SEAT_CATEGORY", ticket.getSeatCategory());
             intent.putExtra("SEAT_NUMBER", ticket.getSeatNumber());
+            intent.putExtra("CONCERT_NAME",ticket.getConcertTitle());
             holder.itemView.getContext().startActivity(intent);
         });
 

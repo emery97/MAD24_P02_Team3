@@ -134,12 +134,14 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
                             String seatCategory = documentSnapshot.getString("SeatCategory");
                             String seatNumber = documentSnapshot.getString("SeatNumber");
                             Long ticketID = documentSnapshot.getLong("TicketID");
+                            String concertTitle = documentSnapshot.getString("ConcertTitle");
                             Log.d(TAG, "getTicketsFromIDs: " + seatCategory);
                             Log.d(TAG, "getTicketsFromIDs: " + seatNumber);
                             Log.d(TAG, "getTicketsFromIDs: "+ ticketID);
+
                             if (seatCategory != null && seatNumber != null && ticketID != null) {
                                 // Create a new Ticket object using the retrieved fields
-                                Ticket ticket = new Ticket(seatCategory, seatNumber, ticketID);
+                                Ticket ticket = new Ticket(seatCategory, seatNumber, ticketID, concertTitle);
                                 tickets.add(ticket);
                                 Log.d(TAG, "Ticket fetched: " + ticket.getSeatNumber() + ", Ticket ID: " + ticket.getTicketID());
                             } else {

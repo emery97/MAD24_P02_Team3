@@ -3,15 +3,17 @@ package sg.edu.np.mad.TicketFinder;
 public class Ticket {
     private String seatCategory;
     private String seatNumber;
+    private String concertTitle;
     private long TicketID; // Use long for TicketID
 
     // No-argument constructor required for Firestore
     public Ticket() {}
 
-    public Ticket(String seatCategory, String seatNumber, long TicketID) {
+    public Ticket(String seatCategory, String seatNumber, long TicketID, String concertTitle) {
         this.seatCategory = seatCategory;
         this.seatNumber = seatNumber;
         this.TicketID = TicketID;
+        this.concertTitle = concertTitle;
     }
 
     public String getSeatCategory() {
@@ -37,4 +39,6 @@ public class Ticket {
     public void setTicketID(long TicketID) {
         this.TicketID = TicketID;
     }
+    public String getConcertTitle(){return concertTitle;}
+    public void setConcertTitle(){this.concertTitle = concertTitle;}
 }
