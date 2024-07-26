@@ -19,10 +19,13 @@ import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    // Constants for different view types
     private static final int VIEW_TYPE_USER = 0;
     private static final int VIEW_TYPE_BOT = 1;
     private static final int VIEW_TYPE_EVENT = 2;
     private static final int VIEW_TYPE_ARROW_DOWN = 3;
+
+    // Context and message list
     private final Context context;
     private final ArrayList<Message> messageList;
 
@@ -33,6 +36,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
+    // Method to create a new ViewHolder instance
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         // Inflate different layouts based on the view type
@@ -53,6 +57,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     @Override
+    // Method to bind data to the ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messageList.get(position);
         // Bind data to the appropriate view holder
@@ -70,6 +75,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     @Override
+    // Method to determine the view type based on the message content
     public int getItemViewType(int position) {
         Message message = messageList.get(position);
         // Determine the view type based on the message content
