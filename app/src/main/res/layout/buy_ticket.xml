@@ -37,9 +37,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/concertTitleChosen"
-        app:layout_constraintBottom_toTopOf="@id/footer">
+        app:layout_constraintBottom_toTopOf="@id/button_booked">
 
         <LinearLayout
+            android:id="@+id/dynamic_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -54,155 +55,44 @@
                 app:srcCompat="@drawable/bigger_font_data" />
 
             <TextView
-                android:id="@+id/category"
+                android:id="@+id/quantityTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
-                android:text="Category"
+                android:text="Quantity"
                 android:textSize="25sp" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:padding="10dp"
-                android:id="@+id/dropdown_menu"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:hint="@string/select_seat_category">
-
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_txt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/select_seat_category"
-                    android:inputType="none"
-                    android:textSize="16sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/seatNumber"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="10dp"
-                android:text="Seat Number"
-                android:textSize="25sp" />
+                android:layout_marginTop="20dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:padding="10dp"
-                android:id="@+id/dropdown_menu2"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:hint="@string/select_seat_number">
-
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_txt2"
+                <EditText
+                    android:id="@+id/quantityInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/select_seat_number"
-                    android:inputType="none"
-                    android:textSize="16sp"
-                    android:textColor="@color/black"/>
+                    android:ems="5"
+                    android:inputType="number"
+                    android:textSize="14sp"
+                    android:imeOptions="actionDone"/>
 
             </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- table for conclusion -->
-            <TableLayout
-                android:padding="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@android:color/white"
-                android:stretchColumns="1"> <!-- Ensure columns stretch -->
-
-                <!--table heading -->
-                <TableRow
-                    android:background="@drawable/border_for_table">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:padding="10sp"
-                        android:text="Seat Category"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:textColor="@color/black"
-                        android:padding="10sp"
-                        android:text="Seat Number"
-                        android:textSize="14sp"
-                        android:background="@drawable/border_for_table" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:textColor="@color/black"
-                        android:padding="10sp"
-                        android:text="Quantity"
-                        android:textSize="14sp" />
-                </TableRow>
-
-                <!--table data -->
-                <TableRow android:background="@drawable/border_for_table">
-
-                    <TextView
-                        android:id="@+id/selectedSeatCat"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:padding="10sp"
-                        android:text="@string/selected_seat_category"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/selectedSeatNum"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:padding="10sp"
-                        android:text="@string/selected_seat_number"
-                        android:textSize="12sp"
-                        android:background="@drawable/border_for_table" />
-
-                    <EditText
-                        android:id="@+id/quantity"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="5"
-                        android:inputType="number"
-                        android:textSize="14sp" />
-                </TableRow>
-
-            </TableLayout>
-
-            <Button
-                android:id="@+id/button_booked"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Book"
-                android:textSize="20sp"
-                android:visibility="invisible"
-                android:backgroundTint="#1B2B40" />
-
         </LinearLayout>
     </ScrollView>
-
+    <Button
+        android:id="@+id/button_booked"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Book"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="visible"
+        android:backgroundTint="#1B2B40"
+        app:layout_constraintTop_toBottomOf="@id/scrollView2"
+        app:layout_constraintBottom_toTopOf="@id/footer"/>
     <include
         android:id="@+id/footer"
         layout="@layout/footer"

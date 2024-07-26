@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,15 +33,23 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -50,11 +59,13 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class payment extends AppCompatActivity {
-    private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
+    private SharedPreferences sharedPreferences; // SharedPreferences for storing buy ticket data
+    private SharedPreferences userSharedPreferences; // SharedPreferences for storing user data
     private Spinner paymentmethod;
 
     private EditText editCardNumber, editExpiry, editCVV, editName, editAddress, editPostalCode; // EditText fields for payment details
@@ -66,8 +77,11 @@ public class payment extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private static final int REQUEST_CODE_PERMISSIONS = 1001;
-
+    private SeatSelectionViewModel viewModel;
+    private static String TAG = "payment";
+    private HashMap<String, ArrayList<String>> latestSeatMap = new HashMap<>();
     private boolean autofillUsed = false;
+    List<Integer>ticketIDs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +184,18 @@ public class payment extends AppCompatActivity {
             }
         });
         promptRetrieveCredentials();
+
+        // Retrieve the seatMap from the intent
+        Intent intent = getIntent();
+        latestSeatMap = (HashMap<String, ArrayList<String>>) intent.getSerializableExtra("seatMap");
+
+        // Log the seatMap for debugging
+        for (Map.Entry<String, ArrayList<String>> entry : latestSeatMap.entrySet()) {
+            String seatCategoryKey = entry.getKey();
+            ArrayList<String> seatNumbers = entry.getValue();
+            Log.d(TAG, "onCreate: SEAT CAT " + seatCategoryKey);
+            Log.d(TAG, "onCreate: SEAT NO. " + seatNumbers);
+        }
     }
 
     private void promptRetrieveCredentials() {
@@ -283,8 +309,8 @@ public class payment extends AppCompatActivity {
     private void processPayment() {
         // Display payment success message
         Toast.makeText(payment.this, "Payment successful", Toast.LENGTH_SHORT).show();
-        // Post booking details to Firestore
-        postBookingDetailsToFirestore();
+        // Post tickets to Firestore
+        postTicketToFirestore();
         // Show asking to connect to google calendar dialog
         new Handler().postDelayed(this::connectToGoogleCalendar, 1000); // Wait for 1 second before displaying the alert message
 
@@ -292,36 +318,145 @@ public class payment extends AppCompatActivity {
         //new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
     }
 
-    private void postBookingDetailsToFirestore() {
+//    private void postBookingDetailsToFirestore() {
+//        // Get user data from SharedPreferences
+//        String userId = sharedPreferences.getString("UserId", null);
+//        String name = sharedPreferences.getString("Name", null);
+//        // Get booking details from intent
+//        String concertName = getIntent().getStringExtra("concertName");
+//        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+//        String seatCategory = getIntent().getStringExtra("seatCategory");
+//        String seatNumber = getIntent().getStringExtra("seatNumber");
+//        int quantity = getIntent().getIntExtra("quantity", 1);
+//        String paymentMethod = paymentmethod.getSelectedItem().toString();
+//        String Time = getIntent().getStringExtra("eventTiming");
+//
+//        // Create booking details map
+//        Map<String, Object> bookingDetails = new HashMap<>();
+//        bookingDetails.put("userId", userId);
+//        bookingDetails.put("Name", name);
+//        bookingDetails.put("SeatCategory", seatCategory);
+//        bookingDetails.put("SeatNumber", seatNumber);
+//        bookingDetails.put("TotalPrice", totalPrice);
+//        bookingDetails.put("Quantity", quantity);
+//        bookingDetails.put("PaymentMethod", paymentMethod);
+//        bookingDetails.put("ConcertTitle", concertName);
+//        bookingDetails.put("EventTime", Time);
+//        bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
+//
+//        // Add booking details to Firestore
+//        db.collection("BookingDetails").add(bookingDetails)
+//                .addOnSuccessListener(documentReference -> {
+//                    // Clear input fields on success
+//                    editCardNumber.setText("");
+//                    editAddress.setText("");
+//                    editCVV.setText("");
+//                    editExpiry.setText("");
+//                    editName.setText("");
+//                    editPostalCode.setText("");
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
+//                });
+//    }
+
+
+    // post ticket to firestore
+
+    public void postTicketToFirestore() {
         // Get user data from SharedPreferences
-        String userId = sharedPreferences.getString("UserId", null);
-        String name = sharedPreferences.getString("Name", null);
-        // Get booking details from intent
+        sharedPreferences = getSharedPreferences("TicketFinderPrefs", Context.MODE_PRIVATE);
+        userSharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String userId = userSharedPreferences.getString("UserId", null);
+        String name = userSharedPreferences.getString("Name", null);
+
         String concertName = getIntent().getStringExtra("concertName");
+        String time = getIntent().getStringExtra("eventTiming");
+
+        // Fetch the latest ticket ID from Firestore
+        db.collection("Ticket")
+                .orderBy("TicketID", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        DocumentSnapshot latestTicket = task.getResult().getDocuments().get(0);
+                        int latestTicketID = latestTicket.getLong("TicketID").intValue();
+                        postTickets(latestTicketID + 1, userId, name, concertName, time);
+                    } else {
+                        // No tickets in the collection, start with ID 1
+                        postTickets(1, userId, name, concertName, time);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(payment.this, "Error fetching latest ticket ID", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void postTickets(int startingTicketID, String userId, String name, String concertName, String time) {
+        List<Map<String, Object>> ticketList = new ArrayList<>();
+        List<Integer> ticketIDs = new ArrayList<>();  // Initialize ticketIDs list
+        int currentTicketID = startingTicketID;
+
+        // Initialize bookingDetails map
+        Map<String, Object> bookingDetails = new HashMap<>();
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
-        String seatCategory = getIntent().getStringExtra("seatCategory");
-        String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
         String paymentMethod = paymentmethod.getSelectedItem().toString();
-        String Time = getIntent().getStringExtra("eventTiming");
 
-        // Create booking details map
-        Map<String, Object> bookingDetails = new HashMap<>();
-        bookingDetails.put("userId", userId);
-        bookingDetails.put("Name", name);
-        bookingDetails.put("SeatCategory", seatCategory);
-        bookingDetails.put("SeatNumber", seatNumber);
-        bookingDetails.put("TotalPrice", totalPrice);
-        bookingDetails.put("Quantity", quantity);
-        bookingDetails.put("PaymentMethod", paymentMethod);
         bookingDetails.put("ConcertTitle", concertName);
-        bookingDetails.put("EventTime", Time);
+        bookingDetails.put("EventTime", time);
+        bookingDetails.put("Name", name);
+        bookingDetails.put("PaymentMethod", paymentMethod);
         bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
+        bookingDetails.put("Quantity", quantity);
+        bookingDetails.put("TotalPrice", totalPrice);
+        bookingDetails.put("userId", userId);
 
-        // Add booking details to Firestore
+        boolean firstSeatAdded = false;
+
+        for (Map.Entry<String, ArrayList<String>> entry : latestSeatMap.entrySet()) {
+            String seatCategoryKey = entry.getKey();
+            ArrayList<String> seatNumbers = entry.getValue();
+            Log.d(TAG, "postTicketToFirestore: SEAT CAT " + seatCategoryKey);
+            Log.d(TAG, "postTicketToFirestore: SEAT NO. " + seatNumbers);
+
+            for (String seatNumber : seatNumbers) {
+                Map<String, Object> ticket = new HashMap<>();
+                ticket.put("ConcertTitle", concertName);
+                ticket.put("EventTime", time);
+                ticket.put("Name", name);
+                ticket.put("SeatCategory", seatCategoryKey);
+                ticket.put("SeatNumber", seatNumber);
+                ticket.put("TicketID", currentTicketID); // Use incremental ID
+                ticket.put("userId", userId);
+                ticketList.add(ticket);
+                ticketIDs.add(currentTicketID++); // Add ticketID to list and increment
+
+                // Add seat details to bookingDetails once
+                if (!firstSeatAdded) {
+                    bookingDetails.put("SeatCategory", seatCategoryKey);
+                    bookingDetails.put("SeatNumber", seatNumber);
+                    firstSeatAdded = true;
+                }
+            }
+        }
+
+        // Add tickets to Firestore
+        for (Map<String, Object> ticket : ticketList) {
+            db.collection("Ticket").add(ticket)
+                    .addOnSuccessListener(documentReference -> {
+                        Log.d(TAG, "Ticket added with ID: " + documentReference.getId());
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(payment.this, "Error saving tickets ", Toast.LENGTH_SHORT).show();
+                    });
+        }
+
+        // Add booking details to Firestore once
         db.collection("BookingDetails").add(bookingDetails)
                 .addOnSuccessListener(documentReference -> {
-                    // Clear input fields on success
+                    Log.d(TAG, "Booking details added with ID: " + documentReference.getId());
                     editCardNumber.setText("");
                     editAddress.setText("");
                     editCVV.setText("");
@@ -332,7 +467,41 @@ public class payment extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
                 });
+
+        // After tickets are added, you can now post the booking details
+        postBookingDetailsToFirestore(ticketIDs, userId, name, concertName, time);
     }
+
+
+    private void postBookingDetailsToFirestore(List<Integer> ticketIDs, String userId, String name, String concertName, String time) {
+        // Get booking details from intent
+        sharedPreferences = getSharedPreferences("TicketFinderPrefs", Context.MODE_PRIVATE);
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        int quantity = getIntent().getIntExtra("quantity", 1);
+        String paymentMethod = paymentmethod.getSelectedItem().toString();
+
+        // Create booking details map
+        Map<String, Object> bookingDetails = new HashMap<>();
+        bookingDetails.put("ConcertTitle", concertName);
+        bookingDetails.put("EventTime", time);
+        bookingDetails.put("Name", name);
+        bookingDetails.put("PaymentMethod", paymentMethod);
+        bookingDetails.put("PurchaseTime", FieldValue.serverTimestamp());
+        bookingDetails.put("Quantity", quantity);
+        bookingDetails.put("TotalPrice", totalPrice);
+        bookingDetails.put("TicketIDs", ticketIDs);
+        bookingDetails.put("UserID", userId);
+
+        // Add booking details to Firestore
+        db.collection("BookingDetailsII").add(bookingDetails)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "Booking details added with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     // ASK IF THEY WANT TO CONNECT TO GOOGLE CALENDAR
     private void connectToGoogleCalendar() {

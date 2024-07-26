@@ -19,21 +19,27 @@ import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    // Constants for different view types
     private static final int VIEW_TYPE_USER = 0;
     private static final int VIEW_TYPE_BOT = 1;
     private static final int VIEW_TYPE_EVENT = 2;
     private static final int VIEW_TYPE_ARROW_DOWN = 3;
+
+    // Context and message list
     private final Context context;
     private final ArrayList<Message> messageList;
 
+    // Constructor to initialize context and message list
     public ChatAdapter(Context context, ArrayList<Message> messageList) {
         this.context = context;
         this.messageList = messageList;
     }
 
     @Override
+    // Method to create a new ViewHolder instance
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
+        // Inflate different layouts based on the view type
         if (viewType == VIEW_TYPE_USER) {
             view = LayoutInflater.from(context).inflate(R.layout.user_message, parent, false);
             return new UserViewHolder(view);
@@ -51,8 +57,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     @Override
+    // Method to bind data to the ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messageList.get(position);
+        // Bind data to the appropriate view holder
         if (holder.getItemViewType() == VIEW_TYPE_USER) {
             ((UserViewHolder) holder).bind(message);
         } else if (holder.getItemViewType() == VIEW_TYPE_BOT) {
@@ -67,8 +75,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     @Override
+    // Method to determine the view type based on the message content
     public int getItemViewType(int position) {
         Message message = messageList.get(position);
+        // Determine the view type based on the message content
         if (message.isUser()) {
             return VIEW_TYPE_USER;
         } else if (message.getMessage() != null && message.getMessage().equals("arrow_down_animation")) {
@@ -93,10 +103,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     @Override
+    // Return the total number of items in the list
     public int getItemCount() {
         return messageList.size();
     }
 
+    // ViewHolder for user messages
     class UserViewHolder extends RecyclerView.ViewHolder {
         private final TextView userMessage;
         private final de.hdodenhof.circleimageview.CircleImageView profileImageView;
@@ -108,6 +120,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         public void bind(Message message) {
+            // Bind the message content to the TextView
             userMessage.setText(message.getMessage());
 
             // ----------- Start of changes -----------
@@ -126,6 +139,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    // ViewHolder for bot messages
     static class BotViewHolder extends RecyclerView.ViewHolder {
         private final TextView botMessage;
 
@@ -134,11 +148,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             botMessage = itemView.findViewById(R.id.bot_message);
         }
 
+        // Bind the bot message content to the TextView
         public void bind(Message message) {
             botMessage.setText(message.getMessage());
         }
     }
 
+    // ViewHolder for event messages
     static class EventViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerView eventRecyclerView;
         private final EventAdapter eventAdapter; // Adapter for the inner RecyclerView

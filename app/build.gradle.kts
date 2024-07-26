@@ -117,4 +117,9 @@ dependencies {
     // for unfriend activity
     implementation ("com.google.code.gson:gson:2.8.6")
 
+    // for fragment for seat cat and seat num
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
+
+
 }
