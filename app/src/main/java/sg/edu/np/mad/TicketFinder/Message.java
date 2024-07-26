@@ -21,15 +21,32 @@ public class Message {
         this.events = events;
     }
 
+    // Getter for message
     public String getMessage() {
         return message;
+    }
+
+    // Setter for message
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public boolean isUser() {
         return isUser;
     }
 
+    // Setter for isUser
+    public void setUser(boolean user) {
+        isUser = user;
+    }
+
+    // Getter for events
     public List<Event> getEventList() {
         return events;
+    }
+
+    // Setter for events
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }
