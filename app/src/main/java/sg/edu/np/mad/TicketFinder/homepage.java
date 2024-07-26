@@ -144,8 +144,10 @@
 
 package sg.edu.np.mad.TicketFinder;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -158,7 +160,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -174,6 +179,7 @@ import java.util.List;
 
 public class homepage extends AppCompatActivity implements SpeechRecognitionNav.SpeechRecognitionListener {
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private RecyclerView horizontalRecyclerView;
     private EventAdapter horizontalItemAdapter;
     private RecyclerView gridRecyclerView;
@@ -264,7 +270,27 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
 
         // Initialize and set up speech recognition
         ImageButton speakerButton = findViewById(R.id.speakerButton);
-        speakerButton.setOnClickListener(v -> speechRecognitionHelper.startListening());
+        speakerButton.setOnClickListener(v -> checkMicrophonePermission());
+    }
+
+    private void checkMicrophonePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
+        } else {
+            speechRecognitionHelper.startListening();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                speechRecognitionHelper.startListening();
+            } else {
+                Toast.makeText(this, "Microphone permission is required to use speech recognition", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void loadUserPreferences() {
