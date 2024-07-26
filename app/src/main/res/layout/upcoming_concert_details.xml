@@ -34,18 +34,6 @@
             android:text="Date"
             android:textColor="@color/black"
             android:textSize="18sp" />
-        <Button
-            android:id="@+id/transferTickets"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Transfer Tickets"
-            android:textColor="@color/white"
-            android:backgroundTint="#1B2B40"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp">
-
-
-        </Button>
 
         <!-- Expandable section -->
         <LinearLayout
@@ -56,28 +44,14 @@
             android:background="@color/white"
             android:visibility="gone">
 
+            <!-- Ticket RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ticketRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+
             <!-- Additional details -->
-            <TextView
-                android:id="@+id/seatCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Seat Category"
-                android:layout_marginTop="30sp"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/seatNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Seat Number"
-                android:layout_marginTop="10sp"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
-
-            <!--CONCERT DATE TIME-->
             <TextView
                 android:id="@+id/eventDate"
                 android:layout_width="wrap_content"

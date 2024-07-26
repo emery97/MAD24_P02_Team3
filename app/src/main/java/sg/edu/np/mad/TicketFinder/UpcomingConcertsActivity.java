@@ -34,8 +34,8 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private RecyclerView recyclerView; // RecyclerView to display booking details
     private UpcomingConcertsAdapter upcomingConcertsAdapter;
-    private List<BookingDetails> upcomingConcertsList = new ArrayList<>();
-    private Map<BookingDetails, Timestamp> upcomingConcertsTimestamps = new HashMap<>(); // Store timestamps separately
+    private static final String TAG = "UpcomingConcertsActivity";
+    private List<BookingDetailsII> bookingDetailsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,52 +62,41 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
     }
 
     private void fetchUpcomingConcerts(String userId) {
-        db.collection("BookingDetails")
-                .whereEqualTo("userId", userId)
+        db.collection("BookingDetailsII")
+                .whereEqualTo("UserID", userId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                            upcomingConcertsList.clear();
-                            upcomingConcertsTimestamps.clear();
                             Date currentDate = new Date();
+                            Log.d(TAG, "fetchUpcomingConcerts: COMES HERE");
 
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 String documentId = document.getId();
-                                String eventTitle = document.getString("ConcertTitle");
-                                String seatCategory = document.getString("SeatCategory");
-                                String seatNumber = document.getString("SeatNumber");
-
-                                Double totalPrice = document.getDouble("TotalPrice");
-                                String totalPriceString = totalPrice != null ? String.valueOf(totalPrice) : null;
-
-                                Long quantityLong = document.getLong("Quantity");
-                                String quantityString = quantityLong != null ? String.valueOf(quantityLong) : null;
-
+                                String concertTitle = document.getString("ConcertTitle");
+                                String eventTime = document.getString("EventTime");
+                                String name = document.getString("Name");
                                 String paymentMethod = document.getString("PaymentMethod");
-
-                                String time = document.getString("EventTime");
-
-                                Timestamp purchaseTimeTimestamp = document.getTimestamp("PurchaseTime");
-                                Log.d("UPCOMING_CONCERT_ACTIVITY", "Retrieved Timestamp: " + purchaseTimeTimestamp.toDate().toString());
-
-                                String purchaseTimeString = formatTimestamp(purchaseTimeTimestamp);
-
+                                Timestamp purchaseTime = document.getTimestamp("PurchaseTime");
+                                int quantity = document.getLong("Quantity").intValue();
+                                List<Long> ticketIDs = (List<Long>) document.get("TicketIDs");
+                                double totalPrice = document.getDouble("TotalPrice");
+                                Log.d(TAG, "fetchUpcomingConcerts: EVENT TIME FROM DOCUMENT"+ eventTime);
+                                Log.d(TAG, "fetchUpcomingConcerts: CURRENT TIME"+currentDate);
                                 try {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
-                                    Date concertDate = sdf.parse(time);
-                                    if (concertDate != null && concertDate.after(currentDate)) {
-                                        BookingDetails bookingDetails = new BookingDetails(documentId,eventTitle, purchaseTimeString, time, seatCategory, seatNumber, totalPriceString, quantityString, paymentMethod);
-                                        upcomingConcertsList.add(bookingDetails);
-                                        upcomingConcertsTimestamps.put(bookingDetails, purchaseTimeTimestamp); // Store timestamp separately
+                                    Date eventDate = sdf.parse(eventTime);
+                                    if (eventDate != null && eventDate.after(currentDate)) {
+                                        BookingDetailsII bookingDetails = new BookingDetailsII(concertTitle, eventTime, name, paymentMethod, purchaseTime, quantity, ticketIDs, totalPrice);
+                                        bookingDetailsList.add(bookingDetails);
                                     }
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
                             }
 
-                            upcomingConcertsAdapter = new UpcomingConcertsAdapter(upcomingConcertsList, upcomingConcertsTimestamps);
+                            upcomingConcertsAdapter = new UpcomingConcertsAdapter(bookingDetailsList, db);
                             recyclerView.setAdapter(upcomingConcertsAdapter);
                         } else {
                             Log.d("UpcomingConcertsActivity", "No upcoming concerts found");
@@ -117,6 +106,7 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
     private String formatTimestamp(Timestamp timestamp) {
         if (timestamp != null) {

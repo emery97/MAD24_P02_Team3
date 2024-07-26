@@ -22,6 +22,7 @@
             android:text="Seat Category : "
             android:textColor="@color/black"
             android:textSize="18sp" />
+
         <TextView
             android:id="@+id/seatNum"
             android:layout_width="wrap_content"
@@ -31,6 +32,7 @@
             android:text="Seat Number : "
             android:textColor="@color/black"
             android:textSize="18sp" />
+
         <Button
             android:id="@+id/transferTickets"
             android:layout_height="wrap_content"
@@ -39,8 +41,6 @@
             android:textColor="@color/white"
             android:backgroundTint="#1B2B40"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp">
-        </Button>
-
+            android:layout_marginTop="20dp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
