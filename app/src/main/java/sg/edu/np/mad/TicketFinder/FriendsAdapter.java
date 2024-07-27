@@ -20,7 +20,10 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> {
 
@@ -122,7 +125,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                                         .update("Name", friend.getName(), "userId", friend.getUserId())
                                         .addOnSuccessListener(aVoid -> {
                                             Log.d(TAG, "DocumentSnapshot successfully updated!");
-                                            removeTicketIDFromUpcomingConcert(ticketID);
+                                            removeTicketIDFromUpcomingConcert(ticketID, friend);
                                         })
                                         .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                             } else {
@@ -135,9 +138,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying tickets", e));
     }
-    // remove ticketID from ticketIDs array in database
 
-    private void removeTicketIDFromUpcomingConcert(Long ticketID) {
+    private void removeTicketIDFromUpcomingConcert(Long ticketID, User friend) {
         Log.d(TAG, "Removing ticketID: " + ticketID + " from UpcomingConcert with concertTitle: " + concertTitle);
 
         db.collection("UpcomingConcert")
@@ -155,13 +157,19 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                                     // Delete the entire document if there are no TicketIDs left
                                     db.collection("UpcomingConcert").document(document.getId())
                                             .delete()
-                                            .addOnSuccessListener(aVoid -> Log.d(TAG, "UpcomingConcert document successfully deleted!"))
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d(TAG, "UpcomingConcert document successfully deleted!");
+                                                updateFriendUpcomingConcert(friend, ticketID, concertTitle, "01 August 2024, 16:00");
+                                            })
                                             .addOnFailureListener(e -> Log.w(TAG, "Error deleting UpcomingConcert document", e));
                                 } else {
                                     // Update the document with the new list of TicketIDs
                                     db.collection("UpcomingConcert").document(document.getId())
                                             .update("TicketIDs", ticketIDs)
-                                            .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully removed from UpcomingConcert!"))
+                                            .addOnSuccessListener(aVoid -> {
+                                                Log.d(TAG, "TicketID successfully removed from UpcomingConcert!");
+                                                updateFriendUpcomingConcert(friend, ticketID, concertTitle, "01 August 2024, 16:00");
+                                            })
                                             .addOnFailureListener(e -> Log.w(TAG, "Error removing TicketID from UpcomingConcert", e));
                                 }
                             } else {
@@ -175,5 +183,43 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying UpcomingConcert", e));
     }
 
+    private void updateFriendUpcomingConcert(User friend, Long ticketID, String concertTitle, String eventTime) {
+        Log.d(TAG, "Updating friend's UpcomingConcert: " + friend.getUserId());
 
+        db.collection("UpcomingConcert")
+                .whereEqualTo("ConcertTitle", concertTitle)
+                .whereEqualTo("UserID", friend.getUserId())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(TAG, "Found friend's UpcomingConcert document: " + document.getId());
+                            List<Long> ticketIDs = (List<Long>) document.get("TicketIDs");
+                            if (ticketIDs != null) {
+                                ticketIDs.add(ticketID);
+                                db.collection("UpcomingConcert").document(document.getId())
+                                        .update("TicketIDs", ticketIDs)
+                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully added to friend's UpcomingConcert!"))
+                                        .addOnFailureListener(e -> Log.w(TAG, "Error adding TicketID to friend's UpcomingConcert", e));
+                            } else {
+                                Log.w(TAG, "TicketIDs list is null in friend's UpcomingConcert document.");
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No existing UpcomingConcert document found for friend, creating a new one.");
+                        Map<String, Object> newConcertData = new HashMap<>();
+                        newConcertData.put("ConcertTitle", concertTitle);
+                        newConcertData.put("EventTime", eventTime);
+                        newConcertData.put("Name", friend.getName());
+                        newConcertData.put("Quantity", 1);
+                        newConcertData.put("TicketIDs", Arrays.asList(ticketID));
+                        newConcertData.put("UserID", friend.getUserId());
+
+                        db.collection("UpcomingConcert").add(newConcertData)
+                                .addOnSuccessListener(documentReference -> Log.d(TAG, "New UpcomingConcert document successfully created for friend!"))
+                                .addOnFailureListener(e -> Log.w(TAG, "Error creating new UpcomingConcert document for friend", e));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error querying friend's UpcomingConcert", e));
+    }
 }
