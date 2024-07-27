@@ -356,11 +356,25 @@ Speech recognition capabilities have been integrated into the app to enhance acc
   - Requires login to their Google account.
   - Redirects users to the Google Calendar app where concert details such as location, event title, and time are autofilled.
 
-## Upcoming Concert Page  [Lee WEI YING]
+## Upcoming Concert Page
+
 - **User-Friendly Interface**:
-  - Provides a clean and intuitive interface for users to filter upcoming concerts.
-  - Features nested adapters to display tickets.
-  - Includes a "Transfer Tickets" button.
+  - Provides an intuitive interface for users to filter and view their upcoming concerts.
+  
+- **Nested Adapters for Tickets**:
+  - Displays tickets using nested adapters for easy management and viewing.
+
+- **Transfer Tickets Button**:
+  - Includes a button for users to transfer tickets to friends.
+
+- **Dynamic Concert Management**:
+  - **Remove Concerts**:
+    - Automatically removes concerts from the list if no tickets are available.
+  - **Add New Concerts**:
+    - Adds new concerts to the adapter if they are newly available.
+  - **Update Existing Concerts**:
+    - Updates the details of existing concerts in the adapter if they were already listed.
+
 
 ## Transfer Tickets  [Lee WEI YING]
 - **Ticket Transfer**:
@@ -375,7 +389,7 @@ Speech recognition capabilities have been integrated into the app to enhance acc
 ## Unfriend Friend  [Lee WEI YING]
 - **Unfriend Interface**:
   - Allows users to unfriend individuals through a user-friendly interface.
-  - Includes a search container to find friends by name.
+  - Includes a search container to find their friends by name.
 
     
 ## Implement weather forecast API for dates of events [KOH YE CHYANG]
