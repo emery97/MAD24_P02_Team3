@@ -355,7 +355,7 @@ Speech recognition capabilities have been integrated into the app to enhance acc
   - xxxxx
   - xxxxx
     
-## Implement weather forecast API for dates of events [YE CHYANG]
+## Implement weather forecast API for dates of events [KOH YE CHYANG]
 ### 4 Day Weather Forecast & 2-Hour Weather Forecast
 - Integrated APIs to fetch weather data for 4 day weather forecast and 2 Hour weather forecast, providing weather information for the next 2 Hours or 4 days.
 - Ensures accurate and detailed data like area, wind, wind direction, humidity, latitude and longtitude.
@@ -368,7 +368,7 @@ Speech recognition capabilities have been integrated into the app to enhance acc
 ### Weather Implementation at bookingdetailsmore page
 - Automatic date detection and displaying the weather information for that specific event date
 
-## QR Code [YE CHYANG]
+## QR Codes [KOH YE CHYANG]
 ### Generating Qr Codes
 - Displaying a QR Code that contains all the booking information inside the QR Code.
 
@@ -379,7 +379,7 @@ Speech recognition capabilities have been integrated into the app to enhance acc
 - Ensuring QR Code validity using database firestore.
 - Ensuring QR Code belongs to the user that owns it.
 
-## Local Notification [YE CHYANG]
+## Local Notification [KOH YE CHYANG]
 Local Notification has been implemented in different pages of the ticket finder app, the local notification will be sent to their device.
 
 ### BookingDetailsMore Page
@@ -393,7 +393,7 @@ Local Notification has been implemented in different pages of the ticket finder 
   - Users can use the add button beside the weather data to add the specific area and the forecast to the notification
   - Users can select the date and time they want for the notification to be sent to their device.
 
-## ItemTouchHelper/Swipe To Reveal Options [YE CHYANG]
+## ItemTouchHelper/Swipe To Reveal Options [KOH YE CHYANG]
 ItemTouchHelper has been implemented to different pages of the ticket finder app
 
 ### Forum Page
