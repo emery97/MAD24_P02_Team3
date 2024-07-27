@@ -51,7 +51,9 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
         // Set up footer
         Footer.setUpFooter(this);
     }
-
+    /**
+     * Fetches upcoming concert data from the Firestore database, filters by current user ID, and initializes the RecyclerView adapter.
+     */
     private void fetchUpcomingConcerts() {
         String currentUserId = sharedPreferences.getString("UserId", null);
 

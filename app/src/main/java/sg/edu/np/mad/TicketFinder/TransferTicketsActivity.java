@@ -40,6 +40,13 @@ public class TransferTicketsActivity extends AppCompatActivity {
     private String concertName;
     private String purchaseTime;
 
+    /**
+     * Converts a date string into a Firestore Timestamp object.
+     * Assumes the string format matches Date.toString() in UTC timezone.
+     * @param timestampString The date string to convert.
+     * @return The Firestore Timestamp object, or null if parsing fails.
+     */
+
     private Timestamp convertStringToFirestoreTimestamp(String timestampString) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault()); // Match the default Date.toString() format
@@ -107,7 +114,10 @@ public class TransferTicketsActivity extends AppCompatActivity {
         Footer.setUpFooter(this);
     }
 
-
+    /**
+     * Fetches friend IDs from the Firestore based on the current user ID and initiates loading of friend details.
+     * @param currentUserId The current user's ID to fetch friends for.
+     */
     private void fetchFriends(String currentUserId) {
         db.collection("Account")
                 .whereEqualTo("userId", Integer.parseInt(currentUserId))
@@ -128,6 +138,10 @@ public class TransferTicketsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Loads friend details from Firestore using their IDs.
+     * @param friendsIds List of friend IDs to load user details for.
+     */
     private void loadFriends(List<String> friendsIds) {
         List<Task<QuerySnapshot>> tasks = new ArrayList<>();
 

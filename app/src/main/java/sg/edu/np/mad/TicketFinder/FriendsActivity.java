@@ -98,6 +98,9 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
         editor.apply();
     }
 
+    /**
+     * Fetches the current user's friends from Firestore.
+     */
     private void fetchUsers(FetchUsersCallback callback) {
         Log.d(TAG, "fetchUsers: " + currentUserId);
         db.collection("Account")
@@ -134,7 +137,9 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                     }
                 });
     }
-
+    /**
+     * Handles the extraction and processing of friend data from a Firestore task.
+     */
     private void fetchCurrentUserFriends(FetchUsersCallback callback) {
         Log.d(TAG, "fetchCurrentUserFriends: " + currentUserId);
         db.collection("Account")
@@ -164,6 +169,10 @@ public class FriendsActivity extends AppCompatActivity implements UserAdapter.On
                     Log.d(TAG, "fetchCurrentUserFriends: friend user id " + friendUserId.size());
                 });
     }
+    /**
+     * Fetches detailed user information for a  friend.
+     * @param friendId specific friend id
+     */
 
     private void fetchFriendDetails(String friendId, FetchUsersCallback callback) {
         db.collection("Account")

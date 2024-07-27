@@ -88,6 +88,11 @@ public class UnfriendAdapter extends RecyclerView.Adapter<UnfriendAdapter.ViewHo
             unfriendButton = itemView.findViewById(R.id.unfriendButton);
         }
     }
+    /**
+     * Displays a dialog to confirm the unfriend action and handles the unfriending process if confirmed.
+     * @param context Context in which the dialog is to be shown.
+     * @param userId ID of the friend to be unfriended.
+     */
 
     private void unfriendFriendDialogue(Context context, String userId) {
         AlertDialog dialog = new AlertDialog.Builder(context)
@@ -137,12 +142,20 @@ public class UnfriendAdapter extends RecyclerView.Adapter<UnfriendAdapter.ViewHo
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
 
+    /**
+     * Updates the list of friends displayed based on the user's search query. This helps in filtering the list to only show the matching friends.
+     * @param userList List of users that match the search query.
+     */
+
     public void show(List<User> userList) {
         this.filteredList = new ArrayList<>(userList);
         notifyDataSetChanged();
     }
 
-    // Method to update the filtered list based on the query
+    /**
+     * Filters the friend list based on the search query provided and updates the RecyclerView.
+     * @param query The text used to filter the friend list.
+     */
     public void filter(String query) {
         filteredList.clear(); // Clear the previous filtered list
         if (query.trim().isEmpty()) {

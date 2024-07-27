@@ -75,6 +75,9 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         return friendsList.size();
     }
 
+    /**
+     * This is where the transfer of tickets happen
+     */
     public static class FriendViewHolder extends RecyclerView.ViewHolder {
         ImageView profilePicture;
         TextView friendName;
@@ -87,6 +90,12 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
             friendTransferButton = itemView.findViewById(R.id.friendTransferButton);
         }
     }
+    /**
+     * Displays a dialog to confirm the transfer of a ticket to a friend.
+     *
+     * @param context The context in which the dialog should be displayed.
+     * @param friend  The friend to whom the ticket will be transferred.
+     */
 
     private void showTransferDialog(Context context, User friend) {
         AlertDialog dialog = new AlertDialog.Builder(context)
@@ -106,6 +115,12 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         positiveButton.setTextColor(Color.parseColor("#976954"));
         negativeButton.setTextColor(Color.parseColor("#976954"));
     }
+
+    /**
+     * Transfers a ticket from the current user to a friend in the database.
+     *
+     * @param friend The friend to whom the ticket will be transferred.
+     */
 
     private void transferTicketFromDatabase(User friend) {
         Log.d(TAG, "Querying with concertTitle: " + concertTitle + ", seatCategory: " + seatCategory + ", seatNumber: " + seatNumber);
@@ -138,7 +153,13 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying tickets", e));
     }
-
+    /**
+     * Removes the ticketID from the current user's UpcomingConcert document.
+     * If no ticketIDs remain, deletes the document. Updates the friend's UpcomingConcert document.
+     *
+     * @param ticketID The ticketID to be removed.
+     * @param friend   The friend to whom the ticket was transferred.
+     */
     private void removeTicketIDFromUpcomingConcert(Long ticketID, User friend) {
         Log.d(TAG, "Removing ticketID: " + ticketID + " from UpcomingConcert with concertTitle: " + concertTitle);
 
@@ -183,6 +204,14 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying UpcomingConcert", e));
     }
 
+    /**
+     * Updates or creates an UpcomingConcert document for the friend receiving the ticket.
+     *
+     * @param friend       The friend to whom the ticket is transferred.
+     * @param ticketID     The ticketID being transferred.
+     * @param concertTitle The title of the concert.
+     * @param eventTime    The event time of the concert.
+     */
     private void updateFriendUpcomingConcert(User friend, Long ticketID, String concertTitle, String eventTime) {
         Log.d(TAG, "Updating friend's UpcomingConcert: " + friend.getUserId());
 

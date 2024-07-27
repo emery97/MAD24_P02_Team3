@@ -55,6 +55,12 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.upcoming_concert_details, parent, false);
         return new ViewHolder(view);
     }
+    /**
+     * Called by RecyclerView to display the data at the specified position. This method updates the contents of the ViewHolder to reflect the item at the given position.
+     *
+     * @param holder   The ViewHolder which should be updated to represent the contents of the item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -97,11 +103,24 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
             }
         });
     }
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     *
+     * @return The total number of items in this adapter.
+     */
 
     @Override
     public int getItemCount() {
         return upcomingConcertsList.size();
     }
+
+
+    /**
+     * Fetches tickets from the database using the provided ticket IDs and returns them through a callback.
+     *
+     * @param ticketIDs The list of ticket IDs to fetch.
+     * @param listener  The callback to return the fetched tickets.
+     */
 
     // Fetch tickets from UpcomingConcert using the ticketIDs
     private void getTicketsFromIDs(List<Long> ticketIDs, OnTicketsFetchedListener listener) {
@@ -152,7 +171,10 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
                     listener.onTicketsFetched(tickets); // Handle partial results
                 });
     }
-
+    /**
+     * Callback interface for handling the results of ticket fetching operations.
+     * This interface should be implemented to define actions that will be performed once tickets have been fetched from the database.
+     */
     public interface OnTicketsFetchedListener {
         void onTicketsFetched(List<Ticket> tickets);
     }
