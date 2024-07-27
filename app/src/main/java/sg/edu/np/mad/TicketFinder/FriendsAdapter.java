@@ -17,13 +17,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.List;
 
-// ACTUAL TRANSFER TICKET HAPPENS HERE !!
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> {
 
     private static final String TAG = "FriendsAdapter";
@@ -33,13 +31,17 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
     private String concertTitle;
     private String seatCategory;
     private String seatNumber;
+    private String currentUserId;
+    private String currentUserName;
 
-    public FriendsAdapter(Context context, List<User> friendsList, String currentUserId, String concertTitle, String seatCategory, String seatNumber) {
+    public FriendsAdapter(Context context, List<User> friendsList, String concertTitle, String seatCategory, String seatNumber, String currentUserId, String currentUserName) {
         this.context = context;
         this.friendsList = friendsList;
         this.concertTitle = concertTitle;
         this.seatCategory = seatCategory;
         this.seatNumber = seatNumber;
+        this.currentUserId = currentUserId;
+        this.currentUserName = currentUserName;
         db = FirebaseFirestore.getInstance();
     }
 
@@ -114,15 +116,51 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Log.d(TAG, "Found document: " + document.getId());
-                            db.collection("Ticket").document(document.getId())
+                            String ticketID = document.getId();
+                            db.collection("Ticket").document(ticketID)
                                     .update("Name", friend.getName(), "userId", friend.getUserId())
-                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                        removeTicketIDFromUpcomingConcert(ticketID);
+                                    })
                                     .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
                         }
                     } else {
                         Log.w(TAG, "No matching document found for update.");
                     }
-                });
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error querying tickets", e));
+    }
+
+    private void removeTicketIDFromUpcomingConcert(String ticketID) {
+        Log.d(TAG, "Removing ticketID: " + ticketID + " from UpcomingConcert with concertTitle: " + concertTitle);
+
+        db.collection("UpcomingConcert")
+                .whereEqualTo("ConcertTitle", concertTitle)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(TAG, "Found UpcomingConcert document: " + document.getId());
+                            List<String> ticketIDs = (List<String>) document.get("TicketIDs");
+                            String userID = document.getString("UserID");
+                            String userName = document.getString("Name");
+                            Log.d(TAG, "Document UserID: " + userID + ", Document UserName: " + userName);
+                            if (ticketIDs != null && ticketIDs.contains(ticketID) && userID.equals(currentUserId) && userName.equals(currentUserName)) {
+                                Log.d(TAG, "TicketID found in UpcomingConcert document and matches current user. Removing it.");
+                                ticketIDs.remove(ticketID);
+                                db.collection("UpcomingConcert").document(document.getId())
+                                        .update("TicketIDs", ticketIDs)
+                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully removed from UpcomingConcert!"))
+                                        .addOnFailureListener(e -> Log.w(TAG, "Error removing TicketID from UpcomingConcert", e));
+                            } else {
+                                Log.w(TAG, "TicketID not found in UpcomingConcert document or does not match current user.");
+                            }
+                        }
+                    } else {
+                        Log.w(TAG, "No matching UpcomingConcert document found for update.");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error querying UpcomingConcert", e));
     }
 }
-

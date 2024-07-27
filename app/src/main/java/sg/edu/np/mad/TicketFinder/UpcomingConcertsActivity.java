@@ -1,41 +1,30 @@
 package sg.edu.np.mad.TicketFinder;
 
-import static android.content.ContentValues.TAG;
-
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import java.util.HashMap;
-import java.util.Map;
-
-// Class definition
 public class UpcomingConcertsActivity extends AppCompatActivity {
-    private SharedPreferences sharedPreferences; // Shared preferences for storing user data
+    private SharedPreferences sharedPreferences;
     private FirebaseFirestore db;
-    private RecyclerView recyclerView; // RecyclerView to display booking details
+    private RecyclerView recyclerView;
     private UpcomingConcertsAdapter upcomingConcertsAdapter;
     private static final String TAG = "UpcomingConcertsActivity";
-    private List<BookingDetailsII> bookingDetailsList = new ArrayList<>();
+    private List<UpcomingConcert> upcomingConcertList = new ArrayList<>();
+    private String currentUserId;
+    private String currentUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,74 +36,57 @@ public class UpcomingConcertsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         // Get shared preferences for user data
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        // Retrieve user ID and name from shared preferences
+        currentUserId = sharedPreferences.getString("UserId", null);
+        currentUserName = sharedPreferences.getString("Name", null);
+        Log.d(TAG, "Current User ID: " + currentUserId + ", Current User Name: " + currentUserName);
+
         // Initialize RecyclerView
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Get user ID from shared preferences and fetch upcoming concerts
-        String userId = sharedPreferences.getString("UserId", null);
-        if (userId != null) {
-            fetchUpcomingConcerts(userId);
-        }
+        // Fetch upcoming concerts
+        fetchUpcomingConcerts();
 
         // Set up footer
         Footer.setUpFooter(this);
     }
 
-    private void fetchUpcomingConcerts(String userId) {
-        db.collection("BookingDetailsII")
-                .whereEqualTo("UserID", userId)
+    private void fetchUpcomingConcerts() {
+        String currentUserId = sharedPreferences.getString("UserId", null);
+
+        db.collection("UpcomingConcert")
+                .whereEqualTo("UserID", currentUserId)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                            Date currentDate = new Date();
-                            Log.d(TAG, "fetchUpcomingConcerts: COMES HERE");
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<UpcomingConcert> concertsList = new ArrayList<>();
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Log.d(TAG, "Document data: " + documentSnapshot.getData());
 
-                            for (QueryDocumentSnapshot document : querySnapshot) {
-                                String documentId = document.getId();
-                                String concertTitle = document.getString("ConcertTitle");
-                                String eventTime = document.getString("EventTime");
-                                String name = document.getString("Name");
-                                String paymentMethod = document.getString("PaymentMethod");
-                                Timestamp purchaseTime = document.getTimestamp("PurchaseTime");
-                                int quantity = document.getLong("Quantity").intValue();
-                                List<Long> ticketIDs = (List<Long>) document.get("TicketIDs");
-                                double totalPrice = document.getDouble("TotalPrice");
-                                Log.d(TAG, "fetchUpcomingConcerts: EVENT TIME FROM DOCUMENT"+ eventTime);
-                                Log.d(TAG, "fetchUpcomingConcerts: CURRENT TIME"+currentDate);
-                                try {
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
-                                    Date eventDate = sdf.parse(eventTime);
-                                    if (eventDate != null && eventDate.after(currentDate)) {
-                                        BookingDetailsII bookingDetails = new BookingDetailsII(concertTitle, eventTime, name, paymentMethod, purchaseTime, quantity, ticketIDs, totalPrice);
-                                        bookingDetailsList.add(bookingDetails);
-                                    }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                        String concertTitle = documentSnapshot.getString("ConcertTitle");
+                        String eventTime = documentSnapshot.getString("EventTime");
+                        String name = documentSnapshot.getString("Name");
+                        Long quantityLong = documentSnapshot.getLong("Quantity");
+                        List<Long> ticketIDs = (List<Long>) documentSnapshot.get("TicketIDs");
+                        String userId = documentSnapshot.getString("UserID");
 
-                            upcomingConcertsAdapter = new UpcomingConcertsAdapter(bookingDetailsList, db);
-                            recyclerView.setAdapter(upcomingConcertsAdapter);
+                        int quantity = quantityLong != null ? quantityLong.intValue() : 0;
+
+                        if (concertTitle != null && eventTime != null && ticketIDs != null && userId != null) {
+                            UpcomingConcert concert = new UpcomingConcert(concertTitle, eventTime, name, quantity, ticketIDs, userId);
+                            concertsList.add(concert);
+                            Log.d(TAG, "Concert retrieved: " + concert.getConcertTitle() + ", Ticket IDs: " + concert.getTicketIDs());
                         } else {
-                            Log.d("UpcomingConcertsActivity", "No upcoming concerts found");
+                            Log.w(TAG, "Missing fields in document: " + documentSnapshot.getId());
                         }
-                    } else {
-                        Log.d("UpcomingConcertsActivity", "Error getting documents: ", task.getException());
                     }
-                });
+                    // Initialize the adapter with the fetched data
+                    upcomingConcertsAdapter = new UpcomingConcertsAdapter(concertsList, db, currentUserId, currentUserName);
+                    recyclerView.setAdapter(upcomingConcertsAdapter);
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error fetching upcoming concerts", e));
     }
 
 
-    private String formatTimestamp(Timestamp timestamp) {
-        if (timestamp != null) {
-            Date date = timestamp.toDate();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
-            return sdf.format(date);
-        }
-        return "";
-    }
+
 }
-

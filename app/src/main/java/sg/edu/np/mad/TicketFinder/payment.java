@@ -487,7 +487,16 @@ public class payment extends AppCompatActivity {
         bookingDetails.put("TicketIDs", ticketIDs);
         bookingDetails.put("UserID", userId);
 
+        // create upcoming concert map
         // Add booking details to Firestore
+        Map<String, Object> upcomingConcert = new HashMap<>();
+        upcomingConcert.put("ConcertTitle", concertName);
+        upcomingConcert.put("EventTime", time);
+        upcomingConcert.put("Name", name);
+        upcomingConcert.put("Quantity", quantity);
+        upcomingConcert.put("TicketIDs", ticketIDs);
+        upcomingConcert.put("UserID", userId);
+
         db.collection("BookingDetailsII").add(bookingDetails)
                 .addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "Booking details added with ID: " + documentReference.getId());
@@ -495,6 +504,15 @@ public class payment extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
                 });
+        // add concert details to upcoming concert
+        db.collection("UpcomingConcert").add(upcomingConcert)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "upcoming concert added with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(payment.this, "Error saving upcoming concert", Toast.LENGTH_SHORT).show();
+                });
+
     }
 
     // ASK IF THEY WANT TO CONNECT TO GOOGLE CALENDAR

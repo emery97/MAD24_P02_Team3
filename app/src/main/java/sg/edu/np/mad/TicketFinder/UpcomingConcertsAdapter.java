@@ -1,51 +1,47 @@
 package sg.edu.np.mad.TicketFinder;
 
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcertsAdapter.ViewHolder> {
-    private List<BookingDetailsII> upcomingConcertsList;
+    private List<UpcomingConcert> upcomingConcertsList;
     private static final String TAG = "UpcomingConcertsAdapter";
     private FirebaseFirestore db;
+    private String currentUserId;
+    private String currentUserName;
 
-    public UpcomingConcertsAdapter(List<BookingDetailsII> upcomingConcertsList, FirebaseFirestore db) {
+    public UpcomingConcertsAdapter(List<UpcomingConcert> upcomingConcertsList, FirebaseFirestore db, String currentUserId, String currentUserName) {
         this.upcomingConcertsList = upcomingConcertsList;
         this.db = db;
+        this.currentUserId = currentUserId;
+        this.currentUserName = currentUserName;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView concertName, purchaseTime, eventTime, totalPrice, quantity, paymentMethod;
-        public Button viewMoreButton;
+        public TextView concertName, eventTime, quantity;
+        public ToggleButton viewMoreButton;
         public View expandableLayout;
         public RecyclerView ticketRecyclerView;
 
         public ViewHolder(View view) {
             super(view);
             concertName = view.findViewById(R.id.EventTitle);
-            purchaseTime = view.findViewById(R.id.Datebought);
             eventTime = view.findViewById(R.id.eventDate);
-            totalPrice = view.findViewById(R.id.totalPrice);
             quantity = view.findViewById(R.id.quantity);
-            paymentMethod = view.findViewById(R.id.paymentMethod);
             viewMoreButton = view.findViewById(R.id.viewMoreButton);
             expandableLayout = view.findViewById(R.id.expandableLayout);
             ticketRecyclerView = view.findViewById(R.id.ticketRecyclerView);
@@ -64,38 +60,32 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder called for position: " + position);
 
-        BookingDetailsII bookingDetails = upcomingConcertsList.get(position);
+        UpcomingConcert concert = upcomingConcertsList.get(position);
+        Log.d(TAG, "Concert data: " + concert.getConcertTitle() + ", " + concert.getEventTime() + ", " + concert.getQuantity() + ", " + concert.getTicketIDs());
 
-        holder.concertName.setText(bookingDetails.getConcertTitle());
-        holder.eventTime.setText("Concert Date: " + bookingDetails.getEventTime());
-        holder.totalPrice.setText("Total Price: $" + bookingDetails.getTotalPrice());
-        holder.quantity.setText("Quantity: " + bookingDetails.getQuantity());
-        holder.paymentMethod.setText("Payment Method: " + bookingDetails.getPaymentMethod());
+        holder.concertName.setText(concert.getConcertTitle() != null ? concert.getConcertTitle() : "No Title");
+        holder.eventTime.setText("Concert Date: " + (concert.getEventTime() != null ? concert.getEventTime() : "No Date"));
+        holder.quantity.setText("Quantity: " + concert.getQuantity());
 
-        // Format and set purchase time
-        Timestamp purchaseTimestamp = bookingDetails.getPurchaseTime();
-        if (purchaseTimestamp != null) {
-            Date purchaseDate = purchaseTimestamp.toDate();
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.getDefault());
-            String purchaseTimeString = sdf.format(purchaseDate);
-            holder.purchaseTime.setText(purchaseTimeString);
-        } else {
-            holder.purchaseTime.setText("");
-        }
-
-        boolean isExpanded = bookingDetails.isExpanded();
+        boolean isExpanded = concert.isExpanded();
         holder.expandableLayout.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
 
         holder.viewMoreButton.setText(isExpanded ? "View Less" : "View More");
+        holder.viewMoreButton.setChecked(isExpanded);
         holder.viewMoreButton.setOnClickListener(v -> {
-            bookingDetails.setExpanded(!isExpanded);
+            concert.setExpanded(!isExpanded);
             notifyItemChanged(position);
         });
 
-        Log.d(TAG, "Fetching tickets for bookingDetails: " + bookingDetails.getConcertTitle());
+        Log.d(TAG, "Fetching tickets for concert: " + concert.getConcertTitle());
         // Fetch and set tickets
-        getTicketsFromIDs(bookingDetails.getTicketIDs(), tickets -> {
-            Log.d(TAG, "Tickets fetched for bookingDetails: " + bookingDetails.getConcertTitle() + ", Tickets: " + tickets.size());
+        List<Long> ticketIDs = concert.getTicketIDs();
+        if (ticketIDs == null) {
+            Log.w(TAG, "No ticket IDs found for concert: " + concert.getConcertTitle());
+            return;
+        }
+        getTicketsFromIDs(ticketIDs, tickets -> {
+            Log.d(TAG, "Tickets fetched for concert: " + concert.getConcertTitle() + ", Tickets: " + tickets.size());
             if (!tickets.isEmpty()) {
                 Log.d(TAG, "Setting TicketAdapter for RecyclerView at position: " + position);
                 TicketAdapter ticketAdapter = new TicketAdapter(tickets);
@@ -113,9 +103,14 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
         return upcomingConcertsList.size();
     }
 
-    // Fetch tickets from BookingDetailsII using the ticketIDs
+    // Fetch tickets from UpcomingConcert using the ticketIDs
     private void getTicketsFromIDs(List<Long> ticketIDs, OnTicketsFetchedListener listener) {
         List<Ticket> tickets = new ArrayList<>();
+        if (ticketIDs == null) {
+            Log.w(TAG, "ticketIDs is null");
+            listener.onTicketsFetched(tickets);
+            return;
+        }
         Log.d(TAG, "getTicketsFromIDs called with ticketIDs: " + ticketIDs.toString());
 
         if (ticketIDs.isEmpty()) {
@@ -135,9 +130,6 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
                             String seatNumber = documentSnapshot.getString("SeatNumber");
                             Long ticketID = documentSnapshot.getLong("TicketID");
                             String concertTitle = documentSnapshot.getString("ConcertTitle");
-                            Log.d(TAG, "getTicketsFromIDs: " + seatCategory);
-                            Log.d(TAG, "getTicketsFromIDs: " + seatNumber);
-                            Log.d(TAG, "getTicketsFromIDs: "+ ticketID);
 
                             if (seatCategory != null && seatNumber != null && ticketID != null) {
                                 // Create a new Ticket object using the retrieved fields
@@ -145,7 +137,7 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
                                 tickets.add(ticket);
                                 Log.d(TAG, "Ticket fetched: " + ticket.getSeatNumber() + ", Ticket ID: " + ticket.getTicketID());
                             } else {
-                                Log.d(TAG, "Some fields are missing for ticket with ID: " + ticketID);
+                                Log.d(TAG, "Some fields are missing for ticket with ID: " + (ticketID != null ? ticketID : "unknown"));
                             }
                         }
                         Log.d(TAG, "All tickets fetched for IDs: " + ticketIDs.toString());
@@ -160,7 +152,6 @@ public class UpcomingConcertsAdapter extends RecyclerView.Adapter<UpcomingConcer
                     listener.onTicketsFetched(tickets); // Handle partial results
                 });
     }
-
 
     public interface OnTicketsFetchedListener {
         void onTicketsFetched(List<Ticket> tickets);
