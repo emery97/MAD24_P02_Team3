@@ -135,6 +135,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying tickets", e));
     }
+    // remove ticketID from ticketIDs array in database
 
     private void removeTicketIDFromUpcomingConcert(Long ticketID) {
         Log.d(TAG, "Removing ticketID: " + ticketID + " from UpcomingConcert with concertTitle: " + concertTitle);
@@ -149,14 +150,22 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                             Log.d(TAG, "Found UpcomingConcert document: " + document.getId());
                             List<Long> ticketIDs = (List<Long>) document.get("TicketIDs");
                             if (ticketIDs != null && ticketIDs.contains(ticketID)) {
-                                Log.d(TAG, "TicketID found in UpcomingConcert document. Removing it.");
                                 ticketIDs.remove(ticketID);
-                                db.collection("UpcomingConcert").document(document.getId())
-                                        .update("TicketIDs", ticketIDs)
-                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully removed from UpcomingConcert!"))
-                                        .addOnFailureListener(e -> Log.w(TAG, "Error removing TicketID from UpcomingConcert", e));
+                                if (ticketIDs.isEmpty()) {
+                                    // Delete the entire document if there are no TicketIDs left
+                                    db.collection("UpcomingConcert").document(document.getId())
+                                            .delete()
+                                            .addOnSuccessListener(aVoid -> Log.d(TAG, "UpcomingConcert document successfully deleted!"))
+                                            .addOnFailureListener(e -> Log.w(TAG, "Error deleting UpcomingConcert document", e));
+                                } else {
+                                    // Update the document with the new list of TicketIDs
+                                    db.collection("UpcomingConcert").document(document.getId())
+                                            .update("TicketIDs", ticketIDs)
+                                            .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully removed from UpcomingConcert!"))
+                                            .addOnFailureListener(e -> Log.w(TAG, "Error removing TicketID from UpcomingConcert", e));
+                                }
                             } else {
-                                Log.w(TAG, "TicketID not found in UpcomingConcert document.");
+                                Log.w(TAG, "TicketID not found in UpcomingConcert document or ticketIDs is null.");
                             }
                         }
                     } else {
