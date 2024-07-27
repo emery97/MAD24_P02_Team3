@@ -116,14 +116,18 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Log.d(TAG, "Found document: " + document.getId());
-                            String ticketID = document.getId();
-                            db.collection("Ticket").document(ticketID)
-                                    .update("Name", friend.getName(), "userId", friend.getUserId())
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d(TAG, "DocumentSnapshot successfully updated!");
-                                        removeTicketIDFromUpcomingConcert(ticketID);
-                                    })
-                                    .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+                            Long ticketID = document.getLong("TicketID"); // Fetch the actual ticketID field
+                            if (ticketID != null) {
+                                db.collection("Ticket").document(document.getId())
+                                        .update("Name", friend.getName(), "userId", friend.getUserId())
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                            removeTicketIDFromUpcomingConcert(ticketID);
+                                        })
+                                        .addOnFailureListener(e -> Log.w(TAG, "Error updating document", e));
+                            } else {
+                                Log.w(TAG, "No ticketID found in the document");
+                            }
                         }
                     } else {
                         Log.w(TAG, "No matching document found for update.");
@@ -132,29 +136,27 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying tickets", e));
     }
 
-    private void removeTicketIDFromUpcomingConcert(String ticketID) {
+    private void removeTicketIDFromUpcomingConcert(Long ticketID) {
         Log.d(TAG, "Removing ticketID: " + ticketID + " from UpcomingConcert with concertTitle: " + concertTitle);
 
         db.collection("UpcomingConcert")
                 .whereEqualTo("ConcertTitle", concertTitle)
+                .whereEqualTo("UserID", currentUserId) // Ensure we are removing from the current user's document
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Log.d(TAG, "Found UpcomingConcert document: " + document.getId());
-                            List<String> ticketIDs = (List<String>) document.get("TicketIDs");
-                            String userID = document.getString("UserID");
-                            String userName = document.getString("Name");
-                            Log.d(TAG, "Document UserID: " + userID + ", Document UserName: " + userName);
-                            if (ticketIDs != null && ticketIDs.contains(ticketID) && userID.equals(currentUserId) && userName.equals(currentUserName)) {
-                                Log.d(TAG, "TicketID found in UpcomingConcert document and matches current user. Removing it.");
+                            List<Long> ticketIDs = (List<Long>) document.get("TicketIDs");
+                            if (ticketIDs != null && ticketIDs.contains(ticketID)) {
+                                Log.d(TAG, "TicketID found in UpcomingConcert document. Removing it.");
                                 ticketIDs.remove(ticketID);
                                 db.collection("UpcomingConcert").document(document.getId())
                                         .update("TicketIDs", ticketIDs)
                                         .addOnSuccessListener(aVoid -> Log.d(TAG, "TicketID successfully removed from UpcomingConcert!"))
                                         .addOnFailureListener(e -> Log.w(TAG, "Error removing TicketID from UpcomingConcert", e));
                             } else {
-                                Log.w(TAG, "TicketID not found in UpcomingConcert document or does not match current user.");
+                                Log.w(TAG, "TicketID not found in UpcomingConcert document.");
                             }
                         }
                     } else {
@@ -163,4 +165,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error querying UpcomingConcert", e));
     }
+
+
 }

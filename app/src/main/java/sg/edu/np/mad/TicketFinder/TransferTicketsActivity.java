@@ -90,7 +90,7 @@ public class TransferTicketsActivity extends AppCompatActivity {
 
         Log.d(TAG, "Received purchaseTime: " + purchaseTimeDb.toDate().toString());
 
-        friendsAdapter = new FriendsAdapter(this, friendsList, concertName, currentUserId, concertName, seatCategory, seatNumber);
+        friendsAdapter = new FriendsAdapter(this, friendsList, concertName, seatCategory,seatNumber,currentUserId, concertName);
         recyclerView.setAdapter(friendsAdapter);
 
         // Initialize Firebase components
