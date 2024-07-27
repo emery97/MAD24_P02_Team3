@@ -418,3 +418,4 @@ ItemTouchHelper has been implemented to different pages of the ticket finder app
 - Ai robot icon: https://lottiefiles.com/
 - 4 Day Weather Forecast: https://beta.data.gov.sg/collections/1456/datasets/d_1efe4728b2dad26fd7729c5e4eff7802/view
 - 2-hour Weather Forecast: https://beta.data.gov.sg/collections/1456/datasets/d_91ffc58263cff535910c16a4166ccbc3/view
+- Scanner Icon: https://www.flaticon.com/free-icon/barcode-scanner_4379661?term=qr+scanner&page=1&position=3&origin=search&related_id=4379661
