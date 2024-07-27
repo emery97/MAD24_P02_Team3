@@ -59,6 +59,9 @@
         android:onClick="scanQRCode"
         android:scaleType="fitCenter"
         android:src="@drawable/scanner"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="50sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/weatherRecyclerView" />
 
     <TextView

@@ -80,6 +80,17 @@
                     android:src="@drawable/active_mic_icon"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/venueSpinner" />
+
+                <ImageButton
+                    android:id="@+id/forumButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/baseline_forum_24"
+                    app:layout_constraintEnd_toStartOf="@+id/speakerButton"
+                    app:layout_constraintTop_toTopOf="@+id/speakerButton"
+                    app:layout_constraintBottom_toBottomOf="@+id/speakerButton" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <HorizontalScrollView

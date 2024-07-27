@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -179,6 +180,15 @@ public class Bookingdetailsmore extends AppCompatActivity {
         Button buttonAddReminder = findViewById(R.id.buttonaddreminder);
         buttonAddReminder.setOnClickListener(v -> showAddReminderDialog());
 
+        ImageButton backbtn = findViewById(R.id.bookingdetailsbackbtn);
+        backbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Bookingdetailsmore.this, BookingHistoryDetails.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void createNotificationChannel() {

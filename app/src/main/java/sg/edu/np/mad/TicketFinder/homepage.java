@@ -271,6 +271,12 @@ public class homepage extends AppCompatActivity implements SpeechRecognitionNav.
         // Initialize and set up speech recognition
         ImageButton speakerButton = findViewById(R.id.speakerButton);
         speakerButton.setOnClickListener(v -> checkMicrophonePermission());
+
+        ImageButton forumButton = findViewById(R.id.forumButton);
+        forumButton.setOnClickListener(v -> {
+            Intent intent = new Intent(homepage.this, ForumPage.class);
+            startActivity(intent);
+        });
     }
 
     private void checkMicrophonePermission() {

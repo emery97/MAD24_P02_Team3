@@ -61,6 +61,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -239,6 +241,16 @@ public class ForumPage extends AppCompatActivity {
                 }
             }
             return false;
+        });
+
+        TextView exitButtonForum = findViewById(R.id.exitButtonForum);
+        exitButtonForum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an Intent to navigate to another page
+                Intent intent = new Intent(ForumPage.this, profilePage.class); // Replace OtherActivity with your target activity
+                startActivity(intent);
+            }
         });
     }
     private void setupSpinnerWithPlaceholder() {

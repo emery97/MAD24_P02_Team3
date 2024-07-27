@@ -255,7 +255,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:background="@null"
-        android:src="@drawable/baseline_forum_24"
+        android:src="@drawable/baseline_forum_48"
         android:contentDescription="Forum Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

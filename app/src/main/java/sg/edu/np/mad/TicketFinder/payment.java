@@ -713,10 +713,22 @@ public class payment extends AppCompatActivity {
         // Get booking details from intent
         String concertName = getIntent().getStringExtra("concertName");
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
-        String seatCategory = getIntent().getStringExtra("seatCategory");
-        String seatNumber = getIntent().getStringExtra("seatNumber");
         int quantity = getIntent().getIntExtra("quantity", 1);
         String eventTiming = getIntent().getStringExtra("eventTiming");
+
+        // Extract seat details from the latestSeatMap
+        String firstSeatCategory = null;
+        String firstSeatNumber = null;
+
+        if (!latestSeatMap.isEmpty()) {
+            // Get the first entry from the map
+            Map.Entry<String, ArrayList<String>> firstEntry = latestSeatMap.entrySet().iterator().next();
+            firstSeatCategory = firstEntry.getKey();
+            ArrayList<String> seatNumbers = firstEntry.getValue();
+            if (!seatNumbers.isEmpty()) {
+                firstSeatNumber = seatNumbers.get(0); // Get the first seat number
+            }
+        }
 
         // Create and show booking details dialog
         Dialog dialog = new Dialog(payment.this);
@@ -732,11 +744,13 @@ public class payment extends AppCompatActivity {
 
         // Set booking details in the dialog
         concertText.setText(concertName);
-        categoryText.setText(seatCategory);
-        numberText.setText(seatNumber);
+        categoryText.setText(firstSeatCategory != null ? firstSeatCategory : "N/A");
+        numberText.setText(firstSeatNumber != null ? firstSeatNumber : "N/A");
         priceText.setText("Price: $" + totalPrice);
         quantityText.setText("Quantity: " + quantity);
         timingText.setText(eventTiming);
+
         dialog.show();
     }
+
 }
