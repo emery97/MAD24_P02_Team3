@@ -49,77 +49,79 @@ import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Executor;
 
 public class profilePage extends AppCompatActivity {
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int CAMERA_REQUEST_CODE = 2;
-    private static final int CAMERA_PERMISSION_CODE = 3;
+    // Request codes for image picking and camera
+    private static final int PICK_IMAGE_REQUEST = 1; // Request code for picking an image from the gallery
+    private static final int CAMERA_REQUEST_CODE = 2; // Request code for taking a photo with the camera
+    private static final int CAMERA_PERMISSION_CODE = 3; // Request code for camera permission
 
     // UI components
-    private TextView username, password, email, regPassword;
-    private EditText editUsername, editPassword;
-    private ImageView editingIcon, profilePicture;
-    private CheckBox showPassword;
-    private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton, uploadProfilePicButton;
-    private String actualPassword;
-    private SharedPreferences sharedPreferences;
-    private FirebaseFirestore db;
-    private FirebaseAuth mAuth;
-    private FirebaseUser firebaseUser;
-    private FirebaseStorage storage;
-    private StorageReference storageReference;
-    private String userId;
-    private static final String TAG = "ProfilePage";
-    private boolean isEditMode = false;
+    private TextView username, password, email, regPassword; // TextView components for displaying user info
+    private EditText editUsername, editPassword; // EditText components for editing user info
+    private ImageView editingIcon, profilePicture; // ImageView components for editing icon and profile picture
+    private CheckBox showPassword; // CheckBox component for toggling password visibility
+    private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton, uploadProfilePicButton; // Button components for various actions
+    private String actualPassword; // String to store the actual password
+    private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
+    private FirebaseFirestore db; // Firestore database instance
+    private FirebaseAuth mAuth; // Firebase Authentication instance
+    private FirebaseUser firebaseUser; // Current authenticated user
+    private FirebaseStorage storage; // Firebase Storage instance
+    private StorageReference storageReference; // Reference to Firebase Storage
+    private String userId; // User ID
+    private static final String TAG = "ProfilePage"; // Tag for logging
+    private boolean isEditMode = false; // Boolean to track if the profile is in edit mode
 
-    private BiometricPrompt biometricPrompt;
-    private BiometricPrompt.PromptInfo promptInfo;
-    private Executor executor;
+    // Biometric authentication components
+    private BiometricPrompt biometricPrompt; // Biometric prompt for authentication
+    private BiometricPrompt.PromptInfo promptInfo; // Information for biometric prompt
+    private Executor executor; // Executor for handling biometric authentication callbacks
 
     @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile_page);
+        setContentView(R.layout.profile_page); // Set the layout for the profile page
 
         // Set up footer
-        Footer.setUpFooter(this);
+        Footer.setUpFooter(this); // Set up footer view
 
         // Initialize UI components
-        username = findViewById(R.id.regUsername);
-        password = findViewById(R.id.regPassword);
-        email = findViewById(R.id.regEmail);
-        editUsername = findViewById(R.id.editUsername);
-        editPassword = findViewById(R.id.editPassword);
-        regPassword = findViewById(R.id.regPassword);
-        editingIcon = findViewById(R.id.editingIcon);
-        profilePicture = findViewById(R.id.profilePicture);
-        showPassword = findViewById(R.id.showPassword);
-        saveButton = findViewById(R.id.saveButton);
-        logoutButton = findViewById(R.id.logoutButton);
-        feedbackbutton = findViewById(R.id.Viewfeedbackbtn);
-        deleteAccountButton = findViewById(R.id.deleteAccountButton);
-        uploadProfilePicButton = findViewById(R.id.uploadProfilePicButton);
+        username = findViewById(R.id.regUsername); // Initialize TextView for username
+        password = findViewById(R.id.regPassword); // Initialize TextView for password
+        email = findViewById(R.id.regEmail); // Initialize TextView for email
+        editUsername = findViewById(R.id.editUsername); // Initialize EditText for editing username
+        editPassword = findViewById(R.id.editPassword); // Initialize EditText for editing password
+        regPassword = findViewById(R.id.regPassword); // Initialize TextView for registering password
+        editingIcon = findViewById(R.id.editingIcon); // Initialize ImageView for editing icon
+        profilePicture = findViewById(R.id.profilePicture); // Initialize ImageView for profile picture
+        showPassword = findViewById(R.id.showPassword); // Initialize CheckBox for showing password
+        saveButton = findViewById(R.id.saveButton); // Initialize Button for saving changes
+        logoutButton = findViewById(R.id.logoutButton); // Initialize Button for logging out
+        feedbackbutton = findViewById(R.id.Viewfeedbackbtn); // Initialize Button for viewing feedback
+        deleteAccountButton = findViewById(R.id.deleteAccountButton); // Initialize Button for deleting account
+        uploadProfilePicButton = findViewById(R.id.uploadProfilePicButton); // Initialize Button for uploading profile picture
 
         // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE); // Get SharedPreferences instance
 
         // Initialize Firebase components
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
+        db = FirebaseFirestore.getInstance(); // Initialize Firestore database
+        mAuth = FirebaseAuth.getInstance(); // Initialize Firebase Authentication
+        firebaseUser = mAuth.getCurrentUser(); // Get current authenticated user
+        storage = FirebaseStorage.getInstance(); // Initialize Firebase Storage
+        storageReference = storage.getReference(); // Get reference to Firebase Storage
 
         // Redirect to login if user is not authenticated
-        redirectToLoginIfNoUser();
+        redirectToLoginIfNoUser(); // Check if user is authenticated, if not redirect to login
 
         // Get userId from SharedPreferences
-        userId = sharedPreferences.getString("userId", "N/A");
+        userId = sharedPreferences.getString("userId", "N/A"); // Get userId from SharedPreferences
         if (userId.equals("N/A")) {
             // Attempt to fetch the userId from Firestore using the email
-            fetchUserId();
+            fetchUserId(); // Fetch userId from Firestore
         } else {
             // Load user data
-            loadUserData();
+            loadUserData(); // Load user data from SharedPreferences
         }
 
         // OnClickListener for show password checkbox
@@ -127,9 +129,9 @@ public class profilePage extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isEditMode) {
-                    togglePasswordVisibility();
+                    togglePasswordVisibility(); // Toggle password visibility in edit mode
                 } else {
-                    togglePasswordVisibilityNonEditMode();
+                    togglePasswordVisibilityNonEditMode(); // Toggle password visibility in non-edit mode
                 }
             }
         });
@@ -138,7 +140,7 @@ public class profilePage extends AppCompatActivity {
         editingIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                authenticateUser();
+                authenticateUser(); // Authenticate user before allowing editing
             }
         });
 
@@ -146,13 +148,10 @@ public class profilePage extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get password from EditText
-                actualPassword = editPassword.getText().toString();
-                // Disable editing mode
-                UnallowEditing();
-                isEditMode = false;
-                // Update user information
-                updateUserInformation();
+                actualPassword = editPassword.getText().toString(); // Get password from EditText
+                UnallowEditing(); // Disable editing mode
+                isEditMode = false; // Set edit mode to false
+                updateUserInformation(); // Update user information
             }
         });
 
@@ -160,8 +159,7 @@ public class profilePage extends AppCompatActivity {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Perform logout
-                logout();
+                logout(); // Perform logout
             }
         });
 
@@ -185,13 +183,12 @@ public class profilePage extends AppCompatActivity {
                         .setMessage("Are you sure you want to delete your account? This action cannot be undone.")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // User confirmed to delete the account
-                                deleteAccount();
+                                deleteAccount(); // User confirmed to delete the account
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                        .show(); // Show confirmation dialog
             }
         });
 
@@ -199,36 +196,36 @@ public class profilePage extends AppCompatActivity {
         uploadProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showImageOptions();
+                showImageOptions(); // Show options for uploading profile picture
             }
         });
 
         // Initialize biometric prompt
-        executor = ContextCompat.getMainExecutor(this);
+        executor = ContextCompat.getMainExecutor(this); // Get executor for biometric authentication
         biometricPrompt = new BiometricPrompt(profilePage.this, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                Toast.makeText(profilePage.this, "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                Toast.makeText(profilePage.this, "Authentication error: " + errString, Toast.LENGTH_SHORT).show(); // Show error message
             }
 
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Toast.makeText(profilePage.this, "Authentication succeeded!", Toast.LENGTH_SHORT).show();
-                isEditMode = true;
-                AllowEditing();
+                Toast.makeText(profilePage.this, "Authentication succeeded!", Toast.LENGTH_SHORT).show(); // Show success message
+                isEditMode = true; // Set edit mode to true
+                AllowEditing(); // Allow editing of user information
                 saveButton.setVisibility(View.VISIBLE); // Ensure save button is visible when editing
                 deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
-                feedbackbutton.setVisibility(View.INVISIBLE);
-                logoutButton.setVisibility(View.INVISIBLE);
-                uploadProfilePicButton.setVisibility(View.VISIBLE);
+                feedbackbutton.setVisibility(View.INVISIBLE); // Hide feedback button in edit mode
+                logoutButton.setVisibility(View.INVISIBLE); // Hide logout button in edit mode
+                uploadProfilePicButton.setVisibility(View.VISIBLE); // Show upload profile picture button in edit mode
             }
 
             @Override
             public void onAuthenticationFailed() {
                 super.onAuthenticationFailed();
-                Toast.makeText(profilePage.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(profilePage.this, "Authentication failed", Toast.LENGTH_SHORT).show(); // Show failure message
             }
         });
 
@@ -245,7 +242,7 @@ public class profilePage extends AppCompatActivity {
             promptInfoBuilder.setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL);
         }
 
-        promptInfo = promptInfoBuilder.build();
+        promptInfo = promptInfoBuilder.build(); // Build the biometric prompt info
     }
 
     @Override
@@ -253,7 +250,7 @@ public class profilePage extends AppCompatActivity {
         super.onDestroy();
         // Clear SharedPreferences if "RememberMe" is false
         if (!sharedPreferences.getBoolean("RememberMe", false)) {
-            sharedPreferences.edit().clear().apply();
+            sharedPreferences.edit().clear().apply(); // Clear SharedPreferences
         }
     }
 
@@ -348,72 +345,71 @@ public class profilePage extends AppCompatActivity {
     private void togglePasswordVisibility() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibility: checked");
-            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD); // Show password
         } else {
-            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); // Hide password
         }
-        editPassword.setSelection(editPassword.getText().length());
+        editPassword.setSelection(editPassword.getText().length()); // Set cursor position
     }
 
     // Method to toggle password visibility in non-edit mode
     private void togglePasswordVisibilityNonEditMode() {
         if (showPassword.isChecked()) {
             Log.d("SHOW PASSWORD", "togglePasswordVisibilityNonEditMode: checked");
-            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD); // Show password
         } else {
-            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            regPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); // Hide password
         }
-        regPassword.requestLayout();
+        regPassword.requestLayout(); // Refresh layout
     }
 
     // Method to allow editing user information
     private void AllowEditing() {
         // Regular fields not shown
-        username.setVisibility(View.GONE);
-        password.setVisibility(View.GONE);
-        editingIcon.setVisibility(View.GONE);
+        username.setVisibility(View.GONE); // Hide username TextView
+        password.setVisibility(View.GONE); // Hide password TextView
+        editingIcon.setVisibility(View.GONE); // Hide editing icon
 
         // Replaced by editing fields
-        editUsername.setVisibility(View.VISIBLE);
-        editPassword.setVisibility(View.VISIBLE);
+        editUsername.setVisibility(View.VISIBLE); // Show EditText for username
+        editPassword.setVisibility(View.VISIBLE); // Show EditText for password
         // Setting account data in editing fields
-        editUsername.setText(username.getText());
-        editPassword.setText(password.getText());
+        editUsername.setText(username.getText()); // Set username in EditText
+        editPassword.setText(password.getText()); // Set password in EditText
 
         // Display save button
-        saveButton.setVisibility(View.VISIBLE);
+        saveButton.setVisibility(View.VISIBLE); // Show save button
         deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button in edit mode
-        uploadProfilePicButton.setVisibility(View.VISIBLE);
+        uploadProfilePicButton.setVisibility(View.VISIBLE); // Show upload profile picture button
     }
 
     // Method to disable editing user information
     private void UnallowEditing() {
         // Regular fields shown
-        username.setVisibility(View.VISIBLE);
-        password.setVisibility(View.VISIBLE);
-        editingIcon.setVisibility(View.VISIBLE);
-
+        username.setVisibility(View.VISIBLE); // Show username TextView
+        password.setVisibility(View.VISIBLE); // Show password TextView
+        editingIcon.setVisibility(View.VISIBLE); // Show editing icon
 
         // Editing fields and save button not shown
-        editUsername.setVisibility(View.GONE);
-        editPassword.setVisibility(View.GONE);
-        saveButton.setVisibility(View.GONE);
+        editUsername.setVisibility(View.GONE); // Hide EditText for username
+        editPassword.setVisibility(View.GONE); // Hide EditText for password
+        saveButton.setVisibility(View.GONE); // Hide save button
         deleteAccountButton.setVisibility(View.GONE); // Hide delete button after editing
-        uploadProfilePicButton.setVisibility(View.GONE);
-        feedbackbutton.setVisibility(View.VISIBLE);
-        logoutButton.setVisibility(View.VISIBLE);
+        uploadProfilePicButton.setVisibility(View.GONE); // Hide upload profile picture button
+        feedbackbutton.setVisibility(View.VISIBLE); // Show feedback button
+        logoutButton.setVisibility(View.VISIBLE); // Show logout button
     }
 
     // Method to logout user
     private void logout() {
-        mAuth.signOut();
-        sharedPreferences.edit().clear().apply();
-        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        mAuth.signOut(); // Sign out from Firebase Authentication
+        sharedPreferences.edit().clear().apply(); // Clear SharedPreferences
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show(); // Show success message
 
         // Navigate to login/register page
-        Intent intent = new Intent(profilePage.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        Intent intent = new Intent(profilePage.this, MainActivity.class); // Create intent for MainActivity
+        startActivity(intent); // Start MainActivity
+        finish(); // Finish current activity
     }
 
     // Method to update user information in Firestore
@@ -425,16 +421,16 @@ public class profilePage extends AppCompatActivity {
                     // Upon posting
                     // Update SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("Name", updatedName);
-                    editor.putString("Password", updatedPassword);
-                    editor.putString("ProfilePicUrl", profilePicUrl);
+                    editor.putString("Name", updatedName); // Save updated name
+                    editor.putString("Password", updatedPassword); // Save updated password
+                    editor.putString("ProfilePicUrl", profilePicUrl); // Save profile picture URL
                     editor.apply();
 
                     Log.d(TAG, "Profile updated successfully in Firestore.");
                     Toast.makeText(profilePage.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
 
                     // Reload user data to reflect changes
-                    loadUserData();
+                    loadUserData(); // Load user data from Firestore
                 })
                 .addOnFailureListener(e -> {
                     // Error handling
@@ -446,23 +442,23 @@ public class profilePage extends AppCompatActivity {
     // Method to update user information
     private void updateUserInformation() {
         // Get updated name and password
-        String updatedName = editUsername.getText().toString();
-        String updatedPassword = editPassword.getText().toString();
-        String profilePicUrl = sharedPreferences.getString("ProfilePicUrl", "");
+        String updatedName = editUsername.getText().toString(); // Get updated username
+        String updatedPassword = editPassword.getText().toString(); // Get updated password
+        String profilePicUrl = sharedPreferences.getString("ProfilePicUrl", ""); // Get profile picture URL
 
         Log.d(TAG, "Updating user information with updatedName: " + updatedName + ", updatedPassword: " + updatedPassword);
 
         if (firebaseUser != null) {
             // Check if user exists
             // Get email and password of user
-            String currentEmail = firebaseUser.getEmail();
-            String currentPassword = sharedPreferences.getString("Password", "N/A");
+            String currentEmail = firebaseUser.getEmail(); // Get current email
+            String currentPassword = sharedPreferences.getString("Password", "N/A"); // Get current password
 
             if (currentEmail != null && !currentPassword.equals("N/A")) {
                 // Check if user has both email and password
                 Log.d(TAG, "Current email: " + currentEmail + ", Current password: " + currentPassword);
 
-                AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, currentPassword);
+                AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, currentPassword); // Create authentication credential
 
                 firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
                     // Reauthenticate user
@@ -557,20 +553,20 @@ public class profilePage extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int item) {
                 if (options[item].equals("Take Photo")) {
                     if (ContextCompat.checkSelfPermission(profilePage.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(profilePage.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+                        ActivityCompat.requestPermissions(profilePage.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE); // Request camera permission
                     } else {
-                        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(takePicture, CAMERA_REQUEST_CODE);
+                        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // Create intent to take a photo
+                        startActivityForResult(takePicture, CAMERA_REQUEST_CODE); // Start camera activity
                     }
                 } else if (options[item].equals("Choose from Gallery")) {
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto, PICK_IMAGE_REQUEST);
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI); // Create intent to pick an image from the gallery
+                    startActivityForResult(pickPhoto, PICK_IMAGE_REQUEST); // Start gallery activity
                 } else if (options[item].equals("Cancel")) {
-                    dialog.dismiss();
+                    dialog.dismiss(); // Dismiss dialog
                 }
             }
         });
-        builder.show();
+        builder.show(); // Show dialog
     }
 
     @Override
@@ -578,10 +574,10 @@ public class profilePage extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(takePicture, CAMERA_REQUEST_CODE);
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // Create intent to take a photo
+                startActivityForResult(takePicture, CAMERA_REQUEST_CODE); // Start camera activity
             } else {
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show(); // Show permission denied message
             }
         }
     }
@@ -591,27 +587,27 @@ public class profilePage extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == PICK_IMAGE_REQUEST) {
-                Uri selectedImage = data.getData();
-                uploadImageToFirebase(selectedImage);
+                Uri selectedImage = data.getData(); // Get selected image URI
+                uploadImageToFirebase(selectedImage); // Upload image to Firebase
             } else if (requestCode == CAMERA_REQUEST_CODE) {
-                Bitmap photo = (Bitmap) data.getExtras().get("data");
-                uploadImageToFirebase(getImageUri(this, photo));
+                Bitmap photo = (Bitmap) data.getExtras().get("data"); // Get photo bitmap
+                uploadImageToFirebase(getImageUri(this, photo)); // Upload image to Firebase
             }
         }
     }
 
     // Method to get URI from bitmap
     private Uri getImageUri(Context context, Bitmap photo) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), photo, "Title", null);
-        return Uri.parse(path);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream(); // Create ByteArrayOutputStream
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes); // Compress bitmap to JPEG
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), photo, "Title", null); // Insert image into MediaStore
+        return Uri.parse(path); // Return URI of the inserted image
     }
 
     // Method to upload image to Firebase Storage
     private void uploadImageToFirebase(Uri imageUri) {
         if (imageUri != null) {
-            StorageReference ref = storageReference.child("profile_pictures/" + userId + ".jpg");
+            StorageReference ref = storageReference.child("profile_pictures/" + userId + ".jpg"); // Get reference to profile picture in Firebase Storage
             ref.putFile(imageUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -619,9 +615,9 @@ public class profilePage extends AppCompatActivity {
                             ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
-                                    String profilePicUrl = uri.toString();
+                                    String profilePicUrl = uri.toString(); // Get profile picture URL
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString("ProfilePicUrl", profilePicUrl);
+                                    editor.putString("ProfilePicUrl", profilePicUrl); // Save profile picture URL to SharedPreferences
                                     editor.apply();
 
                                     // Update Firestore with the new profile picture URL
@@ -633,7 +629,7 @@ public class profilePage extends AppCompatActivity {
                                             .circleCrop()
                                             .into(profilePicture);
 
-                                    profilePicture.setVisibility(View.VISIBLE);
+                                    profilePicture.setVisibility(View.VISIBLE); // Show profile picture
 
                                     Toast.makeText(profilePage.this, "Profile picture uploaded successfully", Toast.LENGTH_SHORT).show();
                                 }
@@ -651,17 +647,17 @@ public class profilePage extends AppCompatActivity {
 
     // Method to authenticate user with biometric or password
     private void authenticateUser() {
-        BiometricManager biometricManager = BiometricManager.from(this);
+        BiometricManager biometricManager = BiometricManager.from(this); // Get BiometricManager instance
         switch (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL)) {
             case BiometricManager.BIOMETRIC_SUCCESS:
                 // Show biometric prompt
-                biometricPrompt.authenticate(promptInfo);
+                biometricPrompt.authenticate(promptInfo); // Authenticate using biometric prompt
                 break;
             case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
             case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
             case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
                 // Show password dialog
-                showPasswordDialog();
+                showPasswordDialog(); // Authenticate using password dialog
                 break;
         }
     }
@@ -671,25 +667,25 @@ public class profilePage extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialogTheme);
         builder.setTitle("Enter Account Password");
 
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_enter_password, null);
-        final EditText input = dialogView.findViewById(R.id.passwordInput);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_enter_password, null); // Inflate dialog view
+        final EditText input = dialogView.findViewById(R.id.passwordInput); // Get password input EditText
 
-        builder.setView(dialogView);
+        builder.setView(dialogView); // Set dialog view
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String password = input.getText().toString();
+                String password = input.getText().toString(); // Get password from EditText
                 if (password.equals(actualPassword)) {
-                    isEditMode = true;
-                    AllowEditing();
-                    saveButton.setVisibility(View.VISIBLE);
-                    deleteAccountButton.setVisibility(View.VISIBLE);
-                    feedbackbutton.setVisibility(View.INVISIBLE);
-                    logoutButton.setVisibility(View.INVISIBLE);
-                    uploadProfilePicButton.setVisibility(View.VISIBLE);
+                    isEditMode = true; // Set edit mode to true
+                    AllowEditing(); // Allow editing of user information
+                    saveButton.setVisibility(View.VISIBLE); // Show save button
+                    deleteAccountButton.setVisibility(View.VISIBLE); // Show delete button
+                    feedbackbutton.setVisibility(View.INVISIBLE); // Hide feedback button
+                    logoutButton.setVisibility(View.INVISIBLE); // Hide logout button
+                    uploadProfilePicButton.setVisibility(View.VISIBLE); // Show upload profile picture button
                 } else {
-                    Toast.makeText(profilePage.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(profilePage.this, "Incorrect password", Toast.LENGTH_SHORT).show(); // Show incorrect password message
                 }
             }
         });
@@ -697,11 +693,11 @@ public class profilePage extends AppCompatActivity {
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                dialog.cancel(); // Cancel dialog
             }
         });
 
-        builder.show();
+        builder.show(); // Show dialog
     }
 
     // Method to redirect to MainActivity if no user is authenticated
@@ -709,10 +705,10 @@ public class profilePage extends AppCompatActivity {
         if (firebaseUser == null) {
             Log.e(TAG, "No authenticated user, redirecting to login");
             // Clear SharedPreferences
-            sharedPreferences.edit().clear().apply();
-            Intent intent = new Intent(profilePage.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            sharedPreferences.edit().clear().apply(); // Clear SharedPreferences
+            Intent intent = new Intent(profilePage.this, MainActivity.class); // Create intent for MainActivity
+            startActivity(intent); // Start MainActivity
+            finish(); // Finish current activity
         }
     }
 }

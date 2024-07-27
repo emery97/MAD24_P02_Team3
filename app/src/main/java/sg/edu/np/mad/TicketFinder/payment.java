@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,23 +32,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -59,7 +52,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -81,7 +73,7 @@ public class payment extends AppCompatActivity {
     private static String TAG = "payment";
     private HashMap<String, ArrayList<String>> latestSeatMap = new HashMap<>();
     private boolean autofillUsed = false;
-    List<Integer>ticketIDs;
+    List<Integer> ticketIDs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +175,8 @@ public class payment extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        promptRetrieveCredentials();
+
+        promptRetrieveCredentials(); // Prompt user to retrieve saved credentials
 
         // Retrieve the seatMap from the intent
         Intent intent = getIntent();
@@ -199,38 +192,40 @@ public class payment extends AppCompatActivity {
     }
 
     private void promptRetrieveCredentials() {
+        // Create an alert dialog to ask the user if they want to retrieve saved card details
         android.app.AlertDialog dialog = new android.app.AlertDialog.Builder(this, R.style.CustomAlertDialogTheme)
-                .setTitle("Retrieve Saved Credentials")
-                .setMessage("Do you want to retrieve your saved card details?")
+                .setTitle("Retrieve Saved Credentials") // Set dialog title
+                .setMessage("Do you want to retrieve your saved card details?") // Set dialog message
                 .setPositiveButton(android.R.string.yes, (dialogInterface, which) -> {
-                    promptBiometricForRetrieve();
+                    promptBiometricForRetrieve(); // Prompt biometric authentication to retrieve credentials
                 })
                 .setNegativeButton(android.R.string.no, (dialogInterface, which) -> {
-                    // User chose not to retrieve saved credentials
+                    // User chose not to retrieve saved credentials, disable autofill
                     editCardNumber.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
                     editExpiry.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
                     editCVV.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
                 })
                 .create();
 
+        // Set custom styles for dialog buttons
         dialog.setOnShowListener(dialogInterface -> {
             dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
             dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.dialogButtonColor));
         });
 
-        dialog.show();
+        dialog.show(); // Show the dialog
     }
 
     // Prompt for biometric authentication before retrieving credentials
     private void promptBiometricForRetrieve() {
-        Executor executor = Executors.newSingleThreadExecutor();
+        Executor executor = Executors.newSingleThreadExecutor(); // Create a single thread executor for biometric prompt
         BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                // Use payment.this.runOnUiThread() to access runOnUiThread
+                // Use runOnUiThread to update UI elements
                 payment.this.runOnUiThread(() -> {
-                    autofillCredentials();
+                    autofillCredentials(); // Autofill credentials upon successful authentication
                 });
             }
 
@@ -247,25 +242,26 @@ public class payment extends AppCompatActivity {
             }
         });
 
+        // Create prompt info for biometric authentication
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric login for my app")
-                .setSubtitle("Log in using your biometric credential to retrieve saved credentials")
+                .setTitle("Biometric login for my app") // Set title for biometric prompt
+                .setSubtitle("Log in using your biometric credential to retrieve saved credentials") // Set subtitle for biometric prompt
                 .setDeviceCredentialAllowed(true) // Allow using device credentials (PIN, pattern, password)
                 .build();
 
-        biometricPrompt.authenticate(promptInfo);
+        biometricPrompt.authenticate(promptInfo); // Authenticate using biometric prompt
     }
 
     // Autofill credentials after biometric authentication succeeds
     private void autofillCredentials() {
-        AutofillManager autofillManager = this.getSystemService(AutofillManager.class);
+        AutofillManager autofillManager = this.getSystemService(AutofillManager.class); // Get AutofillManager instance
         if (autofillManager != null) {
-            editCardNumber.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
-            editExpiry.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
-            editCVV.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES);
-            autofillManager.requestAutofill(editCardNumber);
-            autofillManager.requestAutofill(editExpiry);
-            autofillManager.requestAutofill(editCVV);
+            editCardNumber.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES); // Enable autofill for card number
+            editExpiry.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES); // Enable autofill for expiry date
+            editCVV.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_YES); // Enable autofill for CVV
+            autofillManager.requestAutofill(editCardNumber); // Request autofill for card number
+            autofillManager.requestAutofill(editExpiry); // Request autofill for expiry date
+            autofillManager.requestAutofill(editCVV); // Request autofill for CVV
             autofillUsed = true; // Set autofill used to true
         }
     }
@@ -286,13 +282,13 @@ public class payment extends AppCompatActivity {
         }
 
         // Validate expiry date
-        if (expiry.length() != 5){
+        if (expiry.length() != 5) {
             Toast.makeText(payment.this, "Input valid date", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // Validate CVV
-        if (cvv.length() != 3){
+        if (cvv.length() != 3) {
             Toast.makeText(payment.this, "Invalid CVV Input", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -315,7 +311,7 @@ public class payment extends AppCompatActivity {
         new Handler().postDelayed(this::connectToGoogleCalendar, 1000); // Wait for 1 second before displaying the alert message
 
         // Show confirmation dialog
-        //new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
+        // new Handler().postDelayed(this::showConfirmationDialog, 1000); // Wait for 1 second before displaying the alert message
     }
 
 //    private void postBookingDetailsToFirestore() {
@@ -472,7 +468,6 @@ public class payment extends AppCompatActivity {
         postBookingDetailsToFirestore(ticketIDs, userId, name, concertName, time);
     }
 
-
     private void postBookingDetailsToFirestore(List<Integer> ticketIDs, String userId, String name, String concertName, String time) {
         // Get booking details from intent
         sharedPreferences = getSharedPreferences("TicketFinderPrefs", Context.MODE_PRIVATE);
@@ -501,7 +496,6 @@ public class payment extends AppCompatActivity {
                     Toast.makeText(payment.this, "Error saving booking details", Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     // ASK IF THEY WANT TO CONNECT TO GOOGLE CALENDAR
     private void connectToGoogleCalendar() {
@@ -709,7 +703,7 @@ public class payment extends AppCompatActivity {
         finish();
     }
 
-    private void navigateToFeedback(){
+    private void navigateToFeedback() {
         Intent intent = new Intent(payment.this, Feedback.class);
         startActivity(intent);
         finish();
