@@ -351,46 +351,59 @@ Speech recognition capabilities have been integrated into the app to enhance acc
 - Provides a smooth and engaging user experience with clear and concise responses.
 
 ## Add Event to Calendar [Lee WEI YING]
-- **Google Calendar Integration**:
-  - Users can choose to add their event to Google Calendar after payment.
-  - Requires login to their Google account.
-  - Redirects users to the Google Calendar app where concert details such as location, event title, and time are autofilled.
 
-## Upcoming Concert Page
+### Google Calendar Integration
+- Allows users to add their event to Google Calendar after payment.
+- Requires users to log in to their Google account.
+- Redirects users to the Google Calendar app, where concert details such as location, event title, and time are automatically filled in.
 
-- **User-Friendly Interface**:
-  - Provides an intuitive interface for users to filter and view their upcoming concerts.
-  
-- **Nested Adapters for Tickets**:
-  - Displays tickets using nested adapters for easy management and viewing.
+## Upcoming Concert Page [Lee WEI YING]
 
-- **Transfer Tickets Button**:
-  - Includes a button for users to transfer tickets to friends.
+### User-Friendly Interface
+- Provides an intuitive interface for users to filter and view their upcoming concerts.
 
-- **Dynamic Concert Management**:
-  - **Remove Concerts**:
-    - Automatically removes concerts from the list if no tickets are available.
-  - **Add New Concerts**:
-    - Adds new concerts to the adapter if they are newly available.
-  - **Update Existing Concerts**:
-    - Updates the details of existing concerts in the adapter if they were already listed.
+### Nested Adapters for Tickets
+- Utilizes nested adapters to manage and display tickets effectively.
 
+### Transfer Tickets Button
+- Features a button enabling users to transfer tickets to friends.
 
-## Transfer Tickets  [Lee WEI YING]
-- **Ticket Transfer**:
-  - Allows users to transfer tickets to friends from a list of their contacts.
-  - Users can select specific tickets to transfer.
+### Dynamic Concert Management
+- **Remove Concerts**:
+  - Automatically removes concerts from the list if no tickets are available.
+- **Add New Concerts**:
+  - Adds new concerts to the adapter if they become available.
+- **Update Existing Concerts**:
+  - Updates the details of concerts in the adapter if they were previously listed.
 
-## Add Friend  [Lee WEI YING]
-- **Add Friend Interface**:
-  - Provides an easy-to-use interface for adding friends.
-  - Includes a search container for finding friends by name.
+## User-Friendly Payment Page [Lee WEI YING]
 
-## Unfriend Friend  [Lee WEI YING]
-- **Unfriend Interface**:
-  - Allows users to unfriend individuals through a user-friendly interface.
-  - Includes a search container to find their friends by name.
+### Quantity Entry Requirement
+- Requires users to enter the desired quantity of tickets before selecting seat category and seat number.
 
+### Dynamic Seat Selection
+- Displays the corresponding number of seat selection adapters after entering the desired quantity, allowing users to specify seat category and seat number.
+
+### Conditional Book Button
+- The "Book" button appears only after all required fields (quantity, seat category, and seat number) have been filled in, ensuring users complete all necessary selections.
+
+## Transfer Tickets [Lee WEI YING]
+
+### Ticket Transfer
+- Enables users to transfer tickets to friends from a list of their contacts.
+- Users can select specific tickets to transfer.
+
+## Add Friend [Lee WEI YING]
+
+### Add Friend Interface
+- Provides an easy-to-use interface for adding friends.
+- Includes a search container to find friends by name.
+
+## Unfriend Friend [Lee WEI YING]
+
+### Unfriend Interface
+- Allows users to unfriend individuals through a user-friendly interface.
+- Features a search container to find friends by name.
     
 ## Implement weather forecast API for dates of events [KOH YE CHYANG]
 ### 4 Day Weather Forecast & 2-Hour Weather Forecast
