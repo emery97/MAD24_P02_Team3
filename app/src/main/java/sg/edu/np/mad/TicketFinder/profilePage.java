@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +61,8 @@ public class profilePage extends AppCompatActivity {
     private ImageView editingIcon, profilePicture; // ImageView components for editing icon and profile picture
     private CheckBox showPassword; // CheckBox component for toggling password visibility
     private Button saveButton, logoutButton, feedbackbutton, deleteAccountButton, uploadProfilePicButton; // Button components for various actions
+    private ImageButton forumButton; // ImageButton for navigating to ForumPage
+
     private String actualPassword; // String to store the actual password
     private SharedPreferences sharedPreferences; // SharedPreferences for storing user data
     private FirebaseFirestore db; // Firestore database instance
@@ -100,6 +103,7 @@ public class profilePage extends AppCompatActivity {
         feedbackbutton = findViewById(R.id.Viewfeedbackbtn); // Initialize Button for viewing feedback
         deleteAccountButton = findViewById(R.id.deleteAccountButton); // Initialize Button for deleting account
         uploadProfilePicButton = findViewById(R.id.uploadProfilePicButton); // Initialize Button for uploading profile picture
+        forumButton = findViewById(R.id.forumButton); // Initialize ImageButton for navigating to ForumPage
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE); // Get SharedPreferences instance
@@ -199,7 +203,15 @@ public class profilePage extends AppCompatActivity {
                 showImageOptions(); // Show options for uploading profile picture
             }
         });
-
+        // OnClickListener for forum button
+        forumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to ForumPage
+                Intent intent = new Intent(profilePage.this, ForumPage.class);
+                startActivity(intent);
+            }
+        });
         // Initialize biometric prompt
         executor = ContextCompat.getMainExecutor(this); // Get executor for biometric authentication
         biometricPrompt = new BiometricPrompt(profilePage.this, executor, new BiometricPrompt.AuthenticationCallback() {

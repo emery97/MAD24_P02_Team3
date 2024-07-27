@@ -10,7 +10,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/forumButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -243,9 +243,27 @@
                     android:text="View Feedback"
                     android:textColor="@color/white"
                     android:textSize="16sp"/>
+
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
+
+    <ImageButton
+        android:id="@+id/forumButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@null"
+        android:src="@drawable/baseline_forum_24"
+        android:contentDescription="Forum Button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.93"
+        app:layout_constraintHorizontal_bias="0.96" />
 
     <include
         android:id="@+id/footer"
