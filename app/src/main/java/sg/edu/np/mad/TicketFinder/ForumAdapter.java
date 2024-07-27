@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -122,20 +123,35 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         this.forumList = filteredList;
         notifyDataSetChanged();
     }
+    private String getUserId(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("UserId", null); // Default to null if not found
+    }
 
-    public void onDeleteClicked(int position) {
+    public void onDeleteClicked(int position, Context context) {
         Forum forumToRemove = forumList.get(position);
-        String documentId = forumToRemove.getDocumentId();
+        String postUserId = forumToRemove.getUserId(); // Assume `Forum` has a `getUserId` method
 
-        // Delete from Firestore
-        db.collection("Forum").document(documentId)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("ForumAdapter", "DocumentSnapshot successfully deleted!");
-                    forumList.remove(position);
-                    notifyItemRemoved(position);
-                })
-                .addOnFailureListener(e -> Log.w("ForumAdapter", "Error deleting document", e));
+        // Retrieve current user's ID from SharedPreferences
+        String currentUserId = getUserId(context);
+
+        if (currentUserId != null && currentUserId.equals(postUserId)) {
+            // User is allowed to delete the post
+            String documentId = forumToRemove.getDocumentId();
+
+            // Delete from Firestore
+            db.collection("Forum").document(documentId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("ForumAdapter", "DocumentSnapshot successfully deleted!");
+                        forumList.remove(position);
+                        notifyItemRemoved(position);
+                    })
+                    .addOnFailureListener(e -> Log.w("ForumAdapter", "Error deleting document", e));
+        } else {
+            // User is not allowed to delete the post
+            Toast.makeText(context, "You can only delete your own posts.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onEditClicked(int position) {

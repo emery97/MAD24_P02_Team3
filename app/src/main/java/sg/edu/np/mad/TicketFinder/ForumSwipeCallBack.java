@@ -3,6 +3,7 @@ package sg.edu.np.mad.TicketFinder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -222,7 +223,7 @@ public class ForumSwipeCallBack extends ItemTouchHelper.SimpleCallback {
                 .setMessage("Are you sure you want to delete this item?")
                 .setPositiveButton("Yes", (dialog, which) -> {
                     // Handle deletion logic here
-                    mAdapter.onDeleteClicked(position);
+                    mAdapter.onDeleteClicked(position,context);
                 })
                 .setNegativeButton("No", (dialog, which) -> {
                     // Reset the item view if deletion is cancelled
@@ -232,6 +233,19 @@ public class ForumSwipeCallBack extends ItemTouchHelper.SimpleCallback {
     }
 
     private void handleEditAction(Context context, int position) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        String currentUserId = sharedPreferences.getString("UserId", null);
+
+        if (currentUserId == null) {
+            Toast.makeText(context, "You need to be logged in to edit posts.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Forum forumToEdit = mAdapter.getForumList().get(position);
+
+        if (!forumToEdit.getUserId().equals(currentUserId)) {
+            Toast.makeText(context, "You can only edit your own posts.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         // Inflate the dialog view
         LayoutInflater inflater = LayoutInflater.from(context);
         View dialogView = inflater.inflate(R.layout.dialog_edit_forum, null);
@@ -249,7 +263,7 @@ public class ForumSwipeCallBack extends ItemTouchHelper.SimpleCallback {
         dialog.show();
 
         // Load current forum data into the dialog
-        Forum forumToEdit = mAdapter.getForumList().get(position);
+//        Forum forumToEdit = mAdapter.getForumList().get(position);
         messageEditText.setText(forumToEdit.getMessage());
 
         ForumImageAdapter imageAdapter = new ForumImageAdapter(forumToEdit.getImageUrls());
