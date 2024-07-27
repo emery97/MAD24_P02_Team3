@@ -349,11 +349,34 @@ Speech recognition capabilities have been integrated into the app to enhance acc
 ### User-Friendly Interface
 - Features an intuitive and easy-to-navigate user interface.
 - Provides a smooth and engaging user experience with clear and concise responses.
-    
-## Add event to calendar app [WEIYING]
-- **xxxxx**:
-  - xxxxx
-  - xxxxx
+
+## Add Event to Calendar [Lee WEI YING]
+- **Google Calendar Integration**:
+  - Users can choose to add their event to Google Calendar after payment.
+  - Requires login to their Google account.
+  - Redirects users to the Google Calendar app where concert details such as location, event title, and time are autofilled.
+
+## Upcoming Concert Page  [Lee WEI YING]
+- **User-Friendly Interface**:
+  - Provides a clean and intuitive interface for users to filter upcoming concerts.
+  - Features nested adapters to display tickets.
+  - Includes a "Transfer Tickets" button.
+
+## Transfer Tickets  [Lee WEI YING]
+- **Ticket Transfer**:
+  - Allows users to transfer tickets to friends from a list of their contacts.
+  - Users can select specific tickets to transfer.
+
+## Add Friend  [Lee WEI YING]
+- **Add Friend Interface**:
+  - Provides an easy-to-use interface for adding friends.
+  - Includes a search container for finding friends by name.
+
+## Unfriend Friend  [Lee WEI YING]
+- **Unfriend Interface**:
+  - Allows users to unfriend individuals through a user-friendly interface.
+  - Includes a search container to find friends by name.
+
     
 ## Implement weather forecast API for dates of events [KOH YE CHYANG]
 ### 4 Day Weather Forecast & 2-Hour Weather Forecast
