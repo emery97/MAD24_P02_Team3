@@ -3,20 +3,7 @@
   <component name="deploymentTargetDropDown">
     <value>
       <entry key="BookingHistoryDetails">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="RFCT51MA73H" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-27T13:36:01.837346100Z" />
-        </State>
+        <State />
       </entry>
       <entry key="ForumPage">
         <State>
@@ -31,7 +18,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-07-27T13:38:51.765582400Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-07-27T18:05:00.282615900Z" />
         </State>
       </entry>
       <entry key="app">

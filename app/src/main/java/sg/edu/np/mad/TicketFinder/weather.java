@@ -207,6 +207,7 @@ public class weather extends AppCompatActivity {
     private int removedPosition;
     private String removedItemId;
 
+    // Swipe left and drag and drop for the reminders
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN |
             ItemTouchHelper.START | ItemTouchHelper.END, ItemTouchHelper.LEFT) {
 
@@ -280,6 +281,7 @@ public class weather extends AppCompatActivity {
     };
 
 
+    // 4 hour weather forecast fetching
     private void fetchWeatherData() {
         OkHttpClient client = new OkHttpClient();
 
@@ -311,6 +313,7 @@ public class weather extends AppCompatActivity {
         });
     }
 
+    // 2 hour weather forecast data
     private void fetch2HourWeatherData(int page) {
         showLoading();
         OkHttpClient client = new OkHttpClient();
@@ -351,6 +354,7 @@ public class weather extends AppCompatActivity {
         });
     }
 
+    // Parsing 4 day weather forecast
     private void parseWeatherData(String responseData) {
         try {
             JSONObject json = new JSONObject(responseData);
@@ -420,6 +424,7 @@ public class weather extends AppCompatActivity {
         }
     }
 
+    // Parsing 2 hour weather forecast
     private void parse2HourWeatherData(String responseData, int page) {
         try {
             JSONObject json = new JSONObject(responseData);
@@ -497,6 +502,7 @@ public class weather extends AppCompatActivity {
         return dateFormat.format(date);
     }
 
+    // Datetime picker dialog display for user to select date and time
     private void showTimePickerDialog() {
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -526,6 +532,7 @@ public class weather extends AppCompatActivity {
         timePickerDialog.show();
     }
 
+    // Schedules daily notification
     private void scheduleDailyNotification(Context context) {
         Log.d(TAG, "Scheduling daily weather notification");
 

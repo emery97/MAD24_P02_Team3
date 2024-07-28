@@ -115,6 +115,7 @@ public class ForumSwipeCallBack extends ItemTouchHelper.SimpleCallback {
         }
     }
 
+    // Drawing the delete and edit buttons
     private void drawButtons(Canvas c, View itemView, float dX) {
         float buttonWidth = itemView.getWidth() / 5;
         float buttonHeight = itemView.getHeight() / 1.3f; // Reduced height for shorter buttons
@@ -232,6 +233,7 @@ public class ForumSwipeCallBack extends ItemTouchHelper.SimpleCallback {
                 .show();
     }
 
+    // The edit button functionality
     private void handleEditAction(Context context, int position) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String currentUserId = sharedPreferences.getString("UserId", null);

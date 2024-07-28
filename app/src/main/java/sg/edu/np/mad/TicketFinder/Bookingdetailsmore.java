@@ -191,6 +191,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         });
     }
 
+    // Method to create a notification channel for Android O and above
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Event Notifications";
@@ -202,7 +203,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
-
+    // Sending Notification
     private void sendNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.app_logo) // Replace with your notification icon
@@ -213,7 +214,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
-
+    // Checking date within 4 days
     private boolean isEventDateWithinNextFourDays(String eventDate) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -234,6 +235,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         return false;
     }
 
+    // Getting data from 4 day weather forecast
     private void fetchWeatherData(String eventDate) {
         OkHttpClient client = new OkHttpClient();
         String url = "https://api.data.gov.sg/v1/environment/4-day-weather-forecast";
@@ -329,6 +331,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         });
     }
 
+    // Datetime picker for the notification
     private void showDateTimePickerDialog(String eventIdentifier) {
         Calendar calendar = Calendar.getInstance();
 
@@ -436,6 +439,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         timePickerDialog.show();
     }
 
+    // Scheduling the notification with all the information
     private void scheduleNotification(String eventIdentifier, Calendar calendar) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, EventWeatherNotification.class);
@@ -514,6 +518,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         switchNotification.setChecked(false);
     }
 
+    // Countdown timer
     private void calculateCountdown(String eventDate) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
         try {
@@ -557,6 +562,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         }
     }
 
+    // Stopping countdown
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -586,6 +592,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
         dialog.show();
     }
 
+    // Saving the reminder to below the reminder text
     private void saveReminder(String reminderText) {
         remindersList.add(reminderText);
 
@@ -747,6 +754,7 @@ public class Bookingdetailsmore extends AppCompatActivity {
     }
 
 
+    // Passing details for QR codes as JSON
     public void generateQRCodeOnClick(View view) {
         // Create event details JSON object
         JSONObject eventDetailsJson = new JSONObject();

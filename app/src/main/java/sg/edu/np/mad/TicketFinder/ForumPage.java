@@ -161,6 +161,7 @@ public class ForumPage extends AppCompatActivity {
 
         setupRealTimeListener();
 
+        // Sending forum to database
         iconButton.setOnClickListener(v -> {
             if (selectedEvent == null || selectedEvent.equals("Select an event")) {
                 Toast.makeText(ForumPage.this, "Please select an event from the dropdown", Toast.LENGTH_SHORT).show();
@@ -263,6 +264,7 @@ public class ForumPage extends AppCompatActivity {
         eventSpinner.setAdapter(adapter);
     }
 
+    //Getting all the events for the dropdown/spinner
     private void fetchEventNames() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Events").get()
@@ -314,6 +316,7 @@ public class ForumPage extends AppCompatActivity {
         return x > left && x < right && y > top && y < bottom;
     }
 
+    // Animation
     private void fadeInView(View view) {
         view.setAlpha(0f);
         view.setVisibility(View.VISIBLE);
@@ -323,6 +326,7 @@ public class ForumPage extends AppCompatActivity {
                 .setListener(null);
     }
 
+    // Animation
     private void fadeOutView(View view) {
         view.animate()
                 .alpha(0f)
@@ -335,6 +339,7 @@ public class ForumPage extends AppCompatActivity {
                 });
     }
 
+    // Real time listener for forum posts
     private void setupRealTimeListener() {
         forumListener = db.collection("Forum")
                 .orderBy("timestamp")
@@ -379,6 +384,7 @@ public class ForumPage extends AppCompatActivity {
     }
 
 
+    // Getting profile picture for all users from database
     private void fetchProfilePicUrl(String userIdString) {
         if (userIdString == null || userIdString.isEmpty()) {
             Log.d("Firestore", "User ID is null or empty");
@@ -470,7 +476,7 @@ public class ForumPage extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        // Image selector
         if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK && data != null) {
             if (data.getClipData() != null) {
                 // Multiple images selected

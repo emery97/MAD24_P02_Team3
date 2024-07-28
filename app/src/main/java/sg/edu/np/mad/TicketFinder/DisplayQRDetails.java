@@ -137,6 +137,7 @@ public class DisplayQRDetails extends AppCompatActivity {
         });
     }
 
+    // Checks QR Code validity
     private void checkQrCodeUsageStatus(String qrCodeData) {
         db.collection("QrCodes")
                 .whereEqualTo("data", qrCodeData)
@@ -184,6 +185,7 @@ public class DisplayQRDetails extends AppCompatActivity {
     }
 
 
+    // Displays all the QR code information
     private void displayEventDetails() {
         // Continue displaying event details here
         try {
@@ -280,6 +282,7 @@ public class DisplayQRDetails extends AppCompatActivity {
                 });
     }
 
+    // Updating the QR Code status
     private void updateQrCodeStatus(String status) {
         db.collection("QrCodes")
                 .whereEqualTo("data", qrCodeData)

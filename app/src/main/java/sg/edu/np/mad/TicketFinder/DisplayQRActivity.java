@@ -107,6 +107,7 @@ public class DisplayQRActivity extends AppCompatActivity {
         }
     }
 
+    // Live listener for the status
     private void startListeningForStatusChanges() {
         qrCodeListener = db.collection("QrCodes")
                 .document(qrCodeDocumentId)

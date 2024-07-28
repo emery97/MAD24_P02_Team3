@@ -90,11 +90,11 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         }
 
         final int scrollAmount = 200; // Adjust this value based on your needs
-
+        // left scroll
         holder.arrowLeft.setOnClickListener(v -> {
             holder.imagesRecyclerView.smoothScrollBy(-scrollAmount, 0);
         });
-
+        // Right scroll
         holder.arrowRight.setOnClickListener(v -> {
             holder.imagesRecyclerView.smoothScrollBy(scrollAmount, 0);
         });
@@ -128,6 +128,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ForumViewHol
         return sharedPreferences.getString("UserId", null); // Default to null if not found
     }
 
+    // Deleting data from database and recyclerview
     public void onDeleteClicked(int position, Context context) {
         Forum forumToRemove = forumList.get(position);
         String postUserId = forumToRemove.getUserId(); // Assume `Forum` has a `getUserId` method
